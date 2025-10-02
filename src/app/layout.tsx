@@ -6,10 +6,6 @@ import { cn } from "@/lib/utils";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
-const portfolioData = {
-	name: "Pavin",
-};
-
 const useTheme = () => {
 	const [isDarkMode, setIsDarkMode] = useState(() => {
 		if (typeof window !== "undefined") {
@@ -49,13 +45,9 @@ export default function RootLayout({
 	return (
 		<html lang="en" className={cn("min-h-screen", isDarkMode ? "dark" : "")}>
 			<body className="antialiased min-h-screen bg-background text-foreground transition-colors duration-500">
-				<Header
-					isDarkMode={isDarkMode}
-					toggleDarkMode={toggleDarkMode}
-					portfolioData={portfolioData}
-				/>
+				<Header isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
 				<main>{children}</main>
-				<Footer portfolioData={portfolioData} />
+				<Footer />
 			</body>
 		</html>
 	);

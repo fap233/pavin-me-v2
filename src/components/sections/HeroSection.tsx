@@ -18,11 +18,11 @@ const HeroSection = () => (
 		<div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
 			<div className="flex flex-col items-center text-center">
 				<h1 className="text-6xl font-extrabold tracking-tighter sm:text-7xl md:text-8xl lg:text-9xl mb-4">
-					Hello, I am
+					Hello, I am&nbsp;
 					<span className="text-gradient-hero inline-block">
 						{portfolioData.name}
 					</span>
-					.
+					.dev
 				</h1>
 				<p className="max-w-4xl text-2xl md:text-3xl text-muted-foreground mb-8 font-light">
 					{portfolioData.title}
