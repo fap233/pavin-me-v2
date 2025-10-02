@@ -5,6 +5,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
 
 const useTheme = () => {
 	const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -45,6 +46,7 @@ export default function RootLayout({
 	return (
 		<html lang="en" className={cn("min-h-screen", isDarkMode ? "dark" : "")}>
 			<body className="antialiased min-h-screen bg-background text-foreground transition-colors duration-500">
+				<GoogleAnalytics />
 				<Header isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
 				<main>{children}</main>
 				<Footer />
