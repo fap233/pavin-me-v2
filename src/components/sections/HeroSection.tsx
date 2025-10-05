@@ -11,7 +11,7 @@ const portfolioData = {
 const HeroSection = () => (
 	<section
 		id="hero"
-		className="py-24 md:py-40 bg-background relative overflow-hidden bg-grid-pattern"
+		className="py-24 md:py-40 relative overflow-hidden bg-grid-pattern"
 	>
 		<div className="absolute inset-0 bg-gradient-hero opacity-30 dark:opacity-20 z-0 pointer-events-none"></div>
 

@@ -76,6 +76,8 @@
 	--sidebar-accent-foreground: oklch(0.205 0 0);
 	--sidebar-border: oklch(0.922 0 0);
 	--sidebar-ring: oklch(0.708 0 0);
+
+	--grid-line-color: oklch(0.922 0 0 / 0.5);
 }
 
 .dark {
@@ -94,7 +96,7 @@
 	--accent: oklch(0.269 0 0);
 	--accent-foreground: oklch(0.985 0 0);
 	--destructive: oklch(0.704 0.191 22.216);
-	--border: oklch(1 0 0 / 10%);
+	--border: oklch(1 0 0 / 20%);
 	--input: oklch(1 0 0 / 15%);
 	--ring: oklch(0.556 0 0);
 	--chart-1: oklch(0.488 0.243 264.376);
@@ -110,6 +112,7 @@
 	--sidebar-accent-foreground: oklch(0.985 0 0);
 	--sidebar-border: oklch(1 0 0 / 10%);
 	--sidebar-ring: oklch(0.556 0 0);
+	--grid-line-color: oklch(1 0 0 / 0.1);
 }
 
 @layer base {
@@ -119,37 +122,36 @@
 	body {
 		@apply bg-background text-foreground;
 	}
+
+	.bg-grid-pattern {
+		background-color: oklch(var(--background));
+		background-image:
+			linear-gradient(to right, var(--grid-line-color) 1px, transparent 1px),
+			linear-gradient(to bottom, var(--grid-line-color) 1px, transparent 1px);
+		background-size: 25px 25px;
+	}
+
+	.bg-gradient-hero {
+		background: radial-gradient(
+			circle at 50% -20%,
+			oklch(var(--primary) / 0.15),
+			transparent 50%
+		);
+	}
+
+	.text-gradient-hero {
+		background-image: linear-gradient(
+			to right,
+			hsl(320 80% 55%),
+			hsl(270 70% 60%),
+			hsl(240 80% 65%)
+		);
+		color: transparent;
+		-webkit-background-clip: text;
+		background-clip: text;
+	}
 }
 
 body {
 	font-family: "Inter", sans-serif;
-}
-
-.bg-grid-pattern {
-	background-color: oklch(var(--background));
-	background-image:
-		linear-gradient(to right, oklch(var(--border) / 0.5) 1px, transparent 1px),
-		linear-gradient(to bottom, oklch(var(--border) / 0.5) 1px, transparent 1px);
-	background-size: 25px 25px;
-}
-
-.bg-gradient-hero {
-	background: radial-gradient(
-		circle at 50% -
-		20%,
-		oklch(var(--primary) / 0.15),
-		transparent 50%
-	);
-}
-
-.text-gradient-hero {
-	background-image: linear-gradient(
-		to right,
-		hsl(320 80% 55%),
-		hsl(270 70% 60%),
-		hsl(240 80% 65%)
-	);
-	color: transparent;
-	-webkit-background-clip: text;
-	background-clip: text;
 }
