@@ -44,6 +44,23 @@ const portfolioData = {
 				"CSRF",
 			],
 		},
+		{
+			id: 4,
+			title: "instagram-clone",
+			description:
+				"A full-stack Instagram clone application that allows users to share photos, and interact with posts using firebase on backend.",
+			tags: [
+				"React.js",
+				"Firebase",
+				"Firebase Authentication",
+				"Firestore",
+				"Firebase Storage",
+				"CSS",
+				"Create React App",
+				"Jest",
+				"React Testing Library",
+			],
+		},
 	],
 	contact: {
 		github: "https://github.com/fap233",
