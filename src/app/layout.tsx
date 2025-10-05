@@ -1,39 +1,14 @@
-"use client";
-
-import React, { useCallback, useEffect, useState } from "react";
+import React from "react";
 import "./globals.css";
-import { cn } from "@/lib/utils";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
+
 import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
+import Providers from "@/components/providers";
+import { Metadata } from "next";
 
-const useTheme = () => {
-	const [isDarkMode, setIsDarkMode] = useState(() => {
-		if (typeof window !== "undefined") {
-			const savedTheme = localStorage.getItem("theme");
-			if (savedTheme === "dark") return true;
-			if (savedTheme === "light") return false;
-			return window.matchMedia("(prefers-color-scheme: dark)").matches;
-		}
-		return true;
-	});
-
-	useEffect(() => {
-		const root = window.document.documentElement;
-		if (isDarkMode) {
-			root.classList.add("dark");
-			localStorage.setItem("theme", "dark");
-		} else {
-			root.classList.remove("dark");
-			localStorage.setItem("theme", "light");
-		}
-	}, [isDarkMode]);
-
-	const toggleDarkMode = useCallback(() => {
-		setIsDarkMode((prev) => !prev);
-	}, []);
-
-	return { isDarkMode, toggleDarkMode };
+export const metadata: Metadata = {
+	title: "Pavin.me - Fullstack Developer",
+	description:
+		"Personal Fellipe Pavin portfolio, a Fullstack Developer specialized in React, Node.js, and cloud technologies.",
 };
 
 export default function RootLayout({
@@ -41,15 +16,11 @@ export default function RootLayout({
 }: {
 	children: React.ReactNode;
 }) {
-	const { isDarkMode, toggleDarkMode } = useTheme();
-
 	return (
-		<html lang="en" className={cn("min-h-screen", isDarkMode ? "dark" : "")}>
+		<html lang="en">
 			<body className="antialiased min-h-screen bg-background text-foreground transition-colors duration-500">
 				<GoogleAnalytics />
-				<Header isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
-				<main>{children}</main>
-				<Footer />
+				<Providers>{children}</Providers>
 			</body>
 		</html>
 	);
