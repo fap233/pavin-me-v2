@@ -22,23 +22,13 @@ const socialLinks = [
 		icon: <Github className="h-6 w-6" />,
 	},
 	{
-		href: contactData.instagram,
-		label: "Instagram",
-		icon: <Instagram className="h-6 w-6" />,
-	},
-	{
 		href: `mailto:${contactData.email}`,
 		label: "Email",
 		icon: <Mail className="h-6 w-6" />,
 	},
-	{
-		href: contactData.x,
-		label: "X",
-		icon: <Twitter className="h-6 w-6" />,
-	},
 ];
 
-const ContractSection = () => {
+const ContactSection = () => {
 	return (
 		<section id="contact" className="py-20 md:py-32 bg-background border-t">
 			<div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -82,4 +72,4 @@ const ContractSection = () => {
 	);
 };
 
-export default ContractSection;
+export default ContactSection;

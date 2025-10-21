@@ -4,7 +4,7 @@ import React from "react";
 import HeroSection from "@/components/sections/HeroSection";
 import AboutSection from "@/components/sections/AboutSection";
 import ProjectsSection from "@/components/sections/ProjectsSection";
-import ContractSection from "@/components/sections/ContactSection";
+import ContactSection from "@/components/sections/ContactSection";
 
 export default function Home() {
 	return (
@@ -12,7 +12,7 @@ export default function Home() {
 			<HeroSection />
 			<AboutSection />
 			<ProjectsSection />
-			<ContractSection />
+			<ContactSection />
 		</>
 	);
 }
