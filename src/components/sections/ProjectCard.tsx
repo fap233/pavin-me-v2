@@ -2,40 +2,82 @@ import React from "react";
 import {
 	Card,
 	CardContent,
-	CardDescription,
+	CardFooter,
 	CardHeader,
 	CardTitle,
-} from "../ui/card";
-import { Badge } from "../ui/badge";
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Github, ExternalLink } from "lucide-react";
 
-interface Project {
-	id: number;
+interface ProjectCardProps {
 	title: string;
 	description: string;
 	tags: string[];
+	githubUrl?: string;
+	liveUrl?: string;
+	featured?: boolean;
 }
 
-interface ProjectCardProps {
-	project: Project;
-}
-
-const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => (
-	<Card className="flex flex-col justify-between p-6 h-full transition-all duration-300 hover:scale-[1.02] hover:shadow-primary/30 dark:hover:shadow-primary/50">
-		<div>
+export default function ProjectCard({
+	title,
+	description,
+	tags,
+	githubUrl,
+	liveUrl,
+	featured,
+}: ProjectCardProps) {
+	return (
+		<Card
+			className={`flex flex-col h-full transition-all hover:shadow-md ${featured ? "border-primary/50" : ""}`}
+		>
 			<CardHeader>
-				<CardTitle className="text-2xl font-semibold mb-3">
-					{project.title}
-				</CardTitle>
-
-				<CardDescription>{project.description}</CardDescription>
+				<div className="flex justify-between items-start gap-2">
+					<CardTitle className="text-2xl font-semibold mb-3">
+						{title} {/* Correção: Usamos title direto, não project.title */}
+					</CardTitle>
+					{featured && (
+						<Badge
+							variant="default"
+							className="bg-primary/20 text-primary hover:bg-primary/30 border-none"
+						>
+							Featured
+						</Badge>
+					)}
+				</div>
 			</CardHeader>
-		</div>
-		<CardContent className="flex flex-wrap gap-2 mt-4">
-			{project.tags.map((tag) => (
-				<Badge key={tag}>{tag}</Badge>
-			))}
-		</CardContent>
-	</Card>
-);
-
-export default ProjectCard;
+			<CardContent className="flex-grow space-y-4">
+				<p className="text-muted-foreground text-sm leading-relaxed">
+					{description}
+				</p>
+				<div className="flex flex-wrap gap-2">
+					{tags.map((tag) => (
+						<Badge
+							key={tag}
+							variant="secondary"
+							className="text-xs font-normal"
+						>
+							{tag}
+						</Badge>
+					))}
+				</div>
+			</CardContent>
+			<CardFooter className="gap-2 pt-2">
+				{githubUrl && (
+					<Button variant="outline" size="sm" className="w-full gap-2" asChild>
+						<a href={githubUrl} target="_blank" rel="noopener noreferrer">
+							<Github className="h-4 w-4" /> Code
+						</a>
+					</Button>
+				)}
+				{liveUrl && liveUrl !== "#" && (
+					<Button size="sm" className="w-full gap-2" asChild>
+						<a href={liveUrl} target="_blank" rel="noopener noreferrer">
+							<ExternalLink className="h-4 w-4" /> Demo
+						</a>
+					</Button>
+				)}
+			</CardFooter>
+		</Card>
+	);
+}

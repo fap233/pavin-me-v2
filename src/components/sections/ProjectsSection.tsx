@@ -1,103 +1,73 @@
-import { Briefcase, Github } from "lucide-react";
-import ProjectCard from "./ProjectCard";
-import { Button } from "../ui/button";
+"use client";
 
-const portfolioData = {
-	projects: [
-		{
-			id: 1,
-			title: "pavin-me-v2",
-			description:
-				"My personal portfolio built with the latest web technologies, including TypeScript and the components library shadcn/ui.",
-			tags: ["Next.js", "TypeScript", "shadcn/ui", "Tailwind CSS"],
-		},
-		{
-			id: 2,
-			title: "To-do DApp",
-			description:
-				"A decentralized to-do application that allows users to manage their tasks securely on the blockchain showing my habilities with smart contracts creation with Solidity.",
-			tags: [
-				"React",
-				"TypeScript",
-				"Solidity",
-				"Ethereum",
-				"Smart contracts",
-				"Blockchain",
-			],
-		},
-		{
-			id: 3,
-			title: "HydraSMM",
-			description:
-				"A SMM e-commerce plataform using my experiences on SEO, Social Media and Web Development",
-			tags: [
-				"E-commerce",
-				"Next.js",
-				"TypeScript",
-				"Tailwind CSS",
-				"Node.js",
-				"Express",
-				"PostgreSQL",
-				"Prisma",
-				"JWT",
-				"HttpOnly",
-				"CSRF",
-			],
-		},
-		{
-			id: 4,
-			title: "instagram-clone",
-			description:
-				"A full-stack Instagram clone application that allows users to share photos, and interact with posts using firebase on backend.",
-			tags: [
-				"React.js",
-				"Firebase",
-				"Firebase Authentication",
-				"Firestore",
-				"Firebase Storage",
-				"CSS",
-				"Create React App",
-				"Jest",
-				"React Testing Library",
-			],
-		},
-	],
-	contact: {
-		github: "https://github.com/fap233",
-	},
-};
+import ProjectCard from "./ProjectCard"; // Import default (sem chaves)
+import { useLanguage } from "@/contexts/LanguageContext";
 
-const ProjectsSection = () => (
-	<section id="projects" className="py-20 md-py32 bg-background">
-		<div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-			<h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-12 text-center flex items-center justify-center">
-				<Briefcase className="h-8 w-8 mr-3 text-primary" />
-				Featured Projects
-			</h2>
+export function ProjectsSection() {
+	const { language, t } = useLanguage();
 
-			<div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-				{portfolioData.projects.map((project) => (
-					<ProjectCard key={project.id} project={project} />
-				))}
+	const projects = [
+		{
+			title: "Veritas Task Manager",
+			description:
+				language === "en"
+					? "High-performance Kanban board with Go backend and React frontend. Features Docker containerization, clean architecture, and CI/CD pipelines."
+					: "Sistema de gestão de tarefas Full Stack. Backend robusto, Frontend moderno e infraestrutura configurada com Docker.",
+			tags: ["Go", "React", "PostgreSQL", "Docker"],
+			githubUrl: "https://github.com/fap233/desafio-fullstack-veritas",
+			liveUrl: "#",
+			featured: true,
+		},
+		{
+			title: language === "en" ? "Scheduling API" : "Agendamento API (.NET)",
+			description:
+				language === "en"
+					? "Scalable REST API built with .NET 9 and Clean Architecture principles. Handles complex booking logic with Entity Framework Core."
+					: "API RESTful desenvolvida com C# e .NET 9. Foco em padrões corporativos, Entity Framework e Swagger para documentação.",
+			tags: ["C#", ".NET 9", "SQL Server", "EF Core"],
+			githubUrl: "https://github.com/fap233/schedulingapi",
+			liveUrl: "#",
+			featured: true,
+		},
+		{
+			title: "GoNotes App",
+			description:
+				language === "en"
+					? "Lightweight notes API using Go Standard Library (net/http). Focus on memory management, concurrency safety, and minimal dependencies."
+					: "Aplicação para gestão de notas rápidas. Backend otimizado e Frontend reativo, demonstrando fundamentos sólidos de programação.",
+			tags: ["Go", "Std Lib", "React", "TypeScript"],
+			githubUrl: "https://github.com/fap233/fullstack-notas",
+			liveUrl: "#",
+			featured: false,
+		},
+		{
+			title: "SMMStore Platform",
+			description:
+				language === "en"
+					? "Complete E-commerce platform with Admin Dashboard. Built with Node.js/Express and React, featuring JWT Auth and Prisma ORM."
+					: "Plataforma de E-commerce completa. Painel administrativo, autenticação segura e integração com banco de dados relacional.",
+			tags: ["Node.js", "TypeScript", "Prisma", "React"],
+			githubUrl: "https://github.com/fap233/smmstore-ecommerce-website",
+			liveUrl: "#",
+			featured: false,
+		},
+	];
+
+	return (
+		<section id="projects" className="py-20 bg-secondary/20">
+			<div className="container mx-auto px-4">
+				<div className="max-w-2xl mx-auto text-center mb-12 space-y-4">
+					<h2 className="text-3xl font-bold">{t.projects.title}</h2>
+					<p className="text-muted-foreground">{t.projects.subtitle}</p>
+				</div>
+
+				<div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+					{projects.map((project, index) => (
+						// O erro sumirá porque ProjectCard agora aceita as props espalhadas aqui
+						<ProjectCard key={index} {...project} />
+					))}
+				</div>
 			</div>
-			<div className="mt-16 text-center">
-				<a
-					href={portfolioData.contact.github}
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<Button
-						variant="outline"
-						size="lg"
-						className="text-lg hover:bg-primary/10 transition-colors"
-					>
-						View More on GitHub
-						<Github className="ml-2 h-5 w-5" />
-					</Button>
-				</a>
-			</div>
-		</div>
-	</section>
-);
-
-export default ProjectsSection;
+		</section>
+	);
+}
