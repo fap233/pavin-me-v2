@@ -18,14 +18,16 @@ export function AboutSection() {
 					</div>
 
 					<div className="grid gap-4">
-						{t.about.stats.map((stat: any, index: number) => (
-							<Card key={index} className="p-6">
-								<p className="text-sm text-muted-foreground mb-1">
-									{stat.label}
-								</p>
-								<p className="text-2xl font-bold">{stat.value}</p>
-							</Card>
-						))}
+						{t.about.stats.map(
+							(stat: { label: string; value: string }, index: number) => (
+								<Card key={index} className="p-6">
+									<p className="text-sm text-muted-foreground mb-1">
+										{stat.label}
+									</p>
+									<p className="text-2xl font-bold">{stat.value}</p>
+								</Card>
+							),
+						)}
 					</div>
 				</div>
 			</div>

@@ -1,4 +1,4 @@
-import { Github, Instagram, Linkedin, Mail, Send, Twitter } from "lucide-react";
+import { Github, Linkedin, Mail, Send } from "lucide-react"; // Removidos Instagram e Twitter
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
 
