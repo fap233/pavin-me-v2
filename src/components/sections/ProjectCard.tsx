@@ -33,9 +33,7 @@ export default function ProjectCard({
 		>
 			<CardHeader>
 				<div className="flex justify-between items-start gap-2">
-					<CardTitle className="text-2xl font-semibold mb-3">
-						{title} {/* Correção: Usamos title direto, não project.title */}
-					</CardTitle>
+					<CardTitle className="text-2xl font-semibold mb-3">{title}</CardTitle>
 					{featured && (
 						<Badge
 							variant="default"
@@ -64,14 +62,16 @@ export default function ProjectCard({
 			</CardContent>
 			<CardFooter className="gap-2 pt-2">
 				{githubUrl && (
-					<Button variant="outline" size="sm" className="w-full gap-2" asChild>
+					/* MUDANÇA AQUI: de w-full para flex-1 */
+					<Button variant="outline" size="sm" className="flex-1 gap-2" asChild>
 						<a href={githubUrl} target="_blank" rel="noopener noreferrer">
 							<Github className="h-4 w-4" /> Code
 						</a>
 					</Button>
 				)}
 				{liveUrl && liveUrl !== "#" && (
-					<Button size="sm" className="w-full gap-2" asChild>
+					/* MUDANÇA AQUI: de w-full para flex-1 */
+					<Button size="sm" className="flex-1 gap-2" asChild>
 						<a href={liveUrl} target="_blank" rel="noopener noreferrer">
 							<ExternalLink className="h-4 w-4" /> Demo
 						</a>

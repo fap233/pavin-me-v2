@@ -4,14 +4,11 @@ import React from "react";
 import { Button } from "../ui/button";
 import { Moon, Sun, Github, Linkedin } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useTheme } from "@/contexts/ThemeContext";
 
-interface HeaderProps {
-	isDarkMode: boolean;
-	toggleDarkMode: () => void;
-}
-
-const Header: React.FC<HeaderProps> = ({ isDarkMode, toggleDarkMode }) => {
+const Header = () => {
 	const { language, setLanguage } = useLanguage();
+	const { isDarkMode, toggleDarkMode } = useTheme();
 
 	const navItems = [
 		{ name: language === "en" ? "About" : "Sobre", href: "#about" },
