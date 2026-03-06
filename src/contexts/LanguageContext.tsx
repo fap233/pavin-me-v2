@@ -38,27 +38,27 @@ export const content = {
 	},
 	pt: {
 		hero: {
-			badge: "Em busca de Estágio/Júnior",
-			title: "Estudante de Análise e Desenvolvimento de Sistemas",
+			badge: "Aberto a Oportunidades (Remoto)",
+			title: "Engenheiro de Software | Full Stack",
 			subtitle:
-				"Foco em C# (.NET), Java e React. Busco minha primeira oportunidade formal para aplicar conhecimentos práticos em times ágeis.",
+				"6 anos de experiência como desenvolvedor Full Stack e 2 anos como Freelancer. Especialista em Go, React, Node.js e arquiteturas escaláveis.",
 			cta: "Ver Projetos",
 			secondaryCta: "Entrar em Contato",
 		},
 		about: {
 			title: "Sobre Mim",
 			description:
-				"Sou estudante de ADS em transição de carreira. Diferente de um iniciante comum, trago uma maturidade prática de quem já desenvolveu e manteve sistemas web de forma autônoma por anos. Meu foco agora é a formalização acadêmica e o ingresso em um time de engenharia estruturado. Tenho facilidade com lógica, banco de dados e infraestrutura, e estou estudando a fundo o ecossistema .NET e Java.",
+				"Sou Engenheiro de Software Full Stack com 6 anos de experiência desenvolvendo e escalando sistemas web, incluindo 2 anos atuando como Freelancer autônomo. Durante esse período, construí e mantive uma plataforma SaaS com mais de 10.000 clientes ativos, gerenciando desde a estratégia de produto e o desenvolvimento com PHP/Laravel e React até a administração de servidores Linux em produção. Hoje, direciono essa experiência prática para projetos com Go (Golang), Node.js, .NET e arquiteturas distribuídas, sempre com foco em Clean Architecture, performance e entrega de valor real.",
 			stats: [
-				{ label: "Semestre", value: "3º" },
-				{ label: "Foco", value: "Backend" },
-				{ label: "Disponibilidade", value: "Imediata" },
+				{ label: "Anos de Exp.", value: "6+" },
+				{ label: "Freelancer", value: "2 anos" },
+				{ label: "Clientes Atendidos", value: "10k+" },
 			],
 		},
 		projects: {
-			title: "Projetos Acadêmicos & Pessoais",
+			title: "Projetos em Destaque",
 			subtitle:
-				"Projetos desenvolvidos para fixar conceitos de Arquitetura de Software, APIs REST e Full Stack.",
+				"Aplicações reais com foco em Escalabilidade, Arquitetura Limpa e Alta Performance.",
 		},
 	},
 };
