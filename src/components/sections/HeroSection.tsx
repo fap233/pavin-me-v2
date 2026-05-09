@@ -1,8 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, FileText } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export function HeroSection() {
@@ -61,6 +62,16 @@ export function HeroSection() {
 							asChild
 						>
 							<a href="#contact">{t.hero.secondaryCta}</a>
+						</Button>
+						<Button
+							size="lg"
+							variant="ghost"
+							className="w-full sm:w-auto gap-2 text-base px-6 py-6 text-muted-foreground hover:text-primary"
+							asChild
+						>
+							<Link href="/cv">
+								<FileText className="h-5 w-5" /> {t.hero.cvCta}
+							</Link>
 						</Button>
 					</div>
 				</div>
