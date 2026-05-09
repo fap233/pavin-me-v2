@@ -106,8 +106,8 @@ export default function CVPage() {
 					<Section title={isEN ? "Summary" : "Resumo"}>
 						<p className="text-sm leading-relaxed text-foreground/90 print:text-[11pt] print:text-black">
 							{isEN
-								? "Full Stack Software Engineer with 6+ years of hands-on experience designing, building and scaling production web applications. Architected and maintained a high-traffic SaaS platform serving 10,000+ active users with 99.9% uptime — owning system reliability, database optimization (~40% query latency reduction), DevOps (Docker, Nginx, Linux) and security (Cloudflare WAF, DDoS mitigation, CDN). Currently delivering custom software to international and local clients as an independent engineer, with focus on Go (Golang), Node.js, TypeScript and React/Next.js. Comfortable owning the full stack and the full deployment lifecycle, with a pragmatic product mindset and remote-async work experience."
-								: "Engenheiro de Software Full Stack com mais de 6 anos de experiência projetando, construindo e escalando aplicações web em produção. Arquitetei e mantive uma plataforma SaaS de alto tráfego servindo mais de 10.000 usuários ativos com 99,9% de uptime — atuando em confiabilidade de sistema, otimização de banco de dados (~40% de redução de latência em queries), DevOps (Docker, Nginx, Linux) e segurança (Cloudflare WAF, mitigação de DDoS, CDN). Atualmente entrego software customizado para clientes internacionais e locais como engenheiro independente, com foco em Go (Golang), Node.js, TypeScript e React/Next.js. Confortável dominando a stack completa e o ciclo de deploy, com mentalidade de produto e experiência em trabalho remoto-async."}
+								? "Full Stack Software Engineer with 9+ years of production experience. Founded and scaled a multi-tenant SaaS platform from zero to 10,000+ paying recurring users at 99.9% uptime — owning engineering, infrastructure (Linux, Docker, Nginx, Cloudflare WAF) and operations end-to-end as a single-person tech team. Reduced legacy SQL latency by ~40% via targeted refactoring. Currently delivering custom software to international and local B2B clients as an independent engineer, with focus on Go (Golang), Node.js, TypeScript and React/Next.js. Pragmatic product mindset, fluent English and remote-async work experience."
+								: "Engenheiro de Software Full Stack com 9+ anos de experiência em produção. Fundei e escalei uma plataforma SaaS multi-tenant de zero a 10.000+ usuários recorrentes pagantes com 99,9% de uptime — atuando em engenharia, infraestrutura (Linux, Docker, Nginx, Cloudflare WAF) e operações ponta-a-ponta como time tech de uma pessoa só. Reduzi latência de SQL legado em ~40% via refatoração direcionada. Atualmente entrego software customizado para clientes B2B internacionais e locais como engenheiro independente, com foco em Go (Golang), Node.js, TypeScript e React/Next.js. Mentalidade de produto, inglês fluente e experiência em trabalho remoto-async."}
 						</p>
 					</Section>
 
@@ -146,8 +146,8 @@ export default function CVPage() {
 								label={isEN ? "Languages (spoken)" : "Idiomas"}
 								value={
 									isEN
-										? "Portuguese (Native), English (Professional)"
-										: "Português (Nativo), Inglês (Profissional)"
+										? "Portuguese (Native), English (Fluent)"
+										: "Português (Nativo), Inglês (Fluente)"
 								}
 							/>
 						</dl>
@@ -194,14 +194,12 @@ export default function CVPage() {
 							<Job
 								company="Crescigram"
 								companyMeta={
-									isEN
-										? "SaaS & E-commerce Platform"
-										: "Plataforma SaaS & E-commerce"
+									isEN ? "SaaS Platform" : "Plataforma SaaS"
 								}
 								title={
 									isEN
-										? "Founder · Full Stack Developer · Tech Lead"
-										: "Fundador · Desenvolvedor Full Stack · Tech Lead"
+										? "Founder · Tech Lead · Full Stack Engineer"
+										: "Fundador · Tech Lead · Engenheiro Full Stack"
 								}
 								period={
 									isEN
@@ -216,20 +214,22 @@ export default function CVPage() {
 								bullets={
 									isEN
 										? [
-												"Built and scaled a high-traffic SaaS / e-commerce platform from zero to 10,000+ active users, owning end-to-end engineering, product strategy and operations.",
-												"Maintained 99.9% production uptime on a PHP/Laravel + MySQL monolith through proactive monitoring, observability and bug-fix cadence.",
-												"Refactored legacy SQL queries (MySQL), reducing query response times by approximately 40% and resolving bottlenecks during peak traffic windows.",
-												"Managed Linux production servers (Ubuntu/Debian), Nginx web servers, Docker-containerized environments and automated deployment pipelines.",
-												"Configured Cloudflare WAF rules to mitigate DDoS attacks; managed DNS, SSL and CDN for global content delivery.",
-												"Authored Shell automation scripts that eliminated hundreds of hours of manual operational toil per year.",
+												"Founded, launched and scaled a multi-tenant SaaS platform from zero to 10,000+ paying recurring users — owning engineering, product, billing, customer support and infrastructure as a single-person tech team.",
+												"Sustained 99.9% production uptime on a PHP/Laravel + MySQL monolith over 6 years through proactive monitoring, observability and a tight bug-fix cadence.",
+												"Reduced legacy SQL query response times by ~40% via targeted refactoring and indexing, eliminating bottlenecks during peak-traffic windows.",
+												"Operated production infrastructure end-to-end: Linux servers (Ubuntu/Debian), Docker-containerized environments, Nginx and automated CI/CD deployment pipelines.",
+												"Hardened the platform's edge with Cloudflare WAF and DDoS mitigation; managed DNS, SSL and CDN for global content delivery.",
+												"Authored Shell automation that eliminated hundreds of hours of manual operational toil per year and sustained the unit-economics of running engineering + ops solo.",
+												"Drove the full product lifecycle — discovery, scope, build, ship, support, retention — translating user feedback into roadmap and shipped features.",
 											]
 										: [
-												"Construí e escalei uma plataforma SaaS / e-commerce de alto tráfego de zero a mais de 10.000 usuários ativos, atuando em engenharia ponta-a-ponta, estratégia de produto e operações.",
-												"Mantive 99,9% de uptime em produção em um monolito PHP/Laravel + MySQL através de monitoramento proativo, observabilidade e cadência de correções.",
-												"Refatorei queries SQL legadas (MySQL), reduzindo tempos de resposta em aproximadamente 40% e resolvendo gargalos em picos de tráfego.",
-												"Gerenciei servidores Linux em produção (Ubuntu/Debian), Nginx, ambientes containerizados com Docker e pipelines de deploy automatizados.",
-												"Configurei regras WAF no Cloudflare para mitigação de DDoS; gerenciei DNS, SSL e CDN para entrega global de conteúdo.",
-												"Desenvolvi scripts de automação em Shell que eliminaram centenas de horas de trabalho operacional manual por ano.",
+												"Fundei, lancei e escalei uma plataforma SaaS multi-tenant de zero a mais de 10.000 usuários recorrentes pagantes — atuando em engenharia, produto, billing, suporte e infraestrutura como time tech de uma pessoa só.",
+												"Sustentei 99,9% de uptime em produção num monolito PHP/Laravel + MySQL ao longo de 6 anos, com monitoramento proativo, observabilidade e cadência de correções.",
+												"Reduzi tempo de resposta de queries SQL legadas em ~40% via refatoração e indexação direcionadas, eliminando gargalos em picos de tráfego.",
+												"Operei infraestrutura de produção ponta-a-ponta: servidores Linux (Ubuntu/Debian), ambientes containerizados com Docker, Nginx e pipelines CI/CD automatizadas.",
+												"Blindei a borda da plataforma com Cloudflare WAF e mitigação de DDoS; gerenciei DNS, SSL e CDN para entrega global.",
+												"Desenvolvi automação em Shell que eliminou centenas de horas de trabalho manual por ano e sustentou a unit-economics de rodar engenharia + ops sozinho.",
+												"Conduzi o ciclo completo de produto — discovery, escopo, build, ship, suporte, retenção — traduzindo feedback de usuário em roadmap e features entregues.",
 											]
 								}
 							/>
