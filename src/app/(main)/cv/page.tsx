@@ -106,8 +106,8 @@ export default function CVPage() {
 					<Section title={isEN ? "Summary" : "Resumo"}>
 						<p className="text-sm leading-relaxed text-foreground/90 print:text-[11pt] print:text-black">
 							{isEN
-								? "Full Stack Software Engineer with 9+ years of production experience. Founded and scaled a multi-tenant SaaS platform from zero to 10,000+ paying recurring users at 99.9% uptime — owning engineering, infrastructure (Linux, Docker, Nginx, Cloudflare WAF) and operations end-to-end as a single-person tech team. Reduced legacy SQL latency by ~40% via targeted refactoring. Currently delivering custom software to international and local B2B clients as an independent engineer, with focus on Go (Golang), Node.js, TypeScript and React/Next.js. Pragmatic product mindset, fluent English and remote-async work experience."
-								: "Engenheiro de Software Full Stack com 9+ anos de experiência em produção. Fundei e escalei uma plataforma SaaS multi-tenant de zero a 10.000+ usuários recorrentes pagantes com 99,9% de uptime — atuando em engenharia, infraestrutura (Linux, Docker, Nginx, Cloudflare WAF) e operações ponta-a-ponta como time tech de uma pessoa só. Reduzi latência de SQL legado em ~40% via refatoração direcionada. Atualmente entrego software customizado para clientes B2B internacionais e locais como engenheiro independente, com foco em Go (Golang), Node.js, TypeScript e React/Next.js. Mentalidade de produto, inglês fluente e experiência em trabalho remoto-async."}
+								? "Full Stack Software Engineer with 9+ years of production experience and a full-cycle ownership mindset — comfortable taking a service from design and code to deployment, monitoring, on-call and support. Founded and scaled a multi-tenant SaaS platform from zero to 10,000+ paying recurring users at 99.9% uptime as a single-person tech team, owning architecture, infrastructure (Linux, Docker, Nginx, Cloudflare WAF), incident response and product roadmap. Reduced legacy SQL latency by ~40% via targeted refactoring. Currently delivering custom software to international and local B2B clients as an independent engineer, with focus on Go (Golang), Node.js, TypeScript and React/Next.js. Pragmatic product mindset, fluent English, remote-async by default."
+								: "Engenheiro de Software Full Stack com 9+ anos de experiência em produção e mentalidade full-cycle de ownership — confortável conduzindo um serviço do design e código até deploy, monitoramento, on-call e suporte. Fundei e escalei uma plataforma SaaS multi-tenant de zero a 10.000+ usuários recorrentes pagantes com 99,9% de uptime como time tech de uma pessoa só, conduzindo arquitetura, infraestrutura (Linux, Docker, Nginx, Cloudflare WAF), resposta a incidentes e roadmap de produto. Reduzi latência de SQL legado em ~40% via refatoração direcionada. Atualmente entrego software customizado para clientes B2B internacionais e locais como engenheiro independente, com foco em Go (Golang), Node.js, TypeScript e React/Next.js. Mentalidade de produto, inglês fluente, remoto-async por padrão."}
 						</p>
 					</Section>
 
@@ -214,22 +214,20 @@ export default function CVPage() {
 								bullets={
 									isEN
 										? [
-												"Founded, launched and scaled a multi-tenant SaaS platform from zero to 10,000+ paying recurring users — owning engineering, product, billing, customer support and infrastructure as a single-person tech team.",
-												"Sustained 99.9% production uptime on a PHP/Laravel + MySQL monolith over 6 years through proactive monitoring, observability and a tight bug-fix cadence.",
+												"Founded, launched and scaled a multi-tenant SaaS platform from zero to 10,000+ paying recurring users — full-cycle ownership across engineering, product, billing, customer support and infrastructure as a single-person tech team.",
+												"Sustained 99.9% production uptime on a PHP/Laravel + MySQL monolith over 6 years; ran an on-call rotation of one, from incident detection to root-cause fix.",
 												"Reduced legacy SQL query response times by ~40% via targeted refactoring and indexing, eliminating bottlenecks during peak-traffic windows.",
-												"Operated production infrastructure end-to-end: Linux servers (Ubuntu/Debian), Docker-containerized environments, Nginx and automated CI/CD deployment pipelines.",
-												"Hardened the platform's edge with Cloudflare WAF and DDoS mitigation; managed DNS, SSL and CDN for global content delivery.",
+												"Operated production infrastructure end-to-end across the full stack: Cloudflare edge (WAF, DDoS mitigation, CDN, DNS, SSL), Nginx reverse proxy, Docker-containerized Linux servers (Ubuntu/Debian) and automated CI/CD deployment pipelines.",
 												"Authored Shell automation that eliminated hundreds of hours of manual operational toil per year and sustained the unit-economics of running engineering + ops solo.",
-												"Drove the full product lifecycle — discovery, scope, build, ship, support, retention — translating user feedback into roadmap and shipped features.",
+												"Drove the full product lifecycle — discovery, scope, build, ship, support, retention — translating user feedback into roadmap and shipped features without a PM in the loop.",
 											]
 										: [
-												"Fundei, lancei e escalei uma plataforma SaaS multi-tenant de zero a mais de 10.000 usuários recorrentes pagantes — atuando em engenharia, produto, billing, suporte e infraestrutura como time tech de uma pessoa só.",
-												"Sustentei 99,9% de uptime em produção num monolito PHP/Laravel + MySQL ao longo de 6 anos, com monitoramento proativo, observabilidade e cadência de correções.",
+												"Fundei, lancei e escalei uma plataforma SaaS multi-tenant de zero a 10.000+ usuários recorrentes pagantes — ownership full-cycle em engenharia, produto, billing, suporte e infraestrutura como time tech de uma pessoa só.",
+												"Sustentei 99,9% de uptime em produção num monolito PHP/Laravel + MySQL ao longo de 6 anos; rodei plantão on-call de uma pessoa só, da detecção do incidente até a correção da raiz.",
 												"Reduzi tempo de resposta de queries SQL legadas em ~40% via refatoração e indexação direcionadas, eliminando gargalos em picos de tráfego.",
-												"Operei infraestrutura de produção ponta-a-ponta: servidores Linux (Ubuntu/Debian), ambientes containerizados com Docker, Nginx e pipelines CI/CD automatizadas.",
-												"Blindei a borda da plataforma com Cloudflare WAF e mitigação de DDoS; gerenciei DNS, SSL e CDN para entrega global.",
+												"Operei infraestrutura de produção ponta-a-ponta na stack completa: borda Cloudflare (WAF, mitigação de DDoS, CDN, DNS, SSL), Nginx reverse proxy, servidores Linux (Ubuntu/Debian) containerizados com Docker e pipelines CI/CD automatizadas.",
 												"Desenvolvi automação em Shell que eliminou centenas de horas de trabalho manual por ano e sustentou a unit-economics de rodar engenharia + ops sozinho.",
-												"Conduzi o ciclo completo de produto — discovery, escopo, build, ship, suporte, retenção — traduzindo feedback de usuário em roadmap e features entregues.",
+												"Conduzi o ciclo completo de produto — discovery, escopo, build, ship, suporte, retenção — traduzindo feedback de usuário em roadmap e features entregues sem um PM no loop.",
 											]
 								}
 							/>

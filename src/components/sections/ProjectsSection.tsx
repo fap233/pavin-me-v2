@@ -2,9 +2,12 @@
 
 import ProjectCard from "./ProjectCard";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useInView } from "@/lib/useInView";
 
 export function ProjectsSection() {
 	const { language, t } = useLanguage();
+	const { ref, inView } = useInView<HTMLElement>(0.1);
+	const kicker = language === "en" ? "// projects" : "// projetos";
 
 	const projects = [
 		{
@@ -117,14 +120,60 @@ export function ProjectsSection() {
 	];
 
 	return (
-		<section id="projects" className="py-20 bg-secondary/20">
+		<section
+			id="projects"
+			ref={ref}
+			data-in-view={inView ? "true" : "false"}
+			className="relative py-20 bg-secondary/20 overflow-hidden"
+		>
+			<div
+				aria-hidden="true"
+				className="absolute inset-0 -z-10 section-grid-bg [mask-image:radial-gradient(ellipse_85%_80%_at_50%_30%,#000_60%,transparent_100%)]"
+			/>
+
 			<div className="container mx-auto px-4">
-				<div className="max-w-2xl mx-auto text-center mb-12 space-y-4">
-					<h2 className="text-3xl font-bold">{t.projects.title}</h2>
-					<p className="text-muted-foreground">{t.projects.subtitle}</p>
+				<div className="max-w-2xl mx-auto text-center mb-12 space-y-3 in-view-anim in-view-anim-1">
+					<p className="text-base text-muted-foreground/80 font-[family-name:var(--font-caveat)] tracking-wide">
+						{kicker}
+					</p>
+					<div className="relative inline-block">
+						<h2 className="text-3xl md:text-4xl font-bold">
+							{t.projects.title}
+						</h2>
+						<svg
+							aria-hidden="true"
+							className="absolute left-0 right-0 -bottom-2 w-full max-w-xs mx-auto pointer-events-none"
+							viewBox="0 0 300 14"
+							fill="none"
+							preserveAspectRatio="none"
+						>
+							<path
+								d="M5 8 Q 40 2, 80 7 T 160 7 T 240 8 T 297 5"
+								stroke="url(#projects-scribble-gradient)"
+								strokeWidth="2"
+								strokeLinecap="round"
+								fill="none"
+								opacity="0.85"
+							/>
+							<defs>
+								<linearGradient
+									id="projects-scribble-gradient"
+									x1="0"
+									y1="0"
+									x2="1"
+									y2="0"
+								>
+									<stop offset="0%" stopColor="oklch(0.922 0 0)" />
+									<stop offset="50%" stopColor="#a855f7" />
+									<stop offset="100%" stopColor="#ec4899" />
+								</linearGradient>
+							</defs>
+						</svg>
+					</div>
+					<p className="text-muted-foreground pt-3">{t.projects.subtitle}</p>
 				</div>
 
-				<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+				<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto in-view-anim in-view-anim-2">
 					{projects.map((project, index) => (
 						<ProjectCard key={index} {...project} />
 					))}
