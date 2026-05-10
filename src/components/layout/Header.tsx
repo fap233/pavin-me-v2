@@ -23,9 +23,12 @@ const Header = () => {
 			<div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
 				<Link
 					href="/"
-					className="text-xl font-bold tracking-tight transition-colors hover:text-primary"
+					className="text-xl font-bold tracking-tight transition-colors hover:text-primary group"
 				>
-					Pavin<span className="text-primary">.dev</span>
+					Pavin
+					<span className="font-[family-name:var(--font-caveat)] text-primary text-2xl ml-0.5 inline-block transition-transform group-hover:rotate-[-3deg]">
+						.dev
+					</span>
 				</Link>
 
 				<nav className="hidden items-center space-x-6 md:flex">

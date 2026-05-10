@@ -42,6 +42,21 @@ export const content = {
 			subtitle:
 				"Real-world applications focusing on Scalability, Clean Architecture, and Performance.",
 		},
+		lab: {
+			kicker: "// lab",
+			title: "Frontend UI/UX Lab",
+			subtitle:
+				"A collection of high-fidelity interfaces demonstrating versatility in design and CSS mastery.",
+		},
+		contact: {
+			kicker: "// contact",
+			title: "Get in Touch",
+			subtitle:
+				"Open to remote roles and contract engagements. Reach out for collaborations, opportunities, or to say hello.",
+		},
+		footer: {
+			tagline: "Crafted in Fortaleza · Available worldwide",
+		},
 	},
 	pt: {
 		nav: {
@@ -73,6 +88,21 @@ export const content = {
 			title: "Projetos em Destaque",
 			subtitle:
 				"Aplicações reais com foco em Escalabilidade, Arquitetura Limpa e Alta Performance.",
+		},
+		lab: {
+			kicker: "// lab",
+			title: "Laboratório UI/UX Frontend",
+			subtitle:
+				"Uma coleção de interfaces de alta fidelidade demonstrando versatilidade em design e domínio de CSS.",
+		},
+		contact: {
+			kicker: "// contato",
+			title: "Vamos Conversar",
+			subtitle:
+				"Aberto a vagas remotas e contratos. Me chama pra colaborações, oportunidades ou só pra dar um oi.",
+		},
+		footer: {
+			tagline: "Feito em Fortaleza · Disponível pro mundo",
 		},
 	},
 };

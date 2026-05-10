@@ -2,9 +2,11 @@
 
 import ProjectCard from "./ProjectCard";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useInView } from "@/lib/useInView";
 
 export function FrontendPreviews() {
-	const { language } = useLanguage();
+	const { language, t } = useLanguage();
+	const { ref, inView } = useInView<HTMLElement>(0.1);
 
 	const demos = [
 		{
@@ -14,7 +16,7 @@ export function FrontendPreviews() {
 					? "Futuristic Dark Mode landing page with neon gradients and glassmorphism effects."
 					: "Landing page futurista em Dark Mode com gradientes neon e efeitos de vidro (glassmorphism).",
 			tags: ["React", "Tailwind", "UI Design"],
-			liveUrl: "/demos/ai-saas", // Rota interna
+			liveUrl: "/demos/ai-saas",
 			featured: false,
 		},
 		{
@@ -70,22 +72,58 @@ export function FrontendPreviews() {
 	];
 
 	return (
-		<section id="frontend-demos" className="py-20 bg-background">
+		<section
+			id="frontend-demos"
+			ref={ref}
+			data-in-view={inView ? "true" : "false"}
+			className="relative py-20 bg-background overflow-hidden"
+		>
+			<div
+				aria-hidden="true"
+				className="absolute inset-0 -z-10 section-grid-bg [mask-image:radial-gradient(ellipse_85%_80%_at_50%_30%,#000_60%,transparent_100%)]"
+			/>
+
 			<div className="container mx-auto px-4">
-				<div className="max-w-2xl mx-auto text-center mb-12 space-y-4">
-					<h2 className="text-3xl font-bold">
-						{language === "en"
-							? "Frontend UI/UX Lab"
-							: "Laboratório UI/UX Frontend"}
-					</h2>
-					<p className="text-muted-foreground">
-						{language === "en"
-							? "A collection of high-fidelity interfaces demonstrating versatility in design and CSS mastery."
-							: "Uma coleção de interfaces de alta fidelidade demonstrando versatilidade em design e domínio de CSS."}
+				<div className="max-w-2xl mx-auto text-center mb-12 space-y-3 in-view-anim in-view-anim-1">
+					<p className="text-base text-muted-foreground/80 font-[family-name:var(--font-caveat)] tracking-wide">
+						{t.lab.kicker}
 					</p>
+					<div className="relative inline-block">
+						<h2 className="text-3xl md:text-4xl font-bold">{t.lab.title}</h2>
+						<svg
+							aria-hidden="true"
+							className="absolute left-0 right-0 -bottom-2 w-full max-w-sm mx-auto pointer-events-none"
+							viewBox="0 0 360 14"
+							fill="none"
+							preserveAspectRatio="none"
+						>
+							<path
+								d="M5 8 Q 50 2, 95 7 T 190 7 T 285 8 T 357 5"
+								stroke="url(#lab-scribble-gradient)"
+								strokeWidth="2"
+								strokeLinecap="round"
+								fill="none"
+								opacity="0.85"
+							/>
+							<defs>
+								<linearGradient
+									id="lab-scribble-gradient"
+									x1="0"
+									y1="0"
+									x2="1"
+									y2="0"
+								>
+									<stop offset="0%" stopColor="oklch(0.922 0 0)" />
+									<stop offset="50%" stopColor="#a855f7" />
+									<stop offset="100%" stopColor="#ec4899" />
+								</linearGradient>
+							</defs>
+						</svg>
+					</div>
+					<p className="text-muted-foreground pt-3">{t.lab.subtitle}</p>
 				</div>
 
-				<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+				<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto in-view-anim in-view-anim-2">
 					{demos.map((demo, index) => (
 						<ProjectCard
 							key={index}
@@ -93,7 +131,6 @@ export function FrontendPreviews() {
 							description={demo.description}
 							tags={demo.tags}
 							liveUrl={demo.liveUrl}
-							// Github Url pode ser o repo geral ou null se não quiser linkar direto
 							githubUrl="https://github.com/fap233"
 							featured={demo.featured}
 						/>
