@@ -22,9 +22,70 @@ const caveat = Caveat({
 });
 
 export const metadata: Metadata = {
-	title: "Pavin.me - Fullstack Developer",
+	metadataBase: new URL("https://pavin.me"),
+	title: {
+		default: "Fellipe Pavin · Software Engineer (Go, React, Node.js)",
+		template: "%s · Fellipe Pavin",
+	},
 	description:
-		"Personal Fellipe Pavin portfolio, a Fullstack Developer specialized in React, Node.js, and cloud technologies.",
+		"Software Engineer with 9+ years of production experience. Founded a multi-tenant SaaS scaled to 10,000+ paying users. Full-cycle ownership across Go, TypeScript, Node.js and React/Next.js. Open to remote and contract roles worldwide.",
+	keywords: [
+		"Software Engineer",
+		"Full Stack Developer",
+		"Full Stack Engineer",
+		"Backend Engineer",
+		"Go",
+		"Golang",
+		"TypeScript",
+		"Node.js",
+		"React",
+		"Next.js",
+		"PostgreSQL",
+		"Docker",
+		"SaaS",
+		"Multi-tenant SaaS",
+		"Full Cycle Engineer",
+		"Remote Software Engineer",
+		"Contract Software Engineer",
+		"LATAM Software Engineer",
+		"Brazil",
+		"Fortaleza",
+		"Fellipe Pavin",
+		"pavin.me",
+	],
+	authors: [{ name: "Fellipe Pavin", url: "https://pavin.me" }],
+	creator: "Fellipe Pavin",
+	publisher: "Fellipe Pavin",
+	alternates: {
+		canonical: "https://pavin.me",
+	},
+	openGraph: {
+		type: "website",
+		locale: "en_US",
+		alternateLocale: "pt_BR",
+		url: "https://pavin.me",
+		title: "Fellipe Pavin · Software Engineer (Go, React, Node.js)",
+		description:
+			"9+ years building production SaaS at scale. Founded a multi-tenant SaaS to 10,000+ paying users. Open to remote and contract roles worldwide.",
+		siteName: "pavin.me",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "Fellipe Pavin · Software Engineer",
+		description:
+			"9+ years building production SaaS at scale. Open to remote and contract roles worldwide.",
+		creator: "@pavinfellipe",
+	},
+	robots: {
+		index: true,
+		follow: true,
+		googleBot: {
+			index: true,
+			follow: true,
+			"max-image-preview": "large",
+			"max-snippet": -1,
+		},
+	},
 };
 
 export default function RootLayout({
