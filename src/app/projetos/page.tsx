@@ -255,6 +255,16 @@ function ProjectCard({
             🙋 {p.claimed_email}
           </div>
         )}
+        {p.description && (
+          <details className="text-xs">
+            <summary className="cursor-pointer select-none text-primary">
+              Ver roteiro / valor
+            </summary>
+            <pre className="mt-2 whitespace-pre-wrap break-words font-sans text-foreground/90">
+              {p.description}
+            </pre>
+          </details>
+        )}
         <div className="flex flex-wrap items-center gap-2 pt-1">
           {!p.claimed_by && (
             <Button size="sm" onClick={() => claim(true)}>
