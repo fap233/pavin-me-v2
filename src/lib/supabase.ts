@@ -19,6 +19,7 @@ export type SharedProject = {
   link: string | null;
   status: "backlog" | "doing" | "review" | "done";
   notes: string | null;
+  delivery_at: string | null; // data prevista de entrega (YYYY-MM-DD)
   claimed_by: string | null;
   claimed_email: string | null;
   claimed_at: string | null;

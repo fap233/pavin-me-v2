@@ -191,6 +191,25 @@ function Login({ onAuthed }: { onAuthed: (u: User) => Promise<void> }) {
   );
 }
 
+// Calcula urgência a partir da data de entrega. Urgente = faltam <5 dias
+// (ou atrasado) e o projeto ainda não está concluído.
+function deliveryInfo(p: SharedProject) {
+  if (!p.delivery_at) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const due = new Date(p.delivery_at + "T00:00:00");
+  if (isNaN(due.getTime())) return null;
+  const days = Math.ceil((due.getTime() - today.getTime()) / 86_400_000);
+  const fmt = due.toLocaleDateString("pt-BR");
+  const urgent = p.status !== "done" && days < 5;
+  let label: string;
+  if (days < 0) label = `Atrasado ${Math.abs(days)}d`;
+  else if (days === 0) label = "Entrega hoje";
+  else if (days === 1) label = "Falta 1 dia";
+  else label = `Faltam ${days} dias`;
+  return { days, fmt, urgent, label };
+}
+
 function ProjectCard({
   p,
   me,
@@ -231,12 +250,24 @@ function ProjectCard({
   }
 
   const mine = p.claimed_by === me.id;
+  const dl = deliveryInfo(p);
 
   return (
-    <Card>
+    <Card className={dl?.urgent ? "urgent-blink border-2" : undefined}>
       <CardContent className="space-y-2 pt-4">
         <div className="text-sm font-semibold leading-snug">{p.title}</div>
         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+          {dl && (
+            <span
+              className={
+                dl.urgent
+                  ? "font-semibold text-destructive"
+                  : "text-muted-foreground"
+              }
+            >
+              ⏳ {dl.label} · {dl.fmt}
+            </span>
+          )}
           {p.client && <span>{p.client}</span>}
           {p.source && <Badge variant="secondary">{p.source}</Badge>}
           {p.link && (
