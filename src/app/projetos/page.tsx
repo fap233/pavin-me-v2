@@ -269,7 +269,7 @@ function ProjectCard({
             </span>
           )}
           {p.client && <span>{p.client}</span>}
-          {p.source && <Badge variant="secondary">{p.source}</Badge>}
+          {/* origem (99freelas) escondida do colaborador — não revelar de onde veio */}
           {p.link && (
             <a
               href={p.link}
@@ -277,7 +277,7 @@ function ProjectCard({
               rel="noopener noreferrer"
               className="text-primary underline-offset-4 hover:underline"
             >
-              abrir
+              repositório
             </a>
           )}
         </div>
