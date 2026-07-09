@@ -22,7 +22,7 @@ export const content = {
 			badge: "Open to Work (Remote)",
 			title: "Software Engineer | Full Stack",
 			subtitle:
-				"9+ years of experience as a Full Stack engineer, shipping production applications for B2B clients. Specialist in Go, React, Node.js and scalable architectures.",
+				"9+ years shipping production software end-to-end — from architecture and code to deploy, monitoring and on-call. TypeScript, React/Next.js, Node.js, .NET and PostgreSQL.",
 			cta: "View Projects",
 			secondaryCta: "Contact Me",
 			cvCta: "Download CV",
@@ -30,17 +30,17 @@ export const content = {
 		about: {
 			title: "About Me",
 			description:
-				"I am a Full Stack Software Engineer with 9+ years of experience building and scaling web systems. I built and maintained my own SaaS platform serving 10,000+ active clients — handling everything from product strategy and PHP/Laravel + React development to Linux server administration in production. Currently I direct that hands-on experience to projects with Go (Golang), Node.js, .NET and distributed systems, with a focus on Clean Architecture, performance and real business value.",
+				"I am a Full Stack Software Engineer with 9+ years of experience building and scaling web systems. I founded and scaled my own multi-tenant SaaS to 10,000+ paying recurring users at 99.9% uptime — owning product, PHP/Laravel + MySQL engineering, and Linux/Cloudflare infrastructure in production as a one-person tech team. Today I deliver software for B2B clients: marketplaces, operations SaaS, dashboards, CRM automation, AI agents and security audits — mostly in TypeScript, React/Next.js and Node.js, with production work in .NET, PHP and Python.",
 			stats: [
 				{ label: "Years of Exp.", value: "9+" },
-				{ label: "Projects Delivered", value: "10+" },
-				{ label: "Users Served", value: "10k+" },
+				{ label: "Projects Delivered", value: "20+" },
+				{ label: "Paying Users Served", value: "10k+" },
 			],
 		},
 		projects: {
 			title: "Featured Projects",
 			subtitle:
-				"Real-world applications focusing on Scalability, Clean Architecture, and Performance.",
+				"Real-world applications in production — marketplaces, SaaS, automation and infrastructure.",
 		},
 		lab: {
 			kicker: "// lab",
@@ -69,7 +69,7 @@ export const content = {
 			badge: "Aberto a Oportunidades (Remoto)",
 			title: "Engenheiro de Software | Full Stack",
 			subtitle:
-				"9+ anos de experiência como Engenheiro Full Stack, entregando aplicações em produção para clientes B2B. Especialista em Go, React, Node.js e arquiteturas escaláveis.",
+				"9+ anos entregando software em produção ponta a ponta — da arquitetura e do código ao deploy, monitoramento e plantão. TypeScript, React/Next.js, Node.js, .NET e PostgreSQL.",
 			cta: "Ver Projetos",
 			secondaryCta: "Entrar em Contato",
 			cvCta: "Baixar CV",
@@ -77,17 +77,17 @@ export const content = {
 		about: {
 			title: "Sobre Mim",
 			description:
-				"Sou Engenheiro de Software Full Stack com 9+ anos de experiência desenvolvendo e escalando sistemas web. Construí e mantive uma plataforma SaaS própria com mais de 10.000 clientes ativos — atuando da estratégia de produto ao desenvolvimento com PHP/Laravel e React, e à administração de servidores Linux em produção. Atualmente direciono essa experiência prática para projetos com Go (Golang), Node.js, .NET e arquiteturas distribuídas, sempre com foco em Clean Architecture, performance e entrega de valor real.",
+				"Sou Engenheiro de Software Full Stack com 9+ anos de experiência desenvolvendo e escalando sistemas web. Fundei e escalei um SaaS multi-tenant próprio até 10.000+ usuários recorrentes pagantes com 99,9% de uptime — conduzindo produto, engenharia em PHP/Laravel + MySQL e infraestrutura Linux/Cloudflare em produção como time tech de uma pessoa só. Hoje entrego software para clientes B2B: marketplaces, SaaS operacionais, dashboards, automação de CRM, agentes de IA e auditorias de segurança — principalmente em TypeScript, React/Next.js e Node.js, com entregas em produção também em .NET, PHP e Python.",
 			stats: [
 				{ label: "Anos de Exp.", value: "9+" },
-				{ label: "Projetos Entregues", value: "10+" },
-				{ label: "Usuários Servidos", value: "10k+" },
+				{ label: "Projetos Entregues", value: "20+" },
+				{ label: "Usuários Pagantes", value: "10k+" },
 			],
 		},
 		projects: {
 			title: "Projetos em Destaque",
 			subtitle:
-				"Aplicações reais com foco em Escalabilidade, Arquitetura Limpa e Alta Performance.",
+				"Aplicações reais em produção — marketplaces, SaaS, automação e infraestrutura.",
 		},
 		lab: {
 			kicker: "// lab",

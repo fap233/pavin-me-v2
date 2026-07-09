@@ -1,184 +1,349 @@
 "use client";
 
+import Image from "next/image";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { ArrowUpRight, Github } from "lucide-react";
 import ProjectCard from "./ProjectCard";
+import { projects, type Project } from "@/lib/projects";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useInView } from "@/lib/useInView";
 
+const clamp = (value: number, min: number, max: number) =>
+	Math.min(Math.max(value, min), max);
+
+/**
+ * Turns vertical scroll into horizontal travel across the project track while
+ * the section is pinned. Returns `false` on touch/narrow viewports and when
+ * motion is reduced — callers should render a plain vertical grid instead.
+ */
+function useHorizontalTrack(
+	sectionRef: React.RefObject<HTMLElement | null>,
+	trackRef: React.RefObject<HTMLDivElement | null>,
+	progressRef: React.RefObject<HTMLSpanElement | null>,
+	onActiveChange: (index: number) => void,
+) {
+	const [enabled, setEnabled] = useState(false);
+	const [sectionHeight, setSectionHeight] = useState<number>(0);
+	const activeRef = useRef(0);
+
+	useEffect(() => {
+		const wide = window.matchMedia("(min-width: 1024px)");
+		const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+		const sync = () => setEnabled(wide.matches && !reduced.matches);
+
+		sync();
+		wide.addEventListener("change", sync);
+		reduced.addEventListener("change", sync);
+		return () => {
+			wide.removeEventListener("change", sync);
+			reduced.removeEventListener("change", sync);
+		};
+	}, []);
+
+	useEffect(() => {
+		const section = sectionRef.current;
+		const track = trackRef.current;
+		if (!enabled || !section || !track) {
+			setSectionHeight(0);
+			if (track) track.style.transform = "";
+			return;
+		}
+
+		let distance = 0;
+		let frame = 0;
+
+		const measure = () => {
+			distance = Math.max(track.scrollWidth - window.innerWidth, 0);
+			setSectionHeight(distance + window.innerHeight);
+		};
+
+		const render = () => {
+			frame = 0;
+			const travel = section.offsetHeight - window.innerHeight;
+			if (travel <= 0) return;
+
+			const progress = clamp(-section.getBoundingClientRect().top / travel, 0, 1);
+			const x = progress * distance;
+			track.style.transform = `translate3d(${-x}px, 0, 0)`;
+
+			if (progressRef.current) {
+				progressRef.current.style.transform = `scaleX(${progress || 0.02})`;
+			}
+
+			const centerX = x + window.innerWidth / 2;
+			let nearest = 0;
+			let nearestDistance = Infinity;
+			Array.from(track.children).forEach((child, index) => {
+				const card = child as HTMLElement;
+				const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+				const delta = Math.abs(cardCenter - centerX);
+				if (delta < nearestDistance) {
+					nearestDistance = delta;
+					nearest = index;
+				}
+			});
+
+			if (nearest !== activeRef.current) {
+				activeRef.current = nearest;
+				onActiveChange(nearest);
+			}
+		};
+
+		const schedule = () => {
+			if (!frame) frame = requestAnimationFrame(render);
+		};
+
+		measure();
+		render();
+
+		const observer = new ResizeObserver(() => {
+			measure();
+			schedule();
+		});
+		observer.observe(track);
+
+		window.addEventListener("scroll", schedule, { passive: true });
+		window.addEventListener("resize", () => {
+			measure();
+			schedule();
+		});
+
+		return () => {
+			observer.disconnect();
+			window.removeEventListener("scroll", schedule);
+			if (frame) cancelAnimationFrame(frame);
+		};
+	}, [enabled, sectionRef, trackRef, progressRef, onActiveChange]);
+
+	return { enabled, sectionHeight };
+}
+
 export function ProjectsSection() {
 	const { language, t } = useLanguage();
-	const { ref, inView } = useInView<HTMLElement>(0.1);
 	const kicker = language === "en" ? "// projects" : "// projetos";
 
-	const projects = [
-		{
-			title: "MedSpace Brasil",
-			description:
-				language === "en"
-					? "B2B marketplace connecting clinics and medical equipment suppliers. Listings, account management and contact flow for healthcare professionals."
-					: "Marketplace B2B conectando clínicas e fornecedores de equipamentos médicos. Listagens, gestão de conta e fluxo de contato para profissionais de saúde.",
-			tags: ["Next.js", "TypeScript", "Tailwind", "Marketplace"],
-			liveUrl: "https://medspacebrasil.com.br",
-			imageUrl: "/projects/medspace.png",
-			featured: true,
-		},
-		{
-			title: "Fresh Cleaning 4U",
-			description:
-				language === "en"
-					? "Operations platform for an Australian cleaning company. Client management, calendar, employees, invoices, payments, SMS reminders and ABN-compliant PDF invoicing."
-					: "Plataforma operacional para empresa de limpeza australiana. Gestão de clientes, calendário, funcionários, faturas, pagamentos, lembretes por SMS e emissão de notas em PDF compatível com ABN.",
-			tags: ["Next.js", "TypeScript", "SaaS", "Operations"],
-			imageUrl: "/projects/cleanapp.png",
-			featured: true,
-		},
-		{
-			title: "Macroluz",
-			description:
-				language === "en"
-					? "Corporate site for a natural lighting engineering company specializing in industrial roofing solutions. Product catalog and lead capture."
-					: "Site corporativo para engenharia de iluminação natural especializada em soluções para coberturas industriais. Catálogo de produtos e captura de leads.",
-			tags: ["Next.js", "TypeScript", "Corporate", "B2B"],
-			liveUrl: "https://macroluz.com.br",
-			imageUrl: "/projects/macroluz.png",
-			featured: true,
-		},
-		{
-			title: "ARQforyou",
-			description:
-				language === "en"
-					? "Platform connecting architects and clients across Brazil. Professional profiles, subscription plans and project briefing flow."
-					: "Plataforma que conecta arquitetos e clientes em todo o Brasil. Perfis profissionais, planos por assinatura e fluxo de briefing de projetos.",
-			tags: ["React", "TypeScript", "Platform", "Subscriptions"],
-			liveUrl: "https://arqforyou.lovable.app",
-			imageUrl: "/projects/arqforyou.png",
-			featured: false,
-		},
-		{
-			title: "Meraki",
-			description:
-				language === "en"
-					? "Clinical management dashboard for healthcare professionals. Patients, scheduling, financials, technical archive, supervision and study tracking in one place."
-					: "Dashboard de gestão clínica para profissionais de saúde. Pacientes, agenda, financeiro, acervo técnico, supervisão e estudos integrados em um só lugar.",
-			tags: ["React", "TypeScript", "Healthcare", "Dashboard"],
-			liveUrl: "https://meraki-app-six.vercel.app",
-			imageUrl: "/projects/meraki.png",
-			featured: false,
-		},
-		{
-			title: "LastMile Brasil",
-			description:
-				language === "en"
-					? "Last-mile coverage platform for ISPs. Geographic precision with PostGIS, viability search and integrated checkout for lead-to-customer conversion."
-					: "Plataforma de cobertura de última milha para provedores de internet. Precisão geográfica com PostGIS, busca de viabilidade e checkout integrado para conversão de leads.",
-			tags: ["Next.js", "PostGIS", "Geolocation", "B2B"],
-			liveUrl: "https://projeto-lastmile-brasil.vercel.app",
-			imageUrl: "/projects/lastmile.png",
-			featured: false,
-		},
-		{
-			title: "Rede Silva Lobo",
-			description:
-				language === "en"
-					? "Two-sided marketplace connecting clients and home service professionals. Profile creation, request flow and subscription plans for providers."
-					: "Marketplace de dois lados conectando clientes a profissionais de serviços residenciais. Criação de perfil, fluxo de pedidos e planos por assinatura para prestadores.",
-			tags: ["Next.js", "TypeScript", "Marketplace", "Mobile-first"],
-			liveUrl: "https://redesilvalobo.com.br",
-			imageUrl: "/projects/silvalobo.png",
-			featured: false,
-		},
-		{
-			title: "Lorflux",
-			description:
-				language === "en"
-					? "PWA for cinematic comics and vertical video streaming. Manga reader, anime episodes via Bunny CDN, mobile-first with offline support."
-					: "PWA para cinematic comics e streaming de vídeo vertical. Leitor de mangás, episódios de anime via Bunny CDN, mobile-first com suporte offline.",
-			tags: ["PWA", "React", "Bunny CDN", "Streaming"],
-			liveUrl: "https://lorflux.com",
-			imageUrl: "/projects/lorflux.png",
-			featured: false,
-		},
-		{
-			title: "Veritas Task Manager",
-			description:
-				language === "en"
-					? "High-performance Kanban board with Go backend and React frontend. Docker containerization, clean architecture and CI/CD pipelines."
-					: "Sistema Kanban de alta performance com backend em Go e frontend em React. Conteinerização com Docker, arquitetura limpa e pipelines CI/CD.",
-			tags: ["Go", "React", "PostgreSQL", "Docker"],
-			githubUrl: "https://github.com/fap233/desafio-fullstack-veritas",
-			featured: false,
-		},
-		{
-			title: language === "en" ? "Scheduling API" : "Agendamento API (.NET)",
-			description:
-				language === "en"
-					? "Scalable REST API built with .NET 9 and Clean Architecture principles. Complex booking logic with Entity Framework Core."
-					: "API RESTful escalável com .NET 9 e princípios de Clean Architecture. Lógica de agendamento complexa com Entity Framework Core.",
-			tags: ["C#", ".NET 9", "SQL Server", "EF Core"],
-			githubUrl: "https://github.com/fap233/schedulingapi",
-			featured: false,
-		},
-	];
+	const sectionRef = useRef<HTMLElement>(null);
+	const trackRef = useRef<HTMLDivElement>(null);
+	const progressRef = useRef<HTMLSpanElement>(null);
+	const [active, setActive] = useState(0);
+
+	const onActiveChange = useCallback((index: number) => setActive(index), []);
+	const { enabled, sectionHeight } = useHorizontalTrack(
+		sectionRef,
+		trackRef,
+		progressRef,
+		onActiveChange,
+	);
+
+	const { ref: headingRef, inView } = useInView<HTMLDivElement>(0.2);
+
+	const heading = (
+		<div
+			ref={headingRef}
+			data-in-view={inView ? "true" : "false"}
+			className="max-w-2xl space-y-3"
+		>
+			<p className="text-base text-muted-foreground/80 font-[family-name:var(--font-caveat)] tracking-wide in-view-anim in-view-anim-1">
+				{kicker}
+			</p>
+			<h2 className="text-3xl md:text-5xl font-bold in-view-anim in-view-anim-2">
+				{t.projects.title}
+			</h2>
+			<p className="text-muted-foreground in-view-anim in-view-anim-3">
+				{t.projects.subtitle}
+			</p>
+		</div>
+	);
+
+	if (!enabled) {
+		return (
+			<section
+				id="projects"
+				className="relative py-20 bg-secondary/20 overflow-hidden"
+			>
+				<div
+					aria-hidden="true"
+					className="absolute inset-0 -z-10 section-grid-bg [mask-image:radial-gradient(ellipse_85%_80%_at_50%_30%,#000_60%,transparent_100%)]"
+				/>
+				<div className="container mx-auto px-4">
+					<div className="mb-12 text-center mx-auto">{heading}</div>
+					<div className="grid gap-6 md:grid-cols-2">
+						{projects.map((project) => (
+							<ProjectCard
+								key={project.slug}
+								title={project.title}
+								description={project.description[language]}
+								tags={project.tags}
+								liveUrl={project.liveUrl}
+								githubUrl={project.githubUrl}
+								imageUrl={project.imageUrl}
+								featured={project.featured}
+							/>
+						))}
+					</div>
+				</div>
+			</section>
+		);
+	}
 
 	return (
 		<section
 			id="projects"
-			ref={ref}
-			data-in-view={inView ? "true" : "false"}
-			className="relative py-20 bg-secondary/20 overflow-hidden"
+			ref={sectionRef}
+			className="relative bg-secondary/20"
+			style={{ height: sectionHeight ? `${sectionHeight}px` : undefined }}
 		>
-			<div
-				aria-hidden="true"
-				className="absolute inset-0 -z-10 section-grid-bg [mask-image:radial-gradient(ellipse_85%_80%_at_50%_30%,#000_60%,transparent_100%)]"
-			/>
+			<div className="sticky top-0 flex h-screen flex-col overflow-hidden">
+				<div
+					aria-hidden="true"
+					className="absolute inset-0 -z-10 section-grid-bg [mask-image:radial-gradient(ellipse_85%_80%_at_50%_40%,#000_60%,transparent_100%)]"
+				/>
 
-			<div className="container mx-auto px-4">
-				<div className="max-w-2xl mx-auto text-center mb-12 space-y-3 in-view-anim in-view-anim-1">
-					<p className="text-base text-muted-foreground/80 font-[family-name:var(--font-caveat)] tracking-wide">
-						{kicker}
-					</p>
-					<div className="relative inline-block">
-						<h2 className="text-3xl md:text-4xl font-bold">
-							{t.projects.title}
-						</h2>
-						<svg
-							aria-hidden="true"
-							className="absolute left-0 right-0 -bottom-2 w-full max-w-xs mx-auto pointer-events-none"
-							viewBox="0 0 300 14"
-							fill="none"
-							preserveAspectRatio="none"
-						>
-							<path
-								d="M5 8 Q 40 2, 80 7 T 160 7 T 240 8 T 297 5"
-								stroke="url(#projects-scribble-gradient)"
-								strokeWidth="2"
-								strokeLinecap="round"
-								fill="none"
-								opacity="0.85"
-							/>
-							<defs>
-								<linearGradient
-									id="projects-scribble-gradient"
-									x1="0"
-									y1="0"
-									x2="1"
-									y2="0"
-								>
-									<stop offset="0%" stopColor="oklch(0.922 0 0)" />
-									<stop offset="50%" stopColor="#a855f7" />
-									<stop offset="100%" stopColor="#ec4899" />
-								</linearGradient>
-							</defs>
-						</svg>
+				<div className="container mx-auto shrink-0 px-4 pt-24 pb-8">
+					<div className="flex flex-wrap items-end justify-between gap-6">
+						{heading}
+						<div className="hidden items-baseline gap-2 font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground/70 lg:flex">
+							<span className="text-foreground/90">
+								{String(active + 1).padStart(2, "0")}
+							</span>
+							<span>/</span>
+							<span>{String(projects.length).padStart(2, "0")}</span>
+							<span className="ml-4">
+								{language === "en" ? "Scroll to explore →" : "Role para explorar →"}
+							</span>
+						</div>
 					</div>
-					<p className="text-muted-foreground pt-3">{t.projects.subtitle}</p>
 				</div>
 
-				<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto in-view-anim in-view-anim-2">
-					{projects.map((project, index) => (
-						<ProjectCard key={index} {...project} />
-					))}
+				{/* Horizontal track — driven by the vertical scroll above */}
+				<div className="flex min-h-0 flex-1 items-center">
+					{/* Trailing padding lets the final panel reach the viewport centre. */}
+					<div
+						ref={trackRef}
+						className="flex gap-6 pl-[8vw] pr-[calc(50vw-190px)] will-change-transform xl:pr-[calc(50vw-220px)]"
+					>
+						{projects.map((project, index) => (
+							<ProjectPanel
+								key={project.slug}
+								project={project}
+								index={index}
+								active={index === active}
+								language={language}
+							/>
+						))}
+					</div>
+				</div>
+
+				<div className="container mx-auto shrink-0 px-4 pb-10">
+					<div className="h-px w-full overflow-hidden bg-border">
+						<span
+							ref={progressRef}
+							className="block h-px w-full origin-left bg-gradient-to-r from-primary via-purple-500 to-pink-500"
+							style={{ transform: "scaleX(0.02)" }}
+						/>
+					</div>
 				</div>
 			</div>
 		</section>
+	);
+}
+
+function ProjectPanel({
+	project,
+	index,
+	active,
+	language,
+}: {
+	project: Project;
+	index: number;
+	active: boolean;
+	language: "en" | "pt";
+}) {
+	const href = project.liveUrl ?? project.githubUrl;
+
+	return (
+		<article
+			data-active={active ? "true" : "false"}
+			className="project-panel group relative flex h-[60vh] max-h-[560px] w-[380px] shrink-0 flex-col overflow-hidden rounded-xl border bg-card xl:w-[440px]"
+			style={
+				{
+					"--accent-from": project.accent[0],
+					"--accent-to": project.accent[1],
+				} as React.CSSProperties
+			}
+		>
+			<span aria-hidden="true" className="project-paint" />
+			<span aria-hidden="true" className="project-rule" />
+
+			<div className="relative z-10 flex h-full flex-col">
+				<div className="flex items-center justify-between px-5 pt-5 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+					<span>
+						{String(index + 1).padStart(2, "0")} — {project.category[language]}
+					</span>
+					<span>{project.year}</span>
+				</div>
+
+				{project.imageUrl ? (
+					<div className="relative mt-4 aspect-video w-full overflow-hidden bg-secondary/30">
+						<Image
+							src={project.imageUrl}
+							alt={project.title}
+							fill
+							sizes="440px"
+							className="project-image object-cover"
+						/>
+					</div>
+				) : (
+					<div className="project-plate relative mt-4 flex aspect-video w-full items-center justify-center overflow-hidden">
+						<span className="px-6 text-center font-[family-name:var(--font-caveat)] text-3xl leading-tight text-foreground/70">
+							{project.title}
+						</span>
+					</div>
+				)}
+
+				<div className="flex flex-1 flex-col gap-3 p-5">
+					<h3 className="project-title text-2xl font-semibold">
+						{project.title}
+					</h3>
+					<p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground">
+						{project.description[language]}
+					</p>
+					<p className="project-metric text-xs font-medium leading-relaxed">
+						{project.metric[language]}
+					</p>
+
+					<div className="mt-auto flex flex-wrap items-center gap-1.5 pt-2">
+						{project.tags.slice(0, 4).map((tag) => (
+							<span
+								key={tag}
+								className="rounded-full border border-border/70 px-2 py-0.5 font-mono text-[10px] text-muted-foreground"
+							>
+								{tag}
+							</span>
+						))}
+					</div>
+
+					{href && (
+						<a
+							href={href}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="project-link inline-flex items-center gap-1.5 text-sm font-medium"
+						>
+							{project.githubUrl && !project.liveUrl ? (
+								<>
+									<Github className="h-4 w-4" /> Code
+								</>
+							) : (
+								<>
+									{language === "en" ? "Visit" : "Visitar"}
+									<ArrowUpRight className="h-4 w-4" />
+								</>
+							)}
+						</a>
+					)}
+				</div>
+			</div>
+		</article>
 	);
 }

@@ -4,6 +4,7 @@ import "./globals.css";
 
 import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
 import Providers from "@/components/providers";
+import { SmoothScroll } from "@/components/SmoothScroll";
 import { Metadata } from "next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { LanguageProvider } from "@/contexts/LanguageContext";
@@ -24,11 +25,11 @@ const caveat = Caveat({
 export const metadata: Metadata = {
 	metadataBase: new URL("https://pavin.me"),
 	title: {
-		default: "Fellipe Pavin · Software Engineer (Go, React, Node.js)",
+		default: "Fellipe Pavin · Software Engineer (TypeScript, React, Node.js)",
 		template: "%s · Fellipe Pavin",
 	},
 	description:
-		"Software Engineer with 9+ years of production experience. Founded a multi-tenant SaaS scaled to 10,000+ paying users. Full-cycle ownership across Go, TypeScript, Node.js and React/Next.js. Open to remote and contract roles worldwide.",
+		"Full Stack Software Engineer with 9+ years of production experience. Founded a multi-tenant SaaS scaled to 10,000+ paying users at 99.9% uptime. 20+ B2B projects delivered across TypeScript, React/Next.js, Node.js, .NET and PostgreSQL. Open to remote and contract roles worldwide.",
 	keywords: [
 		"Software Engineer",
 		"Full Stack Developer",
@@ -64,9 +65,9 @@ export const metadata: Metadata = {
 		locale: "en_US",
 		alternateLocale: "pt_BR",
 		url: "https://pavin.me",
-		title: "Fellipe Pavin · Software Engineer (Go, React, Node.js)",
+		title: "Fellipe Pavin · Software Engineer (TypeScript, React, Node.js)",
 		description:
-			"9+ years building production SaaS at scale. Founded a multi-tenant SaaS to 10,000+ paying users. Open to remote and contract roles worldwide.",
+			"9+ years building production software at scale. Founded a multi-tenant SaaS to 10,000+ paying users. 20+ B2B projects delivered. Open to remote and contract roles worldwide.",
 		siteName: "pavin.me",
 	},
 	twitter: {
@@ -102,6 +103,7 @@ export default function RootLayout({
 			<body className="antialiased min-h-screen bg-background text-foreground transition-colors duration-500">
 				<GoogleAnalytics />
 				<SpeedInsights />
+				<SmoothScroll />
 
 				<LanguageProvider>
 					<Providers>{children}</Providers>

@@ -1,23 +1,81 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, FileText } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
+/** Blur applied to the name when the pointer is far away, in px. */
+const MAX_BLUR = 9;
+/** Distance (px) at which the name is fully sharp. */
+const FOCUS_RADIUS = 380;
+
+/**
+ * The name starts out of focus and sharpens as the pointer approaches it —
+ * the visitor literally brings the work into focus. Falls back to a static,
+ * sharp name when the pointer is coarse or motion is reduced.
+ */
+function useFocusOnPointer(ref: React.RefObject<HTMLElement | null>) {
+	const [blur, setBlur] = useState(MAX_BLUR);
+
+	useEffect(() => {
+		const canHover = window.matchMedia("(hover: hover)").matches;
+		const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+		if (!canHover || reduced) {
+			setBlur(0);
+			return;
+		}
+
+		let frame = 0;
+		const onMove = (event: PointerEvent) => {
+			if (frame) return;
+			frame = requestAnimationFrame(() => {
+				frame = 0;
+				const el = ref.current;
+				if (!el) return;
+
+				const rect = el.getBoundingClientRect();
+				const cx = rect.left + rect.width / 2;
+				const cy = rect.top + rect.height / 2;
+				const distance = Math.hypot(event.clientX - cx, event.clientY - cy);
+				const t = Math.min(distance / FOCUS_RADIUS, 1);
+				setBlur(t * t * MAX_BLUR);
+			});
+		};
+
+		window.addEventListener("pointermove", onMove, { passive: true });
+		return () => {
+			window.removeEventListener("pointermove", onMove);
+			if (frame) cancelAnimationFrame(frame);
+		};
+	}, [ref]);
+
+	return blur;
+}
+
 export function HeroSection() {
 	const { t, language } = useLanguage();
+	const nameRef = useRef<HTMLSpanElement>(null);
+	const blur = useFocusOnPointer(nameRef);
 
 	return (
 		<section
 			id="hero"
-			className="relative pt-24 pb-16 md:pt-32 md:pb-32 overflow-hidden min-h-[90vh] flex flex-col justify-center"
+			className="relative pt-24 pb-16 md:pt-32 md:pb-32 overflow-hidden min-h-[92vh] flex flex-col justify-center"
 		>
 			{/* Notebook grid background */}
 			<div className="absolute inset-0 -z-10 h-full w-full bg-background">
 				<div className="absolute h-full w-full bg-[linear-gradient(to_right,oklch(0.55_0.02_280_/_0.18)_1px,transparent_1px),linear-gradient(to_bottom,oklch(0.55_0.02_280_/_0.18)_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_70%_95%_at_50%_10%,#000_55%,transparent_100%)]"></div>
 				<div className="absolute -inset-x-8 top-0 h-[420px] m-auto rounded-full bg-gradient-to-r from-primary/20 via-purple-500/15 to-pink-500/20 opacity-60 blur-[120px]"></div>
+			</div>
+
+			{/* Technical drafting overlay: alignment circle + crosshairs */}
+			<div aria-hidden="true" className="hero-blueprint">
+				<span className="hero-blueprint-circle" />
+				<span className="hero-crosshair hero-crosshair-left" />
+				<span className="hero-crosshair hero-crosshair-right" />
 			</div>
 
 			<div className="container relative z-10 mx-auto px-4">
@@ -36,7 +94,11 @@ export function HeroSection() {
 							<span className="block text-2xl md:text-4xl lg:text-5xl font-normal text-muted-foreground/90 mb-2 font-[family-name:var(--font-caveat)] tracking-wide">
 								{language === "en" ? "Hi, I'm" : "Olá, eu sou"}
 							</span>
-							<span className="hero-name-gradient bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent pb-2 inline-block">
+							<span
+								ref={nameRef}
+								className="hero-name-gradient hero-name-focus bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent pb-2 inline-block"
+								style={{ filter: `blur(${blur.toFixed(2)}px)` }}
+							>
 								Fellipe Pavin
 							</span>
 						</h1>
@@ -111,6 +173,16 @@ export function HeroSection() {
 						</Button>
 					</div>
 				</div>
+			</div>
+
+			{/* Status strip — technical footer of the hero frame */}
+			<div
+				aria-hidden="true"
+				className="hero-anim hero-anim-5 absolute inset-x-0 bottom-5 hidden md:flex items-center justify-between gap-4 px-8 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground/60"
+			>
+				<span>Fortaleza · BR — UTC-3</span>
+				<span className="hero-status-bars" />
+				<span>{language === "en" ? "Scroll" : "Role"} ↓</span>
 			</div>
 		</section>
 	);

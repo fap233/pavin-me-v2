@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
 	title: "CV / Resume",
 	description:
-		"Fellipe Pavin — Software Engineer. 9+ years of production experience. Full-cycle ownership across Go, TypeScript, Node.js and React/Next.js. Founded a multi-tenant SaaS scaled to 10,000+ paying users. Open to remote and contract roles worldwide.",
+		"Fellipe Pavin — Full Stack Software Engineer. 9+ years of production experience, 20+ B2B projects delivered. Founded a multi-tenant SaaS scaled to 10,000+ paying users at 99.9% uptime. TypeScript, React/Next.js, Node.js, .NET, PostgreSQL. Open to remote and contract roles worldwide.",
 	alternates: {
 		canonical: "https://pavin.me/cv",
 	},
