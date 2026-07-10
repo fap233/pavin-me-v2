@@ -49,7 +49,9 @@ html {
 
 :root {
 	--radius: 0.625rem;
-	--background: oklch(1 0 0);
+	/* A whisper of cool tint so the light base reads as a lit surface, not
+	   dead flat white — the animated background does the rest. */
+	--background: oklch(0.992 0.003 280);
 	--foreground: oklch(0.145 0 0);
 	--card: oklch(1 0 0);
 	--card-foreground: oklch(0.145 0 0);
@@ -85,7 +87,8 @@ html {
 }
 
 .dark {
-	--background: oklch(0.145 0 0);
+	/* Lifted off pure black with a faint violet cast — deep-space, not a void. */
+	--background: oklch(0.165 0.014 280);
 	--foreground: oklch(0.985 0 0);
 	--card: oklch(0.205 0 0);
 	--card-foreground: oklch(0.985 0 0);
@@ -280,6 +283,339 @@ body {
 	.hero-scribble path {
 		animation: none !important;
 		opacity: 1 !important;
+	}
+}
+
+/* Projects track — slot width scales from phones up to desktop, and the
+   symmetric inline padding keeps the focused card centred at both ends. */
+.project-track {
+	--slot-w: min(380px, 85vw);
+	padding-inline: calc(50vw - var(--slot-w) / 2);
+}
+@media (min-width: 1280px) {
+	.project-track {
+		--slot-w: 440px;
+	}
+}
+
+/* Contact: giant e-mail CTA that paints itself on hover (ink -> galaxy). */
+.contact-mail {
+	position: relative;
+	padding-bottom: 10px;
+}
+.contact-mail-text {
+	transition: color 0.35s ease;
+}
+.contact-mail:hover .contact-mail-text,
+.contact-mail:focus-visible .contact-mail-text {
+	background-image: linear-gradient(90deg, var(--color-primary), #a855f7, #ec4899);
+	background-clip: text;
+	-webkit-background-clip: text;
+	color: transparent;
+}
+.contact-mail-arrow {
+	transition:
+		transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+		color 0.35s ease;
+	color: var(--muted-foreground);
+}
+.contact-mail:hover .contact-mail-arrow,
+.contact-mail:focus-visible .contact-mail-arrow {
+	transform: translate(6px, -6px);
+	color: #ec4899;
+}
+.contact-mail-rule {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 3px;
+	background: linear-gradient(90deg, var(--color-primary), #a855f7, #ec4899);
+	transform: scaleX(0);
+	transform-origin: left;
+	transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.contact-mail:hover .contact-mail-rule,
+.contact-mail:focus-visible .contact-mail-rule {
+	transform: scaleX(1);
+}
+
+.contact-social-text {
+	background-image: linear-gradient(90deg, var(--color-primary), #a855f7, #ec4899);
+	background-size: 0% 2px;
+	background-position: 0 100%;
+	background-repeat: no-repeat;
+	transition: background-size 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+	padding-bottom: 2px;
+}
+.contact-social:hover .contact-social-text,
+.contact-social:focus-visible .contact-social-text {
+	background-size: 100% 2px;
+}
+
+.contact-status-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 9999px;
+	background: #22c55e;
+	box-shadow: 0 0 0 0 rgb(34 197 94 / 0.55);
+	animation: contact-status-pulse 2.2s ease-out infinite;
+}
+@keyframes contact-status-pulse {
+	0% {
+		box-shadow: 0 0 0 0 rgb(34 197 94 / 0.55);
+	}
+	70% {
+		box-shadow: 0 0 0 9px rgb(34 197 94 / 0);
+	}
+	100% {
+		box-shadow: 0 0 0 0 rgb(34 197 94 / 0);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.contact-status-dot {
+		animation: none;
+	}
+}
+
+/* Theme switch = paint: the new theme is revealed by a growing circular
+   clip (driven from Header via the View Transitions API). Default crossfade
+   is disabled so only the wash reads. */
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation: none;
+	mix-blend-mode: normal;
+}
+::view-transition-old(root) {
+	z-index: 1;
+}
+::view-transition-new(root) {
+	z-index: 2;
+}
+
+/* Transition veil — a skewed panel whose leading edge draws a diagonal line
+   across the screen (dobre.agency-style). Doubles as the preloader on first
+   paint and as the curtain for page/language/theme switches. */
+.veil {
+	pointer-events: none;
+}
+.veil[data-state="covering"],
+.veil[data-state="closing"] {
+	pointer-events: auto;
+}
+
+.veil-panel {
+	position: absolute;
+	inset: -12% -38%;
+	background:
+		radial-gradient(
+			90% 120% at 75% 20%,
+			oklch(0.24 0.07 300 / 0.85),
+			transparent 60%
+		),
+		oklch(0.13 0.02 295);
+	transform: translateX(-116%) skewX(-12deg);
+}
+/* Leading edge: the diagonal brand-gradient line. */
+.veil-panel::after {
+	content: "";
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	width: 3px;
+	background: linear-gradient(to bottom, #6366f1, #a855f7, #ec4899);
+	box-shadow: 0 0 24px 2px rgb(168 85 247 / 0.55);
+}
+
+.veil[data-state="covering"] .veil-panel {
+	transform: translateX(0) skewX(-12deg);
+}
+.veil[data-state="closing"] .veil-panel {
+	transform: translateX(0) skewX(-12deg);
+	transition: transform 0.56s cubic-bezier(0.76, 0, 0.24, 1);
+}
+.veil[data-state="opening"] .veil-panel {
+	transform: translateX(116%) skewX(-12deg);
+	transition: transform 0.68s cubic-bezier(0.76, 0, 0.24, 1);
+}
+.veil[data-state="idle"] .veil-panel {
+	transform: translateX(-116%) skewX(-12deg);
+	transition: none;
+}
+
+/* No-JS safety valve: if hydration never flips the state, the covering
+   panel sweeps itself away and reveals the content. */
+.veil[data-state="covering"] .veil-panel {
+	animation: veil-auto-open 0.68s cubic-bezier(0.76, 0, 0.24, 1) 3s forwards;
+}
+@keyframes veil-auto-open {
+	to {
+		transform: translateX(116%) skewX(-12deg);
+	}
+}
+
+.veil-brand {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 14px;
+	opacity: 0;
+	transition: opacity 0.3s ease;
+}
+.veil[data-state="covering"] .veil-brand,
+.veil[data-state="closing"] .veil-brand {
+	opacity: 1;
+	transition-delay: 0.2s;
+}
+
+.veil-progress {
+	width: 132px;
+	height: 1.5px;
+	overflow: hidden;
+	background: rgb(255 255 255 / 0.14);
+	position: relative;
+}
+.veil-progress::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	transform: translateX(-100%);
+	background: linear-gradient(to right, #6366f1, #a855f7, #ec4899);
+	animation: veil-progress-run 1.1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes veil-progress-run {
+	to {
+		transform: translateX(100%);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.veil {
+		display: none !important;
+	}
+}
+
+/* Lab: Tate-Law-style typographic tiles. At rest: dark tile, huge title.
+   Touched: the tile floods bottom-up with its accent pair, a geometric shape
+   blooms behind the text, and the detail line inks in. */
+.lab-grid {
+	gap: 1px;
+	background: var(--border);
+}
+
+.lab-tile {
+	min-height: 250px;
+	background: var(--card);
+	outline: none;
+}
+
+.lab-tile-paint {
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(135deg, var(--accent-from), var(--accent-to));
+	transform: scaleY(0);
+	transform-origin: bottom;
+	transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.lab-tile:hover .lab-tile-paint,
+.lab-tile:focus-visible .lab-tile-paint {
+	transform: scaleY(1);
+}
+
+.lab-tile-shape {
+	position: absolute;
+	right: -40px;
+	bottom: -40px;
+	width: 190px;
+	height: 190px;
+	background: rgb(0 0 0 / 0.16);
+	opacity: 0;
+	transform: scale(0.5) rotate(-14deg);
+	transition:
+		transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+		opacity 0.45s ease;
+}
+.lab-tile-shape-circle {
+	border-radius: 9999px;
+}
+.lab-tile-shape-square {
+	border-radius: 18px;
+}
+.lab-tile-shape-triangle {
+	background: transparent;
+	border-left: 95px solid transparent;
+	border-right: 95px solid transparent;
+	border-bottom: 165px solid rgb(0 0 0 / 0.16);
+	width: 0;
+	height: 0;
+}
+.lab-tile:hover .lab-tile-shape,
+.lab-tile:focus-visible .lab-tile-shape {
+	opacity: 1;
+	transform: scale(1) rotate(0deg);
+}
+
+.lab-tile-title {
+	color: var(--foreground);
+	transition: color 0.35s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.lab-tile:hover .lab-tile-title,
+.lab-tile:focus-visible .lab-tile-title {
+	color: oklch(0.16 0.02 300);
+	transform: translateX(6px);
+}
+
+.lab-tile-desc,
+.lab-tile-cta {
+	opacity: 0;
+	transform: translateY(8px);
+	transition:
+		opacity 0.4s ease 0.08s,
+		transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.08s,
+		color 0.3s ease;
+}
+.lab-tile:hover .lab-tile-desc,
+.lab-tile:hover .lab-tile-cta,
+.lab-tile:focus-visible .lab-tile-desc,
+.lab-tile:focus-visible .lab-tile-cta {
+	opacity: 1;
+	transform: translateY(0);
+	color: oklch(0.2 0.02 300);
+}
+.lab-tile:hover .lab-tile-meta,
+.lab-tile:focus-visible .lab-tile-meta {
+	color: oklch(0.25 0.02 300);
+}
+.lab-tile:hover .lab-tile-tags span,
+.lab-tile:focus-visible .lab-tile-tags span {
+	color: oklch(0.22 0.02 300);
+	border-color: oklch(0.22 0.02 300 / 0.35);
+}
+
+/* Touch devices never hover: keep the detail visible and hint the accent. */
+@media (hover: none) {
+	.lab-tile-desc,
+	.lab-tile-cta {
+		opacity: 1;
+		transform: none;
+	}
+	.lab-tile {
+		border-left: 3px solid var(--accent-to);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.lab-tile-paint,
+	.lab-tile-shape,
+	.lab-tile-title,
+	.lab-tile-desc,
+	.lab-tile-cta {
+		transition: none !important;
 	}
 }
 

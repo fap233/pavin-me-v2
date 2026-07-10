@@ -1,8 +1,7 @@
 "use client";
 
-import { Github, Linkedin, Mail } from "lucide-react";
-import { Card } from "../ui/card";
-import { Button } from "../ui/button";
+import { useEffect, useState } from "react";
+import { ArrowUpRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useInView } from "@/lib/useInView";
 
@@ -12,123 +11,122 @@ const contactData = {
 	github: "https://github.com/fap233",
 };
 
-const socialLinks = [
-	{
-		href: contactData.linkedin,
-		label: "LinkedIn",
-		icon: <Linkedin className="h-6 w-6" />,
-	},
-	{
-		href: contactData.github,
-		label: "GitHub",
-		icon: <Github className="h-6 w-6" />,
-	},
-	{
-		href: `mailto:${contactData.email}`,
-		label: "Email",
-		icon: <Mail className="h-6 w-6" />,
-	},
-];
+/** Live Fortaleza clock — rendered only after mount to stay hydration-safe. */
+function useLocalTime() {
+	const [time, setTime] = useState<string>("--:--:--");
+
+	useEffect(() => {
+		const fmt = new Intl.DateTimeFormat("pt-BR", {
+			hour: "2-digit",
+			minute: "2-digit",
+			second: "2-digit",
+			hour12: false,
+			timeZone: "America/Fortaleza",
+		});
+		const tick = () => setTime(fmt.format(new Date()));
+		tick();
+		const id = setInterval(tick, 1000);
+		return () => clearInterval(id);
+	}, []);
+
+	return time;
+}
 
 const ContactSection = () => {
-	const { t } = useLanguage();
+	const { t, language } = useLanguage();
 	const { ref, inView } = useInView<HTMLElement>(0.15);
+	const time = useLocalTime();
+	const isEN = language === "en";
+
+	const socials = [
+		{ label: "LinkedIn", href: contactData.linkedin },
+		{ label: "GitHub", href: contactData.github },
+		{ label: isEN ? "Resume / CV" : "Currículo / CV", href: "/cv" },
+	];
 
 	return (
 		<section
 			id="contact"
 			ref={ref}
 			data-in-view={inView ? "true" : "false"}
-			className="relative py-20 md:py-32 bg-background border-t overflow-hidden"
+			className="relative py-24 md:py-36 border-t overflow-hidden"
 		>
 			<div
 				aria-hidden="true"
 				className="absolute inset-0 -z-10 section-grid-bg [mask-image:radial-gradient(ellipse_75%_70%_at_50%_50%,#000_55%,transparent_100%)]"
 			/>
 
-			<div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-				<div className="max-w-2xl mx-auto text-center">
-					<div className="space-y-3 mb-8 in-view-anim in-view-anim-1">
-						<p className="text-base text-muted-foreground/80 font-[family-name:var(--font-caveat)] tracking-wide">
-							{t.contact.kicker}
-						</p>
-						<div className="relative inline-block">
-							<h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
-								{t.contact.title}
-							</h2>
-							<svg
-								aria-hidden="true"
-								className="absolute left-0 right-0 -bottom-2 w-full max-w-sm mx-auto pointer-events-none"
-								viewBox="0 0 360 14"
-								fill="none"
-								preserveAspectRatio="none"
+			<div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+				{/* Kicker */}
+				<p className="in-view-anim in-view-anim-1 text-base text-muted-foreground/80 font-[family-name:var(--font-caveat)] tracking-wide">
+					{t.contact.kicker}
+				</p>
+
+				{/* Editorial headline + giant e-mail CTA */}
+				<h2 className="in-view-anim in-view-anim-2 mt-3 max-w-3xl text-4xl font-bold tracking-tight md:text-6xl">
+					{t.contact.title}
+				</h2>
+				<p className="in-view-anim in-view-anim-2 mt-4 max-w-xl text-lg text-muted-foreground">
+					{t.contact.subtitle}
+				</p>
+
+				<a
+					href={`mailto:${contactData.email}`}
+					className="contact-mail in-view-anim in-view-anim-3 group mt-12 inline-flex max-w-full flex-wrap items-baseline gap-3 text-2xl font-black tracking-tight sm:text-4xl lg:text-6xl"
+				>
+					<span className="contact-mail-text break-all">
+						{contactData.email}
+					</span>
+					<ArrowUpRight
+						aria-hidden="true"
+						className="contact-mail-arrow h-6 w-6 shrink-0 sm:h-9 sm:w-9 lg:h-12 lg:w-12"
+					/>
+					<span aria-hidden="true" className="contact-mail-rule" />
+				</a>
+
+				{/* Status strip + typographic socials */}
+				<div className="in-view-anim in-view-anim-4 mt-16 grid gap-10 border-t pt-8 md:grid-cols-2">
+					<dl className="space-y-2 font-mono text-xs uppercase tracking-[0.18em] text-muted-foreground">
+						<div className="flex items-baseline gap-4">
+							<dt className="w-28 shrink-0 text-muted-foreground/60">
+								{isEN ? "Location" : "Base"}
+							</dt>
+							<dd>Fortaleza, BR — UTC-3</dd>
+						</div>
+						<div className="flex items-baseline gap-4">
+							<dt className="w-28 shrink-0 text-muted-foreground/60">
+								{isEN ? "Local time" : "Hora local"}
+							</dt>
+							<dd className="tabular-nums">{time}</dd>
+						</div>
+						<div className="flex items-baseline gap-4">
+							<dt className="w-28 shrink-0 text-muted-foreground/60">
+								Status
+							</dt>
+							<dd className="inline-flex items-center gap-2">
+								<span className="contact-status-dot" aria-hidden="true" />
+								{isEN ? "Open to work — remote" : "Aberto a oportunidades — remoto"}
+							</dd>
+						</div>
+					</dl>
+
+					<nav
+						aria-label={isEN ? "Social links" : "Redes"}
+						className="flex flex-col items-start gap-2 md:items-end"
+					>
+						{socials.map((s) => (
+							<a
+								key={s.label}
+								href={s.href}
+								target={s.href.startsWith("http") ? "_blank" : undefined}
+								rel={s.href.startsWith("http") ? "noopener noreferrer" : undefined}
+								className="contact-social group inline-flex items-center gap-2 text-xl font-semibold md:text-2xl"
 							>
-								<path
-									d="M5 8 Q 50 2, 95 7 T 190 7 T 285 8 T 357 5"
-									stroke="url(#contact-scribble-gradient)"
-									strokeWidth="2"
-									strokeLinecap="round"
-									fill="none"
-									opacity="0.85"
-								/>
-								<defs>
-									<linearGradient
-										id="contact-scribble-gradient"
-										x1="0"
-										y1="0"
-										x2="1"
-										y2="0"
-									>
-										<stop offset="0%" stopColor="oklch(0.922 0 0)" />
-										<stop offset="50%" stopColor="#a855f7" />
-										<stop offset="100%" stopColor="#ec4899" />
-									</linearGradient>
-								</defs>
-							</svg>
-						</div>
-					</div>
-
-					<p className="text-lg md:text-xl text-muted-foreground mb-12 in-view-anim in-view-anim-2">
-						{t.contact.subtitle}
-					</p>
-
-					<Card className="group relative p-8 overflow-hidden in-view-anim in-view-anim-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_40px_-12px_rgba(168,85,247,0.3),0_0_24px_-8px_rgba(236,72,153,0.22)]">
-						<span
-							aria-hidden="true"
-							className="pointer-events-none absolute inset-0 rounded-[inherit] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-							style={{
-								background:
-									"linear-gradient(to right, var(--color-primary), #a855f7, #ec4899)",
-								WebkitMask:
-									"linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
-								WebkitMaskComposite: "xor",
-								maskComposite: "exclude",
-								padding: "1.5px",
-							}}
-						/>
-						<div className="flex justify-center flex-wrap gap-4">
-							{socialLinks.map((link) => (
-								<a
-									key={link.label}
-									href={link.href}
-									target="_blank"
-									rel="noopener noreferrer"
-									aria-label={`Connect via ${link.label}`}
-								>
-									<Button
-										variant="outline"
-										size="lg"
-										className="h-14 sm:h-auto sm:px-6 transition-all hover:border-purple-500/60 hover:-translate-y-0.5 hover:shadow-[0_6px_20px_-6px_rgba(236,72,153,0.35)]"
-									>
-										{link.icon}
-										<span className="hidden sm:inline sm:ml-2">
-											{link.label}
-										</span>
-									</Button>
-								</a>
-							))}
-						</div>
-					</Card>
+								<span className="contact-social-text">{s.label}</span>
+								<ArrowUpRight className="h-5 w-5 text-muted-foreground transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-foreground" />
+							</a>
+						))}
+					</nav>
 				</div>
 			</div>
 		</section>

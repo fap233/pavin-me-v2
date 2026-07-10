@@ -1,73 +1,89 @@
 "use client";
 
-import ProjectCard from "./ProjectCard";
+import { ArrowUpRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useInView } from "@/lib/useInView";
+
+type Demo = {
+	title: string;
+	description: string;
+	tags: string[];
+	liveUrl: string;
+	/** Flood colour pair — the tile paints itself with this on hover. */
+	accent: [string, string];
+	shape: "circle" | "triangle" | "square";
+};
 
 export function FrontendPreviews() {
 	const { language, t } = useLanguage();
 	const { ref, inView } = useInView<HTMLElement>(0.1);
 
-	const demos = [
+	const demos: Demo[] = [
 		{
-			title: "Nexus AI SaaS",
+			title: "Nexus AI",
 			description:
 				language === "en"
-					? "Futuristic Dark Mode landing page with neon gradients and glassmorphism effects."
-					: "Landing page futurista em Dark Mode com gradientes neon e efeitos de vidro (glassmorphism).",
+					? "Futuristic dark-mode landing page with neon gradients and glassmorphism."
+					: "Landing page futurista em dark mode com gradientes neon e glassmorphism.",
 			tags: ["React", "Tailwind", "UI Design"],
 			liveUrl: "/demos/ai-saas",
-			featured: false,
+			accent: ["#6366f1", "#8b5cf6"],
+			shape: "circle",
 		},
 		{
-			title: "Farine Bakery",
+			title: "Farine",
 			description:
 				language === "en"
-					? "Artisanal bakery website featuring warm tones, serif typography and parallax effects."
-					: "Site de padaria artesanal com tons terrosos, tipografia serifada e efeitos parallax.",
+					? "Artisanal bakery site — warm tones, serif typography, parallax."
+					: "Padaria artesanal — tons terrosos, tipografia serifada, parallax.",
 			tags: ["UX", "Frontend", "Responsive"],
 			liveUrl: "/demos/bakery",
-			featured: false,
+			accent: ["#f59e0b", "#f97316"],
+			shape: "triangle",
 		},
 		{
-			title: "Lumina Fintech",
+			title: "Lumina",
 			description:
 				language === "en"
-					? "Clean and minimalist fintech dashboard using Bento Grid layout and CSS-only charts."
-					: "Dashboard fintech limpo e minimalista usando layout Bento Grid e gráficos pure CSS.",
+					? "Minimalist fintech dashboard — Bento grid and CSS-only charts."
+					: "Dashboard fintech minimalista — Bento grid e gráficos só com CSS.",
 			tags: ["Fintech", "Bento Grid", "Clean UI"],
 			liveUrl: "/demos/fintech",
-			featured: false,
+			accent: ["#06b6d4", "#3b82f6"],
+			shape: "square",
 		},
 		{
-			title: "Iron Forge Gym",
+			title: "Iron Forge",
 			description:
 				language === "en"
-					? "High-energy brutalist design for a gym, using skewed elements and high contrast."
-					: "Design brutalista de alta energia para academia, usando elementos inclinados e alto contraste.",
+					? "High-energy brutalist gym design — skewed elements, hard contrast."
+					: "Academia em brutalismo de alta energia — elementos inclinados, contraste duro.",
 			tags: ["Brutalist", "High Energy", "CSS"],
 			liveUrl: "/demos/gym",
-			featured: false,
+			accent: ["#ef4444", "#f97316"],
+			shape: "triangle",
 		},
 		{
-			title: "Aurum Real Estate",
+			title: "Aurum",
 			description:
 				language === "en"
-					? "Luxury real estate landing page focusing on whitespace, typography and elegance."
-					: "Landing page imobiliária de luxo focada em espaço em branco, tipografia e elegância.",
+					? "Luxury real-estate landing — whitespace, typography, elegance."
+					: "Imobiliária de luxo — espaço em branco, tipografia, elegância.",
 			tags: ["Luxury", "Minimalist", "Real Estate"],
 			liveUrl: "/demos/luxury",
-			featured: false,
+			accent: ["#eab308", "#a16207"],
+			shape: "circle",
 		},
 		{
-			title: "SaaS Admin Dashboard",
+			title: "Admin OS",
 			description:
 				language === "en"
-					? "Complete admin interface with sidebar, data tables, and analytics widgets."
-					: "Interface administrativa completa com sidebar, tabelas de dados e widgets de análise.",
+					? "Complete admin interface — sidebar, data tables, analytics widgets."
+					: "Interface administrativa completa — sidebar, tabelas e widgets de análise.",
 			tags: ["Dashboard", "Admin", "Data Viz"],
 			liveUrl: "/demos/dashboard",
-			featured: true,
+			accent: ["#22c55e", "#14b8a6"],
+			shape: "square",
 		},
 	];
 
@@ -76,7 +92,7 @@ export function FrontendPreviews() {
 			id="frontend-demos"
 			ref={ref}
 			data-in-view={inView ? "true" : "false"}
-			className="relative py-20 bg-background overflow-hidden"
+			className="relative py-20 overflow-hidden"
 		>
 			<div
 				aria-hidden="true"
@@ -123,17 +139,56 @@ export function FrontendPreviews() {
 					<p className="text-muted-foreground pt-3">{t.lab.subtitle}</p>
 				</div>
 
-				<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto in-view-anim in-view-anim-2">
+				{/* Tate-Law-style block: gapless typographic tiles that flood with
+				    their own colour when touched. */}
+				<div className="lab-grid in-view-anim in-view-anim-2 mx-auto grid max-w-6xl overflow-hidden rounded-xl border md:grid-cols-2">
 					{demos.map((demo, index) => (
-						<ProjectCard
-							key={index}
-							title={demo.title}
-							description={demo.description}
-							tags={demo.tags}
-							liveUrl={demo.liveUrl}
-							githubUrl="https://github.com/fap233"
-							featured={demo.featured}
-						/>
+						<a
+							key={demo.title}
+							href={demo.liveUrl}
+							className="lab-tile group relative block overflow-hidden p-6 md:p-8"
+							style={
+								{
+									"--accent-from": demo.accent[0],
+									"--accent-to": demo.accent[1],
+								} as React.CSSProperties
+							}
+						>
+							<span aria-hidden="true" className="lab-tile-paint" />
+							<span
+								aria-hidden="true"
+								className={`lab-tile-shape lab-tile-shape-${demo.shape}`}
+							/>
+
+							<div className="relative z-10 flex h-full flex-col gap-4">
+								<div className="lab-tile-meta flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+									<span>{String(index + 1).padStart(2, "0")}</span>
+									<span className="lab-tile-cta inline-flex items-center gap-1">
+										{language === "en" ? "Open demo" : "Abrir demo"}
+										<ArrowUpRight className="h-3.5 w-3.5" />
+									</span>
+								</div>
+
+								<h3 className="lab-tile-title text-4xl font-black uppercase tracking-tight md:text-6xl">
+									{demo.title}
+								</h3>
+
+								<p className="lab-tile-desc max-w-md text-sm leading-relaxed text-muted-foreground">
+									{demo.description}
+								</p>
+
+								<div className="lab-tile-tags mt-auto flex flex-wrap gap-1.5 pt-2">
+									{demo.tags.map((tag) => (
+										<span
+											key={tag}
+											className="rounded-full border border-border/70 px-2 py-0.5 font-mono text-[10px] text-muted-foreground"
+										>
+											{tag}
+										</span>
+									))}
+								</div>
+							</div>
+						</a>
 					))}
 				</div>
 			</div>

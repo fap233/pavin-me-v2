@@ -4,12 +4,74 @@ import React from "react";
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { Moon, Sun, Github, Linkedin, FileText } from "lucide-react";
+import { flushSync } from "react-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
+import { scrambleDocument } from "@/lib/scramble";
 
 const Header = () => {
 	const { language, setLanguage, t } = useLanguage();
 	const { isDarkMode, toggleDarkMode } = useTheme();
+
+	// Language: swap synchronously, then matrix-scramble the visible text so
+	// the page reads as being live-translated into the chosen language.
+	const switchLanguage = (lang: "pt" | "en") => {
+		if (lang === language) return;
+		flushSync(() => setLanguage(lang));
+		scrambleDocument();
+	};
+
+	// Theme: paint the new theme over the old one — a circular wash expanding
+	// from the toggle (View Transitions API; plain toggle where unsupported).
+	const switchTheme = (event: React.MouseEvent) => {
+		const doc = document as Document & {
+			startViewTransition?: (cb: () => void) => { ready: Promise<void> };
+		};
+		const reduced = window.matchMedia(
+			"(prefers-reduced-motion: reduce)",
+		).matches;
+
+		if (!doc.startViewTransition || reduced) {
+			toggleDarkMode();
+			return;
+		}
+
+		const x = event.clientX;
+		const y = event.clientY;
+		const radius =
+			Math.hypot(
+				Math.max(x, window.innerWidth - x),
+				Math.max(y, window.innerHeight - y),
+			) * 1.2;
+
+		// Irregular blot instead of a perfect circle — the new theme spreads
+		// like ink soaking into paper.
+		const POINTS = 26;
+		const jitter = Array.from(
+			{ length: POINTS },
+			() => 0.8 + Math.random() * 0.45,
+		);
+		const blot = (scale: number) =>
+			`polygon(${Array.from({ length: POINTS }, (_, i) => {
+				const angle = (i / POINTS) * Math.PI * 2;
+				const r = radius * scale * jitter[i];
+				return `${(x + Math.cos(angle) * r).toFixed(1)}px ${(y + Math.sin(angle) * r).toFixed(1)}px`;
+			}).join(",")})`;
+
+		const transition = doc.startViewTransition(() => {
+			flushSync(() => toggleDarkMode());
+		});
+		transition.ready.then(() => {
+			document.documentElement.animate(
+				{ clipPath: [blot(0.004), blot(1)] },
+				{
+					duration: 780,
+					easing: "cubic-bezier(0.3, 0.7, 0.2, 1)",
+					pseudoElement: "::view-transition-new(root)",
+				},
+			);
+		});
+	};
 
 	const navItems = [
 		{ name: t.nav.about, href: "/#about" },
@@ -54,7 +116,7 @@ const Header = () => {
 				<div className="flex items-center gap-4">
 					<div className="flex items-center bg-secondary/50 rounded-full p-1 border border-border">
 						<button
-							onClick={() => setLanguage("pt")}
+							onClick={() => switchLanguage("pt")}
 							className={`px-3 py-1 text-xs rounded-full transition-all ${
 								language === "pt"
 									? "bg-primary text-primary-foreground font-bold shadow-sm"
@@ -64,7 +126,7 @@ const Header = () => {
 							PT
 						</button>
 						<button
-							onClick={() => setLanguage("en")}
+							onClick={() => switchLanguage("en")}
 							className={`px-3 py-1 text-xs rounded-full transition-all ${
 								language === "en"
 									? "bg-primary text-primary-foreground font-bold shadow-sm"
@@ -110,7 +172,7 @@ const Header = () => {
 						<Button
 							variant="ghost"
 							size="icon"
-							onClick={toggleDarkMode}
+							onClick={(e) => switchTheme(e)}
 							aria-label="Toggle Dark Mode"
 						>
 							{isDarkMode ? (

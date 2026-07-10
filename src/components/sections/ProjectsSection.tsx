@@ -27,15 +27,14 @@ function useHorizontalTrack(
 	const activeRef = useRef(0);
 
 	useEffect(() => {
-		const wide = window.matchMedia("(min-width: 1024px)");
+		// The pinned track runs on every viewport (slot width adapts via CSS);
+		// only reduced motion falls back to the vertical grid.
 		const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-		const sync = () => setEnabled(wide.matches && !reduced.matches);
+		const sync = () => setEnabled(!reduced.matches);
 
 		sync();
-		wide.addEventListener("change", sync);
 		reduced.addEventListener("change", sync);
 		return () => {
-			wide.removeEventListener("change", sync);
 			reduced.removeEventListener("change", sync);
 		};
 	}, []);
@@ -219,10 +218,11 @@ export function ProjectsSection() {
 				<div className="flex min-h-0 flex-1 items-center">
 					{/* Symmetric padding centres the first panel at the start and the
 					    last panel at the end, so the focused card is always the one
-					    in the viewport centre. */}
+					    in the viewport centre. Slot width + padding live in
+					    .project-track so they adapt to phone viewports. */}
 					<div
 						ref={trackRef}
-						className="flex gap-6 pl-[calc(50vw-190px)] pr-[calc(50vw-190px)] will-change-transform xl:pl-[calc(50vw-220px)] xl:pr-[calc(50vw-220px)]"
+						className="project-track flex gap-4 md:gap-6 will-change-transform"
 					>
 						{projects.map((project, index) => (
 							<ProjectPanel
@@ -266,7 +266,7 @@ function ProjectPanel({
 	return (
 		<article
 			data-active={active ? "true" : "false"}
-			className="project-panel group relative flex h-[60vh] max-h-[560px] w-[380px] shrink-0 flex-col overflow-hidden rounded-xl border bg-card xl:w-[440px]"
+			className="project-panel group relative flex h-[60vh] max-h-[560px] w-[var(--slot-w)] shrink-0 flex-col overflow-hidden rounded-xl border bg-card"
 			style={
 				{
 					"--accent-from": project.accent[0],
