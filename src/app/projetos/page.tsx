@@ -1,17 +1,22 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import type { User } from "@supabase/supabase-js";
 import { supabase, supabaseConfigured, type SharedProject } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowRight, LogOut, RefreshCw } from "lucide-react";
 
-const STATUSES: { key: SharedProject["status"]; label: string }[] = [
-  { key: "backlog", label: "Backlog" },
-  { key: "doing", label: "Em andamento" },
-  { key: "review", label: "Revisão" },
-  { key: "done", label: "Concluído" },
+const STATUSES: {
+  key: SharedProject["status"];
+  label: string;
+  accent: string;
+}[] = [
+  { key: "backlog", label: "Backlog", accent: "#6366f1" },
+  { key: "doing", label: "Em andamento", accent: "#f59e0b" },
+  { key: "review", label: "Revisão", accent: "#a855f7" },
+  { key: "done", label: "Concluído", accent: "#22c55e" },
 ];
 
 export default function ProjetosPage() {
@@ -69,7 +74,12 @@ export default function ProjetosPage() {
   if (loading) {
     return (
       <Shell>
-        <p className="text-muted-foreground">Carregando…</p>
+        <div className="flex items-center gap-3 text-muted-foreground">
+          <span className="h-2 w-2 animate-pulse rounded-full bg-purple-500" />
+          <span className="font-mono text-xs uppercase tracking-[0.2em]">
+            Carregando…
+          </span>
+        </div>
       </Shell>
     );
   }
@@ -78,38 +88,71 @@ export default function ProjetosPage() {
 
   return (
     <Shell>
-      <div className="mb-6 flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">Backlog de projetos</h1>
-          <p className="text-sm text-muted-foreground">
-            {user.email} ({role})
+      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+        <div className="space-y-1">
+          <p className="font-[family-name:var(--font-caveat)] text-base tracking-wide text-muted-foreground/80">
+            {"// backlog"}
+          </p>
+          <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
+            Backlog de projetos
+          </h1>
+          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+            {user.email}
+            <span className="mx-2 text-muted-foreground/40">·</span>
+            <span
+              className={
+                role === "admin" ? "text-purple-400" : "text-muted-foreground"
+              }
+            >
+              {role}
+            </span>
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={loadProjects}>
-            Atualizar
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-full bg-card/60 backdrop-blur"
+            onClick={loadProjects}
+          >
+            <RefreshCw className="mr-1.5 h-3.5 w-3.5" /> Atualizar
           </Button>
           <Button
             variant="ghost"
             size="sm"
+            className="rounded-full"
             onClick={async () => {
               await supabase!.auth.signOut();
               setUser(null);
             }}
           >
-            Sair
+            <LogOut className="mr-1.5 h-3.5 w-3.5" /> Sair
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
         {STATUSES.map((st) => {
           const items = projects.filter((p) => p.status === st.key);
           return (
             <div key={st.key}>
-              <h2 className="mb-2 px-1 text-sm font-semibold text-muted-foreground">
-                {st.label} ({items.length})
-              </h2>
+              <div
+                className="mb-3 rounded-full border bg-card/60 px-3 py-1.5 backdrop-blur"
+                style={{
+                  borderColor: `color-mix(in oklab, ${st.accent} 35%, transparent)`,
+                }}
+              >
+                <h2 className="flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                  <span className="inline-flex items-center gap-2">
+                    <span
+                      className="h-1.5 w-1.5 rounded-full"
+                      style={{ background: st.accent }}
+                    />
+                    {st.label}
+                  </span>
+                  <span style={{ color: st.accent }}>{items.length}</span>
+                </h2>
+              </div>
               <div className="space-y-3">
                 {items.map((p) => (
                   <ProjectCard
@@ -117,6 +160,7 @@ export default function ProjetosPage() {
                     p={p}
                     me={user}
                     role={role}
+                    accent={st.accent}
                     onChange={loadProjects}
                   />
                 ))}
@@ -130,7 +174,33 @@ export default function ProjetosPage() {
 }
 
 function Shell({ children }: { children: React.ReactNode }) {
-  return <div className="mx-auto max-w-7xl px-4 py-10">{children}</div>;
+  return (
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Notebook grid over the site-wide universe background */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-10 section-grid-bg [mask-image:radial-gradient(ellipse_85%_75%_at_50%_20%,#000_55%,transparent_100%)]"
+      />
+
+      {/* Minimal workspace bar — this route lives outside the main site chrome */}
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 pt-6">
+        <Link
+          href="/"
+          className="group text-lg font-bold tracking-tight transition-colors hover:text-primary"
+        >
+          Pavin
+          <span className="ml-0.5 inline-block font-[family-name:var(--font-caveat)] text-xl text-primary transition-transform group-hover:rotate-[-3deg]">
+            .dev
+          </span>
+        </Link>
+        <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground/70">
+          Workspace — Backlog
+        </span>
+      </div>
+
+      <div className="mx-auto max-w-7xl px-4 py-10">{children}</div>
+    </div>
+  );
 }
 
 function Login({ onAuthed }: { onAuthed: (u: User) => Promise<void> }) {
@@ -158,35 +228,81 @@ function Login({ onAuthed }: { onAuthed: (u: User) => Promise<void> }) {
 
   return (
     <Shell>
-      <Card className="mx-auto mt-[10vh] max-w-sm">
-        <CardHeader>
-          <CardTitle>Backlog — entrar</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={submit} className="space-y-3">
-            <input
-              type="email"
-              placeholder="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="username"
-              className="w-full rounded-md border bg-background px-3 py-2 text-sm"
-            />
-            <input
-              type="password"
-              placeholder="senha"
-              value={pass}
-              onChange={(e) => setPass(e.target.value)}
-              autoComplete="current-password"
-              className="w-full rounded-md border bg-background px-3 py-2 text-sm"
-            />
-            <Button type="submit" className="w-full" disabled={busy}>
-              {busy ? "Entrando…" : "Entrar"}
-            </Button>
-            {err && <p className="text-sm text-destructive">{err}</p>}
+      <div className="relative mx-auto mt-[8vh] max-w-sm">
+        {/* Drafting marks behind the card */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-10 left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full border border-border/60 opacity-50 [mask-image:linear-gradient(to_bottom,transparent,#000_25%,#000_75%,transparent)]"
+        />
+
+        <div className="relative isolate overflow-hidden rounded-2xl border bg-card/70 p-8 shadow-[0_30px_80px_-32px_rgb(0_0_0/0.6)] backdrop-blur-xl">
+          {/* Gradient top rule */}
+          <span
+            aria-hidden="true"
+            className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-primary via-purple-500 to-pink-500"
+          />
+
+          <p className="font-[family-name:var(--font-caveat)] text-base tracking-wide text-muted-foreground/80">
+            {"// acesso restrito"}
+          </p>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight">
+            Backlog de projetos
+          </h1>
+          <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+            pavin.dev — workspace de colaboradores
+          </p>
+
+          <form onSubmit={submit} className="mt-7 space-y-4">
+            <label className="block space-y-1.5">
+              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                E-mail
+              </span>
+              <input
+                type="email"
+                placeholder="voce@exemplo.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="username"
+                className="w-full rounded-lg border border-border/70 bg-background/60 px-3.5 py-2.5 text-sm outline-none backdrop-blur transition focus:border-purple-500/60 focus:ring-2 focus:ring-purple-500/25"
+              />
+            </label>
+            <label className="block space-y-1.5">
+              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                Senha
+              </span>
+              <input
+                type="password"
+                placeholder="••••••••"
+                value={pass}
+                onChange={(e) => setPass(e.target.value)}
+                autoComplete="current-password"
+                className="w-full rounded-lg border border-border/70 bg-background/60 px-3.5 py-2.5 text-sm outline-none backdrop-blur transition focus:border-purple-500/60 focus:ring-2 focus:ring-purple-500/25"
+              />
+            </label>
+
+            <button
+              type="submit"
+              disabled={busy}
+              className="hero-btn hero-btn-fill w-full disabled:pointer-events-none disabled:opacity-60"
+            >
+              <span className="relative z-10 inline-flex items-center gap-2 text-sm font-semibold">
+                {busy ? "Entrando…" : "Entrar"}
+                {!busy && <ArrowRight className="hero-btn-arrow h-4 w-4" />}
+              </span>
+            </button>
+
+            {err && (
+              <p className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 font-mono text-xs text-destructive">
+                {err}
+              </p>
+            )}
           </form>
-        </CardContent>
-      </Card>
+        </div>
+
+        <p className="mt-4 text-center font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground/60">
+          Fortaleza, BR — UTC-3
+        </p>
+      </div>
     </Shell>
   );
 }
@@ -214,11 +330,13 @@ function ProjectCard({
   p,
   me,
   role,
+  accent,
   onChange,
 }: {
   p: SharedProject;
   me: User;
   role: "admin" | "member";
+  accent: string;
   onChange: () => Promise<void>;
 }) {
   async function update(patch: Partial<SharedProject>) {
@@ -253,7 +371,23 @@ function ProjectCard({
   const dl = deliveryInfo(p);
 
   return (
-    <Card className={dl?.urgent ? "urgent-blink border-2" : undefined}>
+    <Card
+      className={`relative overflow-hidden bg-card/75 backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_36px_-18px_rgb(0_0_0/0.55)] ${
+        dl?.urgent ? "urgent-blink border-2" : ""
+      }`}
+      style={
+        dl?.urgent
+          ? undefined
+          : { borderColor: `color-mix(in oklab, ${accent} 22%, var(--border))` }
+      }
+    >
+      <span
+        aria-hidden="true"
+        className="absolute inset-y-0 left-0 w-[3px]"
+        style={{
+          background: `linear-gradient(to bottom, ${accent}, transparent)`,
+        }}
+      />
       <CardContent className="space-y-2 pt-4">
         <div className="text-sm font-semibold leading-snug">{p.title}</div>
         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
@@ -298,19 +432,24 @@ function ProjectCard({
         )}
         <div className="flex flex-wrap items-center gap-2 pt-1">
           {!p.claimed_by && (
-            <Button size="sm" onClick={() => claim(true)}>
+            <Button size="sm" className="rounded-full" onClick={() => claim(true)}>
               Pegar
             </Button>
           )}
           {mine && (
-            <Button size="sm" variant="outline" onClick={() => claim(false)}>
+            <Button
+              size="sm"
+              variant="outline"
+              className="rounded-full"
+              onClick={() => claim(false)}
+            >
               Largar
             </Button>
           )}
           <select
             value={p.status}
             onChange={(e) => update({ status: e.target.value as SharedProject["status"] })}
-            className="rounded-md border bg-background px-2 py-1 text-xs"
+            className="rounded-full border bg-background/60 px-2.5 py-1 font-mono text-[11px] backdrop-blur"
           >
             {STATUSES.map((s) => (
               <option key={s.key} value={s.key}>
@@ -319,7 +458,12 @@ function ProjectCard({
             ))}
           </select>
           {role === "admin" && (
-            <Button size="sm" variant="ghost" onClick={remove}>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="rounded-full"
+              onClick={remove}
+            >
               Remover
             </Button>
           )}
