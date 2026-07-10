@@ -97,7 +97,7 @@ export function HeroParticles({
 			if (!text || rect.width < 10) return [];
 
 			const off = document.createElement("canvas");
-			const scale = 0.7; // higher res + step 1 = many fine points -> crisp letters
+			const scale = 0.92; // near-full res + step 1 = very fine points -> crisp letters
 			off.width = Math.ceil(rect.width * scale);
 			off.height = Math.ceil(rect.height * scale);
 			const octx = off.getContext("2d");
@@ -153,15 +153,15 @@ export function HeroParticles({
 			// band of ambient dust that never converges — so the space around
 			// the assembled name still reads as a living galaxy. Denser on
 			// phones so the smaller particles still read as solid letters.
-			const formedCap = width < 640 ? 3800 : finePointer ? 3200 : 1800;
+			const formedCap = width < 640 ? 5200 : finePointer ? 5200 : 2600;
 			const formedCount = reduced
-				? Math.min(targets.length, 1600)
-				: Math.max(900, Math.min(targets.length, formedCap));
+				? Math.min(targets.length, 2200)
+				: Math.max(1200, Math.min(targets.length, formedCap));
 			const ambientCount = reduced ? 80 : 260;
 
 			// Small particles + high density = crisp, solid letters that never
 			// smear (finer still on phones).
-			const nameSize = width < 640 ? 0.55 : 0.8;
+			const nameSize = width < 640 ? 0.5 : 0.68;
 			const make = (i: number, ambient: boolean, count: number): Particle => {
 				const color = palette[Math.floor(Math.random() * palette.length)];
 				// Spread particles across ALL sampled points (stride), so the
@@ -250,7 +250,7 @@ export function HeroParticles({
 				// Residual orbit shrinks hard as it forms, so the centred name
 				// packs tight; a fast micro-tremor stays even when fully formed —
 				// electrons held to their spot by force, never quite at rest.
-				const tremor = (0.7 + 0.6 * pForm) * 1.1;
+				const tremor = 0.6 + 0.5 * pForm;
 				const jx = Math.sin(time * p.jrate + p.jphase) * tremor;
 				const jy = Math.cos(time * p.jrate * 1.3 + p.jphase) * tremor;
 				const formedX = cx + p.tx + Math.cos(p.orbit) * (1 - pForm) * 2 + jx;

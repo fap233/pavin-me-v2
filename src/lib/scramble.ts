@@ -40,7 +40,9 @@ function collectTextNodes(limit: number): Entry[] {
 	const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
 		acceptNode(node) {
 			const text = node.textContent ?? "";
-			if (!text.trim() || text.length > 400) return NodeFilter.FILTER_REJECT;
+			// Long paragraphs (About bio, CV summary) must scramble too — only
+			// skip the truly huge to keep a frame cheap.
+			if (!text.trim() || text.length > 1600) return NodeFilter.FILTER_REJECT;
 
 			const parent = node.parentElement;
 			if (!parent) return NodeFilter.FILTER_REJECT;
@@ -81,7 +83,7 @@ export function scrambleDocument(duration = 720) {
 	if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
 	const run = ++activeRun;
-	const entries = collectTextNodes(280);
+	const entries = collectTextNodes(600);
 	if (!entries.length) return;
 
 	const start = performance.now();
