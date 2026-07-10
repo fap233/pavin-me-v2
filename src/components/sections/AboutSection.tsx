@@ -63,8 +63,8 @@ export function AboutSection() {
 											y2="0"
 										>
 											<stop offset="0%" stopColor="oklch(0.922 0 0)" />
-											<stop offset="50%" stopColor="#a855f7" />
-											<stop offset="100%" stopColor="#ec4899" />
+											<stop offset="50%" style={{ stopColor: "var(--brand-via)" }} />
+											<stop offset="100%" style={{ stopColor: "var(--brand-to)" }} />
 										</linearGradient>
 									</defs>
 								</svg>

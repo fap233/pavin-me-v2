@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
+import { usePaint } from "@/contexts/PaintContext";
+import { hslToRgb } from "@/lib/color";
 
 type Dust = {
 	x: number;
@@ -22,12 +24,6 @@ type Blob = {
 	drift: number;
 };
 
-const BRAND: [number, number, number][] = [
-	[99, 102, 241], // indigo
-	[168, 85, 247], // purple
-	[236, 72, 153], // pink
-];
-
 /**
  * A fixed, full-viewport canvas that gives the flat background depth and life:
  * soft drifting brand-colour washes plus a slow dust field that parallaxes with
@@ -37,8 +33,16 @@ const BRAND: [number, number, number][] = [
 export function SiteBackground() {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const { isDarkMode } = useTheme();
+	const { hue } = usePaint();
 
 	useEffect(() => {
+		// Nebula washes follow the visitor-paintable brand hue (footer slider) —
+		// same stop offsets as the CSS --brand-from/via/to.
+		const BRAND: [number, number, number][] = [
+			hslToRgb(hue - 61, 84, 67),
+			hslToRgb(hue - 29, 91, 65),
+			hslToRgb(hue + 30, 81, 60),
+		];
 		const canvas = canvasRef.current;
 		if (!canvas) return;
 		const ctx = canvas.getContext("2d");
@@ -264,7 +268,7 @@ export function SiteBackground() {
 			window.removeEventListener("resize", onResize);
 			document.removeEventListener("visibilitychange", onVisibility);
 		};
-	}, [isDarkMode]);
+	}, [isDarkMode, hue]);
 
 	return (
 		<canvas

@@ -239,7 +239,7 @@ function Login({ onAuthed }: { onAuthed: (u: User) => Promise<void> }) {
           {/* Gradient top rule */}
           <span
             aria-hidden="true"
-            className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-primary via-purple-500 to-pink-500"
+            className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-[var(--brand-from)] via-[var(--brand-via)] to-[var(--brand-to)]"
           />
 
           <p className="font-[family-name:var(--font-caveat)] text-base tracking-wide text-muted-foreground/80">

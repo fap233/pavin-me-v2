@@ -252,7 +252,7 @@ export function ProjectsSection() {
 					<div className="h-px w-full overflow-hidden bg-border">
 						<span
 							ref={progressRef}
-							className="block h-px w-full origin-left bg-gradient-to-r from-primary via-purple-500 to-pink-500"
+							className="block h-px w-full origin-left bg-gradient-to-r from-[var(--brand-from)] via-[var(--brand-via)] to-[var(--brand-to)]"
 							style={{ transform: "scaleX(0.02)" }}
 						/>
 					</div>

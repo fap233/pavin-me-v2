@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
+import { usePaint } from "@/contexts/PaintContext";
+import { hslToRgb } from "@/lib/color";
 
 type Particle = {
 	/** Scattered galaxy home (offset from cloud centre). */
@@ -49,6 +51,7 @@ export function HeroParticles({
 }) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const { isDarkMode } = useTheme();
+	const { hue } = usePaint();
 
 	useEffect(() => {
 		const canvas = canvasRef.current;
@@ -74,18 +77,24 @@ export function HeroParticles({
 		const assembleAt = performance.now() + 500; // fly-in starts shortly after paint
 		const pointer = { x: -9999, y: -9999 };
 
+		// Neutral dust + the three paintable brand hues (footer slider), in the
+		// light tints (dark theme) / ink tints (light theme) of the originals.
+		const rgba = (h: number, s: number, l: number) => {
+			const [r, g, b] = hslToRgb(h, s, l);
+			return `rgba(${r}, ${g}, ${b}, A)`;
+		};
 		const palette = isDarkMode
 			? [
 					"rgba(226, 223, 255, A)",
-					"rgba(129, 140, 248, A)",
-					"rgba(192, 132, 252, A)",
-					"rgba(244, 114, 182, A)",
+					rgba(hue - 66, 89, 74),
+					rgba(hue - 29, 95, 75),
+					rgba(hue + 29, 86, 70),
 				]
 			: [
 					"rgba(76, 70, 120, A)",
-					"rgba(99, 102, 241, A)",
-					"rgba(147, 51, 234, A)",
-					"rgba(219, 39, 119, A)",
+					rgba(hue - 61, 84, 67),
+					rgba(hue - 29, 74, 56),
+					rgba(hue + 33, 70, 51),
 				];
 		const baseAlpha = isDarkMode ? 0.65 : 0.45;
 
@@ -366,7 +375,7 @@ export function HeroParticles({
 			window.removeEventListener("resize", onResize);
 			document.removeEventListener("visibilitychange", onVisibility);
 		};
-	}, [isDarkMode, anchorRef]);
+	}, [isDarkMode, anchorRef, hue]);
 
 	return (
 		<canvas
