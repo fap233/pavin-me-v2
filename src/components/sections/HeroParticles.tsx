@@ -226,18 +226,22 @@ export function HeroParticles({
 				// Auto-assembly: every ~9s the galaxy pulls itself into the name
 				// and releases, so an idle visitor (or one who never grasps the
 				// interaction) still gets to read it. The pointer overrides it.
+				// The plateau must reach a full 1: the scatter offsets span
+				// hundreds of px, so even a 10% residue smears the letters.
 				const P = 9000;
 				const ph = ((time - assembleAt) % P) / P;
 				let pulse = 0;
 				if (ph < 0.14) pulse = smoothstep(ph / 0.14);
 				else if (ph < 0.4) pulse = 1;
 				else if (ph < 0.56) pulse = 1 - smoothstep((ph - 0.4) / 0.16);
-				pulse *= 0.9;
 
 				target = Math.max(pointerTarget, pulse);
 			}
 			// Aligning is quicker than dissolving — magnetic, not laggy.
 			form += (target - form) * (target > form ? 0.08 : 0.04);
+			// The easing is asymptotic; snap the last sliver so a fully-formed
+			// name is exactly formed rather than 99% formed.
+			if (target >= 1 && form > 0.995) form = 1;
 
 			for (const p of particles) {
 				p.orbit += p.orbitSpeed * 16;
@@ -257,8 +261,12 @@ export function HeroParticles({
 				const formedY = cy + p.ty + Math.sin(p.orbit) * (1 - pForm) * 2 + jy;
 
 				const f = smoothstep(pForm);
-				let x = scatterX + (formedX - scatterX) * f;
-				let y = scatterY + (formedY - scatterY) * f;
+				// Position uses a sharper curve than brightness: the scatter
+				// offsets are hundreds of px wide, so the last few percent of
+				// `f` still carry enough displacement to blur the glyphs.
+				const fPos = smoothstep(f);
+				let x = scatterX + (formedX - scatterX) * fPos;
+				let y = scatterY + (formedY - scatterY) * fPos;
 
 				// Only the ambient dust drifts with the cursor — the letters of the
 				// name are never disturbed, so the name always stays readable.

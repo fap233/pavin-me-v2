@@ -78,10 +78,14 @@ export function ProjectDetailOverlay({
 
 	return createPortal(
 		<div
-			className="detail-overlay fixed inset-0 z-[90] flex items-start justify-center overflow-y-auto p-4 md:p-8"
+			className="detail-overlay fixed inset-0 z-[90] flex items-start justify-center overflow-y-auto overscroll-contain p-4 md:p-8"
 			role="dialog"
 			aria-modal="true"
 			aria-label={project.title}
+			/* Lenis calls preventDefault on wheel while stopped, which would
+			   kill this container's native scrolling too. It checks this
+			   attribute before that, so the dialog keeps its own scroll. */
+			data-lenis-prevent
 			onClick={(e) => {
 				if (e.target === e.currentTarget) onClose();
 			}}
