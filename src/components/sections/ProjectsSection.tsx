@@ -217,10 +217,12 @@ export function ProjectsSection() {
 
 				{/* Horizontal track — driven by the vertical scroll above */}
 				<div className="flex min-h-0 flex-1 items-center">
-					{/* Trailing padding lets the final panel reach the viewport centre. */}
+					{/* Symmetric padding centres the first panel at the start and the
+					    last panel at the end, so the focused card is always the one
+					    in the viewport centre. */}
 					<div
 						ref={trackRef}
-						className="flex gap-6 pl-[8vw] pr-[calc(50vw-190px)] will-change-transform xl:pr-[calc(50vw-220px)]"
+						className="flex gap-6 pl-[calc(50vw-190px)] pr-[calc(50vw-190px)] will-change-transform xl:pl-[calc(50vw-220px)] xl:pr-[calc(50vw-220px)]"
 					>
 						{projects.map((project, index) => (
 							<ProjectPanel

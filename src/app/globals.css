@@ -283,6 +283,42 @@ body {
 	}
 }
 
+/* Soft seams between sections — the Projects band uses a different background
+   (bg-secondary/20), which otherwise meets its neighbours on a hard horizontal
+   line. These gradients dissolve the colour change over ~140px on each edge.
+   z-index 1 keeps them above the section background but below the cards (z-10). */
+#projects::before,
+#projects::after {
+	content: "";
+	position: absolute;
+	left: 0;
+	right: 0;
+	height: 140px;
+	z-index: 1;
+	pointer-events: none;
+}
+#projects::before {
+	top: 0;
+	background: linear-gradient(to bottom, var(--background), transparent);
+}
+#projects::after {
+	bottom: 0;
+	background: linear-gradient(to top, var(--background), transparent);
+}
+
+/* A gentle exit from the hero so its grid + drafting marks don't stop dead. */
+#hero::after {
+	content: "";
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 120px;
+	z-index: 0;
+	pointer-events: none;
+	background: linear-gradient(to top, var(--background), transparent);
+}
+
 /* Lenis inertial scrolling — native smooth-scroll must yield to it. */
 html.lenis,
 html.lenis body {
@@ -320,6 +356,22 @@ html.lenis body {
 	border: 1px solid var(--border);
 	border-radius: 9999px;
 	opacity: 0.45;
+	/* Dissolve the top/bottom arcs so the ring never hard-clips at the
+	   section edge — it fades into the background instead. */
+	-webkit-mask-image: linear-gradient(
+		to bottom,
+		transparent,
+		#000 22%,
+		#000 78%,
+		transparent
+	);
+	mask-image: linear-gradient(
+		to bottom,
+		transparent,
+		#000 22%,
+		#000 78%,
+		transparent
+	);
 }
 
 .hero-crosshair {
