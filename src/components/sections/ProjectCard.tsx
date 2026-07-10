@@ -33,6 +33,7 @@ export default function ProjectCard({
 	return (
 		<Card
 			className={`group relative flex flex-col h-full overflow-hidden transition-all duration-300 ease-out
+				bg-card/80 backdrop-blur-md
 				hover:-translate-y-1
 				hover:shadow-[0_12px_40px_-12px_rgba(168,85,247,0.35),0_0_24px_-8px_rgba(236,72,153,0.25)]
 				${featured ? "border-primary/50" : ""}

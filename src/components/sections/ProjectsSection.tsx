@@ -266,7 +266,7 @@ function ProjectPanel({
 	return (
 		<article
 			data-active={active ? "true" : "false"}
-			className="project-panel group relative flex h-[60vh] max-h-[560px] w-[var(--slot-w)] shrink-0 flex-col overflow-hidden rounded-xl border bg-card"
+			className="project-panel group relative flex h-[60vh] max-h-[560px] w-[var(--slot-w)] shrink-0 flex-col overflow-hidden rounded-xl border"
 			style={
 				{
 					"--accent-from": project.accent[0],

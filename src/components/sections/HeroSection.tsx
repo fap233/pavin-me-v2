@@ -2,8 +2,6 @@
 
 import Link from "next/link";
 import { useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { ArrowRight, FileText } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { HeroParticles } from "./HeroParticles";
@@ -35,13 +33,11 @@ export function HeroSection() {
 
 			<div className="container relative z-10 mx-auto px-4">
 				<div className="max-w-4xl mx-auto text-center space-y-8">
-					<div className="hero-anim hero-anim-1">
-						<Badge
-							variant="secondary"
-							className="px-4 py-2 text-base backdrop-blur-md bg-secondary/50 border-primary/20 font-[family-name:var(--font-caveat)] tracking-wide"
-						>
+					<div className="hero-anim hero-anim-1 flex justify-center">
+						<span className="hero-badge">
+							<span className="hero-badge-dot" aria-hidden="true" />
 							{t.hero.badge}
-						</Badge>
+						</span>
 					</div>
 
 					<div className="space-y-6">
@@ -100,34 +96,20 @@ export function HeroSection() {
 						{t.hero.subtitle}
 					</p>
 
-					<div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6 hero-anim hero-anim-5">
-						<Button
-							size="lg"
-							className="w-full sm:w-auto gap-2 shadow-lg shadow-primary/20 text-base px-8 py-6 transition-all hover:shadow-xl hover:shadow-pink-500/20 hover:-translate-y-0.5"
-							asChild
-						>
-							<a href="#projects">
-								{t.hero.cta} <ArrowRight className="h-5 w-5" />
-							</a>
-						</Button>
-						<Button
-							size="lg"
-							variant="outline"
-							className="w-full sm:w-auto gap-2 backdrop-blur-sm bg-background/50 text-base px-8 py-6 transition-all hover:border-purple-500/50 hover:-translate-y-0.5"
-							asChild
-						>
-							<a href="#contact">{t.hero.secondaryCta}</a>
-						</Button>
-						<Button
-							size="lg"
-							variant="ghost"
-							className="w-full sm:w-auto gap-2 text-base px-6 py-6 text-muted-foreground hover:text-primary transition-all hover:-translate-y-0.5"
-							asChild
-						>
-							<Link href="/cv">
-								<FileText className="h-5 w-5" /> {t.hero.cvCta}
-							</Link>
-						</Button>
+					<div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-6 hero-anim hero-anim-5">
+						<a href="#projects" className="hero-btn hero-btn-fill w-full sm:w-auto">
+							<span className="relative z-10 inline-flex items-center gap-2">
+								{t.hero.cta}
+								<ArrowRight className="hero-btn-arrow h-5 w-5" />
+							</span>
+						</a>
+						<a href="#contact" className="hero-btn hero-btn-outline w-full sm:w-auto">
+							<span className="relative z-10">{t.hero.secondaryCta}</span>
+						</a>
+						<Link href="/cv" className="hero-btn-ghost group w-full sm:w-auto">
+							<FileText className="h-4 w-4" />
+							<span className="hero-btn-ghost-label">{t.hero.cvCta}</span>
+						</Link>
 					</div>
 				</div>
 			</div>

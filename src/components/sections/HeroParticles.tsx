@@ -23,6 +23,9 @@ type Particle = {
 	twinkle: number;
 	/** Ambient dust never joins the name — it keeps the galaxy alive around it. */
 	ambient: boolean;
+	/** Fast per-particle jitter phase/rate for the "held by force" tremor. */
+	jphase: number;
+	jrate: number;
 };
 
 const gauss = () => (Math.random() + Math.random() + Math.random()) / 3 - 0.5;
@@ -94,7 +97,7 @@ export function HeroParticles({
 			if (!text || rect.width < 10) return [];
 
 			const off = document.createElement("canvas");
-			const scale = 0.5; // sample at half resolution — plenty for dots
+			const scale = 0.7; // higher res + step 1 = many fine points -> crisp letters
 			off.width = Math.ceil(rect.width * scale);
 			off.height = Math.ceil(rect.height * scale);
 			const octx = off.getContext("2d");
@@ -109,13 +112,12 @@ export function HeroParticles({
 
 			const data = octx.getImageData(0, 0, off.width, off.height).data;
 			const points: { x: number; y: number }[] = [];
-			const step = 2; // grid step in offscreen px
-			for (let y = 0; y < off.height; y += step) {
-				for (let x = 0; x < off.width; x += step) {
+			for (let y = 0; y < off.height; y += 1) {
+				for (let x = 0; x < off.width; x += 1) {
 					if (data[(y * off.width + x) * 4 + 3] > 128) {
 						points.push({
-							x: (x / scale) - rect.width / 2,
-							y: (y / scale) - rect.height / 2,
+							x: x / scale - rect.width / 2,
+							y: y / scale - rect.height / 2,
 						});
 					}
 				}
@@ -151,20 +153,23 @@ export function HeroParticles({
 			// band of ambient dust that never converges — so the space around
 			// the assembled name still reads as a living galaxy. Denser on
 			// phones so the smaller particles still read as solid letters.
-			const formedCap = width < 640 ? 2600 : finePointer ? 2000 : 1200;
+			const formedCap = width < 640 ? 3800 : finePointer ? 3200 : 1800;
 			const formedCount = reduced
-				? Math.min(targets.length, 1200)
-				: Math.max(700, Math.min(targets.length, formedCap));
+				? Math.min(targets.length, 1600)
+				: Math.max(900, Math.min(targets.length, formedCap));
 			const ambientCount = reduced ? 80 : 260;
 
-			// Small viewports get crisper letters: smaller name particles so the
-			// glyphs don't smear into each other.
-			const nameSize = width < 640 ? 0.75 : 1.1;
-			const make = (i: number, ambient: boolean): Particle => {
+			// Small particles + high density = crisp, solid letters that never
+			// smear (finer still on phones).
+			const nameSize = width < 640 ? 0.55 : 0.8;
+			const make = (i: number, ambient: boolean, count: number): Particle => {
 				const color = palette[Math.floor(Math.random() * palette.length)];
-				const t = targets.length
-					? targets[i % targets.length]
-					: { x: gauss() * 220, y: gauss() * 60 };
+				// Spread particles across ALL sampled points (stride), so the
+				// whole name fills evenly instead of only the top rows.
+				const t =
+					!ambient && targets.length
+						? targets[Math.floor((i * targets.length) / count)]
+						: { x: gauss() * 220, y: gauss() * 60 };
 				return {
 					sx: gauss() * spreadX * (ambient ? 2.4 : 2),
 					sy: gauss() * spreadY * (ambient ? 2.4 : 2),
@@ -184,12 +189,18 @@ export function HeroParticles({
 					color,
 					twinkle: Math.random() * Math.PI * 2,
 					ambient,
+					jphase: Math.random() * Math.PI * 2,
+					jrate: 0.006 + Math.random() * 0.012,
 				};
 			};
 
 			particles = [
-				...Array.from({ length: formedCount }, (_, i) => make(i, false)),
-				...Array.from({ length: ambientCount }, (_, i) => make(i, true)),
+				...Array.from({ length: formedCount }, (_, i) =>
+					make(i, false, formedCount),
+				),
+				...Array.from({ length: ambientCount }, (_, i) =>
+					make(i, true, ambientCount),
+				),
 			];
 		};
 
@@ -210,7 +221,20 @@ export function HeroParticles({
 				const prox = 1 - Math.min(dist / formRadius, 1); // 0 at circle edge, 1 at centre
 				// Crossing into the circle already shows a clearly-formed name;
 				// it then tightens and densifies toward the centre.
-				target = prox <= 0 ? 0 : 0.5 + 0.5 * smoothstep(prox);
+				const pointerTarget = prox <= 0 ? 0 : 0.5 + 0.5 * smoothstep(prox);
+
+				// Auto-assembly: every ~9s the galaxy pulls itself into the name
+				// and releases, so an idle visitor (or one who never grasps the
+				// interaction) still gets to read it. The pointer overrides it.
+				const P = 9000;
+				const ph = ((time - assembleAt) % P) / P;
+				let pulse = 0;
+				if (ph < 0.14) pulse = smoothstep(ph / 0.14);
+				else if (ph < 0.4) pulse = 1;
+				else if (ph < 0.56) pulse = 1 - smoothstep((ph - 0.4) / 0.16);
+				pulse *= 0.9;
+
+				target = Math.max(pointerTarget, pulse);
 			}
 			// Aligning is quicker than dissolving — magnetic, not laggy.
 			form += (target - form) * (target > form ? 0.08 : 0.04);
@@ -223,10 +247,14 @@ export function HeroParticles({
 				const sway = 1 - pForm * 0.85;
 				const scatterX = cx + p.sx + Math.cos(p.orbit) * p.orbitR * sway * 3;
 				const scatterY = cy + p.sy + Math.sin(p.orbit) * p.orbitR * sway * 2;
-				// Residual jitter shrinks hard as it forms, so the centred name
-				// packs tight and reads dense.
-				const formedX = cx + p.tx + Math.cos(p.orbit) * (1 - pForm) * 2;
-				const formedY = cy + p.ty + Math.sin(p.orbit) * (1 - pForm) * 2;
+				// Residual orbit shrinks hard as it forms, so the centred name
+				// packs tight; a fast micro-tremor stays even when fully formed —
+				// electrons held to their spot by force, never quite at rest.
+				const tremor = (0.7 + 0.6 * pForm) * 1.1;
+				const jx = Math.sin(time * p.jrate + p.jphase) * tremor;
+				const jy = Math.cos(time * p.jrate * 1.3 + p.jphase) * tremor;
+				const formedX = cx + p.tx + Math.cos(p.orbit) * (1 - pForm) * 2 + jx;
+				const formedY = cy + p.ty + Math.sin(p.orbit) * (1 - pForm) * 2 + jy;
 
 				const f = smoothstep(pForm);
 				let x = scatterX + (formedX - scatterX) * f;

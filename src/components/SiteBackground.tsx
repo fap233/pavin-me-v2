@@ -49,7 +49,7 @@ export function SiteBackground() {
 
 		let width = 0;
 		let height = 0;
-		let dust: Dust[] = [];
+		let dust: (Dust & { tint: string | null })[] = [];
 		let blobs: Blob[] = [];
 		let raf = 0;
 		let running = true;
@@ -80,7 +80,7 @@ export function SiteBackground() {
 			ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
 			const count = Math.round(
-				Math.min(Math.max((width * height) / 9500, 70), 210),
+				Math.min(Math.max((width * height) / 6200, 110), 320),
 			);
 			dust = Array.from({ length: count }, (_, i) => ({
 				x: Math.random() * width,
@@ -88,6 +88,13 @@ export function SiteBackground() {
 				z: 0.25 + ((i * 97) % 100) / 133,
 				drift: Math.random() * Math.PI * 2,
 				speed: 0.1 + Math.random() * 0.24,
+				// Occasional warm/cool giant stars break the monochrome dust.
+				tint:
+					Math.random() < 0.14
+						? Math.random() < 0.5
+							? "255, 220, 190"
+							: "190, 210, 255"
+						: null,
 			}));
 
 			blobs = [
@@ -100,6 +107,24 @@ export function SiteBackground() {
 		const draw = (time: number) => {
 			ctx.clearRect(0, 0, width, height);
 			const minDim = Math.min(width, height);
+
+			// Milky-way band — a soft diagonal river of light that slowly rolls,
+			// giving the sky a sense of galactic depth behind the dust.
+			ctx.save();
+			ctx.globalCompositeOperation = "lighter";
+			ctx.translate(width / 2, height / 2);
+			ctx.rotate(-0.5 + Math.sin(time * 0.00003) * 0.05);
+			const band = ctx.createLinearGradient(0, -height * 0.5, 0, height * 0.5);
+			const bandTint = isDarkMode
+				? ["rgba(120,110,220,0)", "rgba(140,120,230,0.10)", "rgba(200,150,230,0.05)", "rgba(120,110,220,0)"]
+				: ["rgba(120,110,220,0)", "rgba(150,130,235,0.06)", "rgba(210,160,235,0.04)", "rgba(120,110,220,0)"];
+			band.addColorStop(0, bandTint[0]);
+			band.addColorStop(0.42, bandTint[1]);
+			band.addColorStop(0.55, bandTint[2]);
+			band.addColorStop(1, bandTint[3]);
+			ctx.fillStyle = band;
+			ctx.fillRect(-width, -height * 0.28, width * 2, height * 0.56);
+			ctx.restore();
 
 			// Soft colour washes — give the flat background depth and movement.
 			ctx.globalCompositeOperation = "lighter";
@@ -132,19 +157,21 @@ export function SiteBackground() {
 				const radius = 0.4 + p.z * 1.6;
 				const twinkle = 0.7 + 0.3 * Math.sin(time * 0.002 * p.speed * 12 + p.drift);
 				const alpha = dustAlpha * (0.35 + p.z * 0.65) * twinkle;
-				ctx.fillStyle = `rgba(${dustColor}, ${alpha.toFixed(3)})`;
+				const col = p.tint ?? dustColor;
+				ctx.fillStyle = `rgba(${col}, ${alpha.toFixed(3)})`;
 				ctx.beginPath();
 				ctx.arc(x, y, radius, 0, Math.PI * 2);
 				ctx.fill();
 
-				// A soft glow around the nearest, brightest stars.
-				if (p.z > 0.82) {
-					const gg = ctx.createRadialGradient(x, y, 0, x, y, radius * 4);
-					gg.addColorStop(0, `rgba(${dustColor}, ${(alpha * 0.5).toFixed(3)})`);
-					gg.addColorStop(1, `rgba(${dustColor}, 0)`);
+				// A soft glow around the nearest and tinted giant stars.
+				if (p.z > 0.82 || p.tint) {
+					const gr = radius * (p.tint ? 6 : 4);
+					const gg = ctx.createRadialGradient(x, y, 0, x, y, gr);
+					gg.addColorStop(0, `rgba(${col}, ${(alpha * 0.55).toFixed(3)})`);
+					gg.addColorStop(1, `rgba(${col}, 0)`);
 					ctx.fillStyle = gg;
 					ctx.beginPath();
-					ctx.arc(x, y, radius * 4, 0, Math.PI * 2);
+					ctx.arc(x, y, gr, 0, Math.PI * 2);
 					ctx.fill();
 				}
 			}

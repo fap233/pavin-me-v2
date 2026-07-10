@@ -9,12 +9,12 @@ import React from "react";
 
 export default function Home() {
 	return (
-		<>
+		<div className="select-none">
 			<HeroSection />
 			<AboutSection />
 			<ProjectsSection />
 			<FrontendPreviews />
 			<ContactSection />
-		</>
+		</div>
 	);
 }
