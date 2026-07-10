@@ -81,7 +81,7 @@ export function AboutSection() {
 							(stat: { label: string; value: string }, index: number) => (
 								<div
 									key={index}
-									className="about-stat group"
+									className="about-stat group backdrop-blur-lg"
 									style={
 										{
 											"--accent-from": ABOUT_ACCENTS[index % 3][0],

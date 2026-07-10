@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Lenis from "lenis";
+import { setLenis } from "@/lib/lenisInstance";
 
 /**
  * Inertial scrolling (Lenis) + anchor links routed through it.
@@ -18,6 +19,7 @@ export function SmoothScroll() {
 			easing: (t: number) => 1 - Math.pow(1 - t, 3),
 			touchMultiplier: 1.6,
 		});
+		setLenis(lenis);
 
 		let frame = requestAnimationFrame(function raf(time) {
 			lenis.raf(time);
@@ -42,6 +44,7 @@ export function SmoothScroll() {
 		return () => {
 			document.removeEventListener("click", onAnchorClick);
 			cancelAnimationFrame(frame);
+			setLenis(null);
 			lenis.destroy();
 		};
 	}, []);

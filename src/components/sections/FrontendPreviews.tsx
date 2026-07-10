@@ -146,7 +146,7 @@ export function FrontendPreviews() {
 						<a
 							key={demo.title}
 							href={demo.liveUrl}
-							className="lab-tile group relative block overflow-hidden p-6 md:p-8"
+							className="lab-tile group relative block overflow-hidden p-6 backdrop-blur-xl md:p-8"
 							style={
 								{
 									"--accent-from": demo.accent[0],

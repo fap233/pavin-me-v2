@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowUpRight, Github } from "lucide-react";
+import { ArrowUpRight, Github, Maximize2 } from "lucide-react";
 import ProjectCard from "./ProjectCard";
+import { ProjectDetailOverlay } from "./ProjectDetailOverlay";
 import { projects, type Project } from "@/lib/projects";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useInView } from "@/lib/useInView";
@@ -125,6 +126,8 @@ export function ProjectsSection() {
 	const trackRef = useRef<HTMLDivElement>(null);
 	const progressRef = useRef<HTMLSpanElement>(null);
 	const [active, setActive] = useState(0);
+	const [openSlug, setOpenSlug] = useState<string | null>(null);
+	const openProject = projects.find((p) => p.slug === openSlug) ?? null;
 
 	const onActiveChange = useCallback((index: number) => setActive(index), []);
 	const { enabled, sectionHeight } = useHorizontalTrack(
@@ -231,10 +234,19 @@ export function ProjectsSection() {
 								index={index}
 								active={index === active}
 								language={language}
+								onOpen={() => setOpenSlug(project.slug)}
 							/>
 						))}
 					</div>
 				</div>
+
+				{openProject && (
+					<ProjectDetailOverlay
+						project={openProject}
+						language={language}
+						onClose={() => setOpenSlug(null)}
+					/>
+				)}
 
 				<div className="container mx-auto shrink-0 px-4 pb-10">
 					<div className="h-px w-full overflow-hidden bg-border">
@@ -255,18 +267,34 @@ function ProjectPanel({
 	index,
 	active,
 	language,
+	onOpen,
 }: {
 	project: Project;
 	index: number;
 	active: boolean;
 	language: "en" | "pt";
+	onOpen: () => void;
 }) {
 	const href = project.liveUrl ?? project.githubUrl;
 
 	return (
 		<article
 			data-active={active ? "true" : "false"}
-			className="project-panel group relative flex h-[60vh] max-h-[560px] w-[var(--slot-w)] shrink-0 flex-col overflow-hidden rounded-xl border"
+			role="button"
+			tabIndex={0}
+			aria-label={
+				language === "en"
+					? `Open technical detail for ${project.title}`
+					: `Abrir detalhe técnico de ${project.title}`
+			}
+			onClick={onOpen}
+			onKeyDown={(e) => {
+				if (e.key === "Enter" || e.key === " ") {
+					e.preventDefault();
+					onOpen();
+				}
+			}}
+			className="project-panel group relative flex h-[60vh] max-h-[560px] w-[var(--slot-w)] shrink-0 cursor-pointer flex-col overflow-hidden rounded-xl border backdrop-blur-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/60"
 			style={
 				{
 					"--accent-from": project.accent[0],
@@ -325,25 +353,32 @@ function ProjectPanel({
 						))}
 					</div>
 
-					{href && (
-						<a
-							href={href}
-							target="_blank"
-							rel="noopener noreferrer"
-							className="project-link inline-flex items-center gap-1.5 text-sm font-medium"
-						>
-							{project.githubUrl && !project.liveUrl ? (
-								<>
-									<Github className="h-4 w-4" /> Code
-								</>
-							) : (
-								<>
-									{language === "en" ? "Visit" : "Visitar"}
-									<ArrowUpRight className="h-4 w-4" />
-								</>
-							)}
-						</a>
-					)}
+					<div className="flex items-center justify-between gap-3">
+						<span className="project-link inline-flex items-center gap-1.5 text-sm font-medium">
+							{language === "en" ? "Technical detail" : "Detalhe técnico"}
+							<Maximize2 className="h-3.5 w-3.5" />
+						</span>
+						{href && (
+							<a
+								href={href}
+								target="_blank"
+								rel="noopener noreferrer"
+								onClick={(e) => e.stopPropagation()}
+								className="inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
+							>
+								{project.githubUrl && !project.liveUrl ? (
+									<>
+										<Github className="h-3.5 w-3.5" /> Code
+									</>
+								) : (
+									<>
+										{language === "en" ? "Visit" : "Visitar"}
+										<ArrowUpRight className="h-3.5 w-3.5" />
+									</>
+								)}
+							</a>
+						)}
+					</div>
 				</div>
 			</div>
 		</article>
