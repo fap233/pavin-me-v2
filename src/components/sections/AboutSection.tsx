@@ -1,8 +1,14 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useInView } from "@/lib/useInView";
+
+/** Accent pair per stat card — lemontree-style colored blocks. */
+const ABOUT_ACCENTS: [string, string][] = [
+	["#6366f1", "#8b5cf6"],
+	["#a855f7", "#ec4899"],
+	["#06b6d4", "#6366f1"],
+];
 
 export function AboutSection() {
 	const { t, language } = useLanguage();
@@ -73,30 +79,25 @@ export function AboutSection() {
 					<div className="grid gap-4 in-view-anim in-view-anim-3">
 						{t.about.stats.map(
 							(stat: { label: string; value: string }, index: number) => (
-								<Card
+								<div
 									key={index}
-									className="group relative p-6 overflow-hidden transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_10px_30px_-10px_rgba(168,85,247,0.3),0_0_18px_-6px_rgba(236,72,153,0.22)]"
+									className="about-stat group"
+									style={
+										{
+											"--accent-from": ABOUT_ACCENTS[index % 3][0],
+											"--accent-to": ABOUT_ACCENTS[index % 3][1],
+											"--tilt": index % 2 === 0 ? "-1.2deg" : "1.2deg",
+										} as React.CSSProperties
+									}
 								>
-									<span
-										aria-hidden="true"
-										className="pointer-events-none absolute inset-0 rounded-[inherit] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-										style={{
-											background:
-												"linear-gradient(to right, var(--color-primary), #a855f7, #ec4899)",
-											WebkitMask:
-												"linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
-											WebkitMaskComposite: "xor",
-											maskComposite: "exclude",
-											padding: "1.5px",
-										}}
-									/>
-									<p className="text-sm text-muted-foreground mb-1">
-										{stat.label}
-									</p>
-									<p className="text-2xl font-bold transition-all duration-300 group-hover:bg-gradient-to-r group-hover:from-primary group-hover:via-purple-500 group-hover:to-pink-500 group-hover:bg-clip-text group-hover:text-transparent">
+									<div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+										<span>{String(index + 1).padStart(2, "0")}</span>
+										<span>{stat.label}</span>
+									</div>
+									<p className="about-stat-value mt-3 text-5xl font-black tracking-tight md:text-6xl">
 										{stat.value}
 									</p>
-								</Card>
+								</div>
 							),
 						)}
 					</div>

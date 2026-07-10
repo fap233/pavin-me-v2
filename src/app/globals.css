@@ -298,6 +298,48 @@ body {
 	}
 }
 
+/* About: lemontree-style stat blocks — rounded colored cards, huge number,
+   playful tilt on hover, accent wash always slightly present. */
+.about-stat {
+	position: relative;
+	overflow: hidden;
+	border-radius: 1.25rem;
+	border: 1px solid var(--border);
+	background:
+		linear-gradient(
+			140deg,
+			color-mix(in oklab, var(--accent-from) 10%, transparent),
+			color-mix(in oklab, var(--accent-to) 6%, transparent)
+		),
+		var(--card);
+	padding: 1.5rem 1.75rem;
+	transition:
+		transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+		border-color 0.35s ease,
+		box-shadow 0.45s ease;
+}
+.about-stat:hover {
+	transform: translateY(-6px) rotate(var(--tilt));
+	border-color: color-mix(in oklab, var(--accent-to) 45%, transparent);
+	box-shadow: 0 22px 48px -24px color-mix(in oklab, var(--accent-to) 55%, transparent);
+}
+.about-stat-value {
+	background-image: linear-gradient(
+		100deg,
+		var(--accent-from),
+		var(--accent-to)
+	);
+	background-clip: text;
+	-webkit-background-clip: text;
+	color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.about-stat {
+		transition: none;
+	}
+}
+
 /* Contact: giant e-mail CTA that paints itself on hover (ink -> galaxy). */
 .contact-mail {
 	position: relative;

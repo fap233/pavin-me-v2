@@ -28,8 +28,6 @@ type Particle = {
 const gauss = () => (Math.random() + Math.random() + Math.random()) / 3 - 0.5;
 const smoothstep = (t: number) => t * t * (3 - 2 * t);
 
-/** Pointer distance (px) at which the galaxy fully aligns into the name. */
-const FORM_RADIUS = 460;
 /** How long the one-off intro assembly stays before the galaxy takes over. */
 const INTRO_HOLD_MS = 2600;
 
@@ -69,6 +67,7 @@ export function HeroParticles({
 		let running = false;
 		let visible = true;
 		let form = 0; // eased 0 (scattered) .. 1 (assembled into the name)
+		let formRadius = 380; // formation zone = the hero's drafting circle
 		const assembleAt = performance.now() + 500; // fly-in starts shortly after paint
 		const pointer = { x: -9999, y: -9999 };
 
@@ -139,6 +138,9 @@ export function HeroParticles({
 			cx = a ? a.left + a.width / 2 - rect.left : width / 2;
 			cy = a ? a.top + a.height / 2 - rect.top : height * 0.42;
 
+			// Match the hero's drafting circle: min(78vw, 760px) diameter.
+			formRadius = Math.min(width * 0.39, 380) * 1.08;
+
 			const targets = anchor ? sampleName(anchor) : [];
 
 			// Wide galaxy for the fly-in — noticeably broader on desktop.
@@ -147,12 +149,17 @@ export function HeroParticles({
 
 			// Enough dots to draw every sampled point of the letterforms, plus a
 			// band of ambient dust that never converges — so the space around
-			// the assembled name still reads as a living galaxy.
+			// the assembled name still reads as a living galaxy. Denser on
+			// phones so the smaller particles still read as solid letters.
+			const formedCap = width < 640 ? 2600 : finePointer ? 2000 : 1200;
 			const formedCount = reduced
-				? Math.min(targets.length, 900)
-				: Math.max(600, Math.min(targets.length, finePointer ? 1600 : 900));
+				? Math.min(targets.length, 1200)
+				: Math.max(700, Math.min(targets.length, formedCap));
 			const ambientCount = reduced ? 80 : 260;
 
+			// Small viewports get crisper letters: smaller name particles so the
+			// glyphs don't smear into each other.
+			const nameSize = width < 640 ? 0.75 : 1.1;
 			const make = (i: number, ambient: boolean): Particle => {
 				const color = palette[Math.floor(Math.random() * palette.length)];
 				const t = targets.length
@@ -161,8 +168,8 @@ export function HeroParticles({
 				return {
 					sx: gauss() * spreadX * (ambient ? 2.4 : 2),
 					sy: gauss() * spreadY * (ambient ? 2.4 : 2),
-					tx: t.x + (Math.random() - 0.5) * 3,
-					ty: t.y + (Math.random() - 0.5) * 3,
+					tx: t.x + (Math.random() - 0.5) * 2,
+					ty: t.y + (Math.random() - 0.5) * 2,
 					dx: 0,
 					dy: 0,
 					vx: 0,
@@ -171,7 +178,9 @@ export function HeroParticles({
 					orbitR: ambient ? 8 + Math.random() * 26 : 3 + Math.random() * 12,
 					orbitSpeed:
 						(0.0002 + Math.random() * 0.0006) * (Math.random() < 0.5 ? -1 : 1),
-					size: ambient ? 0.4 + Math.random() * 1.1 : 0.5 + Math.random() * 1.3,
+					size: ambient
+						? 0.4 + Math.random() * 1.1
+						: 0.35 + Math.random() * nameSize,
 					color,
 					twinkle: Math.random() * Math.PI * 2,
 					ambient,
@@ -188,8 +197,9 @@ export function HeroParticles({
 			ctx.clearRect(0, 0, width, height);
 
 			// Intro: assemble once so the visitor reads the name. After that the
-			// milky way takes over — scattered while the pointer is far, aligning
-			// into the letterforms as it approaches the centre.
+			// drafting circle is the formation zone — the galaxy is scattered
+			// outside it, starts assembling the moment the pointer enters, and
+			// snaps fully together (and densest) at the centre.
 			let target: number;
 			if (!finePointer) {
 				target = 0.72 + 0.24 * Math.sin(time * 0.00045);
@@ -197,7 +207,10 @@ export function HeroParticles({
 				target = time < assembleAt ? 0 : 1;
 			} else {
 				const dist = Math.hypot(pointer.x - cx, pointer.y - cy);
-				target = smoothstep(1 - Math.min(dist / FORM_RADIUS, 1));
+				const prox = 1 - Math.min(dist / formRadius, 1); // 0 at circle edge, 1 at centre
+				// Crossing into the circle already shows a clearly-formed name;
+				// it then tightens and densifies toward the centre.
+				target = prox <= 0 ? 0 : 0.5 + 0.5 * smoothstep(prox);
 			}
 			// Aligning is quicker than dissolving — magnetic, not laggy.
 			form += (target - form) * (target > form ? 0.08 : 0.04);
@@ -210,45 +223,45 @@ export function HeroParticles({
 				const sway = 1 - pForm * 0.85;
 				const scatterX = cx + p.sx + Math.cos(p.orbit) * p.orbitR * sway * 3;
 				const scatterY = cy + p.sy + Math.sin(p.orbit) * p.orbitR * sway * 2;
-				const formedX = cx + p.tx + Math.cos(p.orbit) * (1 - pForm) * 4;
-				const formedY = cy + p.ty + Math.sin(p.orbit) * (1 - pForm) * 4;
+				// Residual jitter shrinks hard as it forms, so the centred name
+				// packs tight and reads dense.
+				const formedX = cx + p.tx + Math.cos(p.orbit) * (1 - pForm) * 2;
+				const formedY = cy + p.ty + Math.sin(p.orbit) * (1 - pForm) * 2;
 
 				const f = smoothstep(pForm);
 				let x = scatterX + (formedX - scatterX) * f;
 				let y = scatterY + (formedY - scatterY) * f;
 
-				// Pointer bubble: stirs the loose dust, but yields as the name
-				// assembles — otherwise the cursor punches a hole right through
-				// the letters you came to read. Ambient dust is always stirred.
-				const bubble = p.ambient ? 1 : 1 - form * 0.92;
-				const R = 95 * bubble;
-				if (finePointer && bubble > 0.12) {
+				// Only the ambient dust drifts with the cursor — the letters of the
+				// name are never disturbed, so the name always stays readable.
+				if (finePointer && p.ambient) {
 					const px = x - pointer.x;
 					const py = y - pointer.y;
 					const dist2 = px * px + py * py;
+					const R = 120;
 					if (dist2 < R * R && dist2 > 0.01) {
 						const dist = Math.sqrt(dist2);
-						const force = ((R - dist) / R) * 2.2 * bubble;
+						const force = ((R - dist) / R) * 1.8;
 						p.vx += (px / dist) * force;
 						p.vy += (py / dist) * force;
 					}
+					p.vx += -p.dx * 0.014;
+					p.vy += -p.dy * 0.014;
+					p.vx *= 0.88;
+					p.vy *= 0.88;
+					p.dx += p.vx;
+					p.dy += p.vy;
+					x += p.dx;
+					y += p.dy;
 				}
 
-				p.vx += -p.dx * 0.014;
-				p.vy += -p.dy * 0.014;
-				p.vx *= 0.88;
-				p.vy *= 0.88;
-				p.dx += p.vx;
-				p.dy += p.vy;
-				x += p.dx;
-				y += p.dy;
-
 				const tw = 0.72 + 0.28 * Math.sin(time * 0.0016 + p.twinkle);
-				// Slightly brighter once assembled — the name "ignites".
-				const alpha = baseAlpha * tw * (0.75 + 0.45 * f);
-				ctx.fillStyle = p.color.replace("A", alpha.toFixed(3));
+				// The name ignites as it forms — much brighter and a touch larger
+				// near full assembly, so the centre reads dense and solid.
+				const alpha = baseAlpha * tw * (p.ambient ? 0.85 : 0.5 + 0.85 * f);
+				ctx.fillStyle = p.color.replace("A", Math.min(alpha, 1).toFixed(3));
 				ctx.beginPath();
-				ctx.arc(x, y, p.size, 0, Math.PI * 2);
+				ctx.arc(x, y, p.size * (1 + 0.25 * f), 0, Math.PI * 2);
 				ctx.fill();
 			}
 		};

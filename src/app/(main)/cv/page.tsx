@@ -422,7 +422,7 @@ export default function CVPage() {
 	};
 
 	return (
-		<div className="min-h-screen bg-secondary/10 py-12 print:bg-white print:py-0">
+		<div className="min-h-screen bg-secondary/10 pt-28 pb-12 print:bg-white print:pt-0 print:pb-0">
 			<div className="mx-auto max-w-3xl px-4 print:px-0">
 				{/* Action bar — hidden on print */}
 				<div className="no-print mb-6 flex items-center justify-between">

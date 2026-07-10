@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { Moon, Sun, Github, Linkedin, FileText } from "lucide-react";
@@ -73,6 +73,32 @@ const Header = () => {
 		});
 	};
 
+	// Floating pill (lemontree.studio-style): detached from the top, hides
+	// when scrolling down and glides back in on the first scroll up.
+	const [hidden, setHidden] = useState(false);
+	const [scrolled, setScrolled] = useState(false);
+	useEffect(() => {
+		let lastY = window.scrollY;
+		let frame = 0;
+		const onScroll = () => {
+			if (frame) return;
+			frame = requestAnimationFrame(() => {
+				frame = 0;
+				const y = window.scrollY;
+				setScrolled(y > 24);
+				if (Math.abs(y - lastY) > 6) {
+					setHidden(y > lastY && y > 140);
+					lastY = y;
+				}
+			});
+		};
+		window.addEventListener("scroll", onScroll, { passive: true });
+		return () => {
+			window.removeEventListener("scroll", onScroll);
+			if (frame) cancelAnimationFrame(frame);
+		};
+	}, []);
+
 	const navItems = [
 		{ name: t.nav.about, href: "/#about" },
 		{ name: t.nav.projects, href: "/#projects" },
@@ -81,8 +107,18 @@ const Header = () => {
 	];
 
 	return (
-		<header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-sm transition-colors duration-500">
-			<div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+		<header
+			className={`fixed inset-x-0 top-3 z-50 px-3 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+				hidden ? "-translate-y-[130%]" : "translate-y-0"
+			}`}
+		>
+			<div
+				className={`mx-auto flex h-14 max-w-5xl items-center justify-between rounded-full border px-4 sm:px-6 backdrop-blur-md transition-all duration-500 ${
+					scrolled
+						? "bg-background/85 shadow-[0_10px_36px_-14px_rgb(0_0_0/0.45)] border-border"
+						: "bg-background/55 border-border/60"
+				}`}
+			>
 				<Link
 					href="/"
 					className="text-xl font-bold tracking-tight transition-colors hover:text-primary group"
