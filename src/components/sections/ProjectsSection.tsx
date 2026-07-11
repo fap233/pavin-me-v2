@@ -163,7 +163,7 @@ export function ProjectsSection() {
 		return (
 			<section
 				id="projects"
-				className="relative py-20 bg-secondary/20 overflow-hidden"
+				className="relative py-20 overflow-hidden"
 			>
 				<div
 					aria-hidden="true"
@@ -194,7 +194,7 @@ export function ProjectsSection() {
 		<section
 			id="projects"
 			ref={sectionRef}
-			className="relative bg-secondary/20"
+			className="relative"
 			style={{ height: sectionHeight ? `${sectionHeight}px` : undefined }}
 		>
 			<div className="sticky top-0 flex h-screen flex-col overflow-hidden">

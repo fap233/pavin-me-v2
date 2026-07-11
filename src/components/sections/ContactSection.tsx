@@ -49,7 +49,7 @@ const ContactSection = () => {
 			id="contact"
 			ref={ref}
 			data-in-view={inView ? "true" : "false"}
-			className="relative py-24 md:py-36 border-t overflow-hidden"
+			className="relative py-24 md:py-36 overflow-hidden"
 		>
 			<div
 				aria-hidden="true"
