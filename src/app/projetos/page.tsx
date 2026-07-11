@@ -19,6 +19,56 @@ const STATUSES: {
   { key: "done", label: "Concluído", accent: "#22c55e" },
 ];
 
+// ---- Roteiro estruturado (coluna `notes`) ----------------------------------
+// O Monitor grava em `notes` um JSON {phases:[{name,items:[{text,done}]}],
+// questions:[]} — fases + checklist do escopo. Renderizado interativo aqui;
+// marcar/desmarcar persiste de volta no Supabase (RLS permite UPDATE a
+// qualquer autenticado — par confiável).
+
+type NotesItem = { text: string; done: boolean };
+type NotesPhase = { name: string; items: NotesItem[] };
+type Notes = { phases: NotesPhase[]; questions: string[] };
+
+function parseNotes(raw: string | null): Notes | null {
+  if (!raw) return null;
+  try {
+    const obj = JSON.parse(raw);
+    const phases: NotesPhase[] = Array.isArray(obj?.phases)
+      ? obj.phases.map((ph: { name?: string; items?: unknown[] }) => ({
+          name: String(ph?.name ?? ""),
+          items: Array.isArray(ph?.items)
+            ? ph.items.map((it) =>
+                typeof it === "string"
+                  ? { text: it, done: false }
+                  : {
+                      text: String((it as NotesItem)?.text ?? ""),
+                      done: Boolean((it as NotesItem)?.done),
+                    }
+              )
+            : [],
+        }))
+      : [];
+    const questions: string[] = Array.isArray(obj?.questions)
+      ? obj.questions.map((q: unknown) => String(q))
+      : [];
+    if (!phases.length && !questions.length) return null;
+    return { phases, questions };
+  } catch {
+    return null;
+  }
+}
+
+function notesProgress(n: Notes): { done: number; total: number } {
+  let done = 0;
+  let total = 0;
+  for (const ph of n.phases)
+    for (const it of ph.items) {
+      total++;
+      if (it.done) done++;
+    }
+  return { done, total };
+}
+
 export default function ProjetosPage() {
   const [user, setUser] = useState<User | null>(null);
   const [role, setRole] = useState<"admin" | "member">("member");
@@ -339,11 +389,41 @@ function ProjectCard({
   accent: string;
   onChange: () => Promise<void>;
 }) {
+  // Roteiro local (otimista): marcar/desmarcar aplica na hora e persiste.
+  const [notes, setNotes] = useState<Notes | null>(() => parseNotes(p.notes));
+  useEffect(() => setNotes(parseNotes(p.notes)), [p.notes]);
+
   async function update(patch: Partial<SharedProject>) {
     if (!supabase) return;
     const { error } = await supabase.from("shared_projects").update(patch).eq("id", p.id);
     if (error) alert("Erro: " + error.message);
     await onChange();
+  }
+
+  async function toggleItem(phaseIdx: number, itemIdx: number) {
+    if (!notes || !supabase) return;
+    const next: Notes = {
+      ...notes,
+      phases: notes.phases.map((ph, i) =>
+        i !== phaseIdx
+          ? ph
+          : {
+              ...ph,
+              items: ph.items.map((it, j) =>
+                j !== itemIdx ? it : { ...it, done: !it.done }
+              ),
+            }
+      ),
+    };
+    setNotes(next);
+    const { error } = await supabase
+      .from("shared_projects")
+      .update({ notes: JSON.stringify(next) })
+      .eq("id", p.id);
+    if (error) {
+      setNotes(notes); // desfaz otimismo
+      alert("Erro ao salvar progresso: " + error.message);
+    }
   }
 
   async function claim(take: boolean) {
@@ -372,15 +452,32 @@ function ProjectCard({
 
   return (
     <Card
-      className={`relative overflow-hidden bg-card/75 backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_36px_-18px_rgb(0_0_0/0.55)] ${
+      className={`group relative overflow-hidden bg-card/75 backdrop-blur-md transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_12px_40px_-12px_color-mix(in_oklab,var(--acc)_45%,transparent),0_0_24px_-8px_color-mix(in_oklab,var(--acc)_30%,transparent)] ${
         dl?.urgent ? "urgent-blink border-2" : ""
       }`}
-      style={
-        dl?.urgent
-          ? undefined
-          : { borderColor: `color-mix(in oklab, ${accent} 22%, var(--border))` }
-      }
+      style={{
+        ["--acc" as string]: accent,
+        ...(dl?.urgent
+          ? {}
+          : {
+              borderColor: `color-mix(in oklab, ${accent} 22%, var(--border))`,
+            }),
+      }}
     >
+      {/* Borda-gradiente no hover — efeito dos featured projects, mas na COR
+          da coluna do card (accent) */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 rounded-[inherit] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        style={{
+          background: `linear-gradient(135deg, ${accent}, color-mix(in oklab, ${accent} 45%, white))`,
+          WebkitMask:
+            "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
+          WebkitMaskComposite: "xor",
+          maskComposite: "exclude",
+          padding: "1.5px",
+        }}
+      />
       <span
         aria-hidden="true"
         className="absolute inset-y-0 left-0 w-[3px]"
@@ -389,7 +486,9 @@ function ProjectCard({
         }}
       />
       <CardContent className="space-y-2 pt-4">
-        <div className="text-sm font-semibold leading-snug">{p.title}</div>
+        <div className="text-sm font-semibold leading-snug transition-colors duration-300 group-hover:text-[var(--acc)]">
+          {p.title}
+        </div>
         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
           {dl && (
             <span
@@ -420,10 +519,92 @@ function ProjectCard({
             🙋 {p.claimed_email}
           </div>
         )}
+
+        {/* Progresso do roteiro (fases + checklist do `notes`) */}
+        {notes && notesProgress(notes).total > 0 && (
+          <div className="pt-0.5">
+            <div className="mb-1 flex justify-between font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+              <span>Progresso</span>
+              <span style={{ color: accent }}>
+                {notesProgress(notes).done}/{notesProgress(notes).total}
+              </span>
+            </div>
+            <div className="h-1 overflow-hidden rounded-full bg-secondary/70">
+              <div
+                className="h-full rounded-full transition-all duration-300"
+                style={{
+                  width: `${
+                    (notesProgress(notes).done /
+                      Math.max(1, notesProgress(notes).total)) *
+                    100
+                  }%`,
+                  background: accent,
+                }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Roteiro interativo — checkboxes persistem no Supabase */}
+        {notes && notes.phases.length > 0 && (
+          <details className="text-xs">
+            <summary className="cursor-pointer select-none text-primary">
+              Roteiro (fases)
+            </summary>
+            <div className="mt-2 space-y-3">
+              {notes.phases.map((ph, i) => (
+                <div key={i}>
+                  {ph.name && (
+                    <div className="mb-1 font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+                      {ph.name}
+                    </div>
+                  )}
+                  <ul className="space-y-1">
+                    {ph.items.map((it, j) => (
+                      <li key={j}>
+                        <label className="flex cursor-pointer items-start gap-2">
+                          <input
+                            type="checkbox"
+                            checked={it.done}
+                            onChange={() => toggleItem(i, j)}
+                            className="mt-0.5 h-3.5 w-3.5 shrink-0 cursor-pointer"
+                            style={{ accentColor: accent }}
+                          />
+                          <span
+                            className={
+                              it.done
+                                ? "text-muted-foreground line-through"
+                                : "text-foreground/90"
+                            }
+                          >
+                            {it.text}
+                          </span>
+                        </label>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+              {notes.questions.length > 0 && (
+                <div>
+                  <div className="mb-1 font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+                    Perguntas em aberto
+                  </div>
+                  <ul className="list-disc space-y-1 pl-4 text-foreground/90">
+                    {notes.questions.map((q, i) => (
+                      <li key={i}>{q}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </details>
+        )}
+
         {p.description && (
           <details className="text-xs">
             <summary className="cursor-pointer select-none text-primary">
-              Ver roteiro / valor
+              Ver briefing / valor
             </summary>
             <pre className="mt-2 whitespace-pre-wrap break-words font-sans text-foreground/90">
               {p.description}
