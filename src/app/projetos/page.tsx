@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { flushSync } from "react-dom";
 import Link from "next/link";
 import type { User } from "@supabase/supabase-js";
 import { supabase, supabaseConfigured, type SharedProject } from "@/lib/supabase";
@@ -262,8 +263,49 @@ export default function ProjetosPage() {
 
 function Shell({ children }: { children: React.ReactNode }) {
   // Esta rota vive fora do chrome do site (sem Header), então traz o próprio
-  // botão de tema — antes só existia na home/p-cv, via Header.
+  // botão de tema — mesmo comportamento do Header da home (revelação em
+  // "blot" de tinta via View Transitions API).
   const { isDarkMode, toggleDarkMode } = useTheme();
+
+  const switchTheme = (event: React.MouseEvent) => {
+    const doc = document as Document & {
+      startViewTransition?: (cb: () => void) => { ready: Promise<void> };
+    };
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!doc.startViewTransition || reduced) {
+      toggleDarkMode();
+      return;
+    }
+    const x = event.clientX;
+    const y = event.clientY;
+    const radius =
+      Math.hypot(
+        Math.max(x, window.innerWidth - x),
+        Math.max(y, window.innerHeight - y),
+      ) * 1.2;
+    const POINTS = 26;
+    const jitter = Array.from({ length: POINTS }, () => 0.8 + Math.random() * 0.45);
+    const blot = (scale: number) =>
+      `polygon(${Array.from({ length: POINTS }, (_, i) => {
+        const angle = (i / POINTS) * Math.PI * 2;
+        const r = radius * scale * jitter[i];
+        return `${(x + Math.cos(angle) * r).toFixed(1)}px ${(y + Math.sin(angle) * r).toFixed(1)}px`;
+      }).join(",")})`;
+    const transition = doc.startViewTransition(() => {
+      flushSync(() => toggleDarkMode());
+    });
+    transition.ready.then(() => {
+      document.documentElement.animate(
+        { clipPath: [blot(0.004), blot(1)] },
+        {
+          duration: 780,
+          easing: "cubic-bezier(0.3, 0.7, 0.2, 1)",
+          pseudoElement: "::view-transition-new(root)",
+        },
+      );
+    });
+  };
+
   return (
     <div className="relative min-h-screen overflow-hidden">
       {/* Notebook grid over the site-wide universe background */}
@@ -287,18 +329,18 @@ function Shell({ children }: { children: React.ReactNode }) {
           <span className="hidden font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground/70 sm:inline">
             Workspace — Backlog
           </span>
-          <button
-            type="button"
-            onClick={toggleDarkMode}
-            aria-label={isDarkMode ? "Tema claro" : "Tema escuro"}
-            className="grid h-9 w-9 place-items-center rounded-full border bg-card/60 text-muted-foreground backdrop-blur transition-colors hover:text-foreground"
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={(e) => switchTheme(e)}
+            aria-label="Toggle Dark Mode"
           >
             {isDarkMode ? (
-              <Sun className="h-4 w-4" />
+              <Sun className="h-5 w-5" />
             ) : (
-              <Moon className="h-4 w-4" />
+              <Moon className="h-5 w-5" />
             )}
-          </button>
+          </Button>
         </div>
       </div>
 
