@@ -22,12 +22,25 @@ const STATUSES: {
 // ---- Roteiro estruturado (coluna `notes`) ----------------------------------
 // O Monitor grava em `notes` um JSON {phases:[{name,items:[{text,done}]}],
 // questions:[]} — fases + checklist do escopo. Renderizado interativo aqui;
-// marcar/desmarcar persiste de volta no Supabase (RLS permite UPDATE a
-// qualquer autenticado — par confiável).
+// tudo persiste de volta no Supabase (RLS permite UPDATE a qualquer
+// autenticado — par confiável). O roteiro é EDITÁVEL (adicionar/editar/
+// excluir itens e fases) e toda alteração vira uma entrada em `activity`
+// com autor+data. `activity` também guarda comentários e PEDIDOS — o
+// Monitor 99freelas do Fellipe polla isso e apita quando chega pedido.
 
 type NotesItem = { text: string; done: boolean };
 type NotesPhase = { name: string; items: NotesItem[] };
-type Notes = { phases: NotesPhase[]; questions: string[] };
+type NotesActivity = {
+  author: string;
+  kind: "comment" | "request" | "roteiro";
+  text: string;
+  at: string; // ISO
+};
+type Notes = {
+  phases: NotesPhase[];
+  questions: string[];
+  activity: NotesActivity[];
+};
 
 function parseNotes(raw: string | null): Notes | null {
   if (!raw) return null;
@@ -51,11 +64,34 @@ function parseNotes(raw: string | null): Notes | null {
     const questions: string[] = Array.isArray(obj?.questions)
       ? obj.questions.map((q: unknown) => String(q))
       : [];
-    if (!phases.length && !questions.length) return null;
-    return { phases, questions };
+    const activity: NotesActivity[] = Array.isArray(obj?.activity)
+      ? obj.activity.map((a: Partial<NotesActivity>) => ({
+          author: String(a?.author ?? ""),
+          kind: (["comment", "request", "roteiro"].includes(String(a?.kind))
+            ? a?.kind
+            : "comment") as NotesActivity["kind"],
+          text: String(a?.text ?? ""),
+          at: String(a?.at ?? ""),
+        }))
+      : [];
+    if (!phases.length && !questions.length && !activity.length) return null;
+    return { phases, questions, activity };
   } catch {
     return null;
   }
+}
+
+const EMPTY_NOTES: Notes = { phases: [], questions: [], activity: [] };
+
+function shortWhen(iso: string): string {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return "";
+  return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }) +
+    " " + d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+}
+
+function shortAuthor(email: string): string {
+  return (email || "?").split("@")[0];
 }
 
 function notesProgress(n: Notes): { done: number; total: number } {
@@ -389,9 +425,15 @@ function ProjectCard({
   accent: string;
   onChange: () => Promise<void>;
 }) {
-  // Roteiro local (otimista): marcar/desmarcar aplica na hora e persiste.
-  const [notes, setNotes] = useState<Notes | null>(() => parseNotes(p.notes));
-  useEffect(() => setNotes(parseNotes(p.notes)), [p.notes]);
+  // Roteiro/atividade local (otimista): edições aplicam na hora e persistem.
+  const [notes, setNotes] = useState<Notes>(() => parseNotes(p.notes) ?? EMPTY_NOTES);
+  useEffect(() => setNotes(parseNotes(p.notes) ?? EMPTY_NOTES), [p.notes]);
+  const [editing, setEditing] = useState(false);
+  const [commentText, setCommentText] = useState("");
+  const [commentKind, setCommentKind] =
+    useState<"comment" | "request">("comment");
+
+  const meLabel = shortAuthor(me.email ?? "");
 
   async function update(patch: Partial<SharedProject>) {
     if (!supabase) return;
@@ -400,8 +442,33 @@ function ProjectCard({
     await onChange();
   }
 
+  // Grava `notes` (otimista → rollback em erro). NÃO chama onChange (refetch)
+  // pra não fechar o formulário de edição enquanto o Gustavo digita.
+  async function saveNotes(next: Notes) {
+    if (!supabase) return;
+    const prev = notes;
+    setNotes(next);
+    const { error } = await supabase
+      .from("shared_projects")
+      .update({ notes: JSON.stringify(next) })
+      .eq("id", p.id);
+    if (error) {
+      setNotes(prev);
+      alert("Erro ao salvar: " + error.message);
+    }
+  }
+
+  function logActivity(next: Notes, kind: NotesActivity["kind"], text: string): Notes {
+    return {
+      ...next,
+      activity: [
+        ...next.activity,
+        { author: meLabel, kind, text, at: new Date().toISOString() },
+      ],
+    };
+  }
+
   async function toggleItem(phaseIdx: number, itemIdx: number) {
-    if (!notes || !supabase) return;
     const next: Notes = {
       ...notes,
       phases: notes.phases.map((ph, i) =>
@@ -415,15 +482,88 @@ function ProjectCard({
             }
       ),
     };
-    setNotes(next);
-    const { error } = await supabase
-      .from("shared_projects")
-      .update({ notes: JSON.stringify(next) })
-      .eq("id", p.id);
-    if (error) {
-      setNotes(notes); // desfaz otimismo
-      alert("Erro ao salvar progresso: " + error.message);
-    }
+    await saveNotes(next);
+  }
+
+  // ---- edição do roteiro (add/edita/exclui item e fase) --------------------
+
+  async function editItem(phaseIdx: number, itemIdx: number, text: string) {
+    const old = notes.phases[phaseIdx]?.items[itemIdx]?.text ?? "";
+    if (text.trim() === old.trim()) return;
+    let next: Notes = {
+      ...notes,
+      phases: notes.phases.map((ph, i) =>
+        i !== phaseIdx
+          ? ph
+          : {
+              ...ph,
+              items: ph.items.map((it, j) =>
+                j !== itemIdx ? it : { ...it, text }
+              ),
+            }
+      ),
+    };
+    next = logActivity(next, "roteiro", `editou "${old}" → "${text}"`);
+    await saveNotes(next);
+  }
+
+  async function deleteItem(phaseIdx: number, itemIdx: number) {
+    const old = notes.phases[phaseIdx]?.items[itemIdx]?.text ?? "";
+    let next: Notes = {
+      ...notes,
+      phases: notes.phases.map((ph, i) =>
+        i !== phaseIdx
+          ? ph
+          : { ...ph, items: ph.items.filter((_, j) => j !== itemIdx) }
+      ),
+    };
+    next = logActivity(next, "roteiro", `removeu "${old}"`);
+    await saveNotes(next);
+  }
+
+  async function addItem(phaseIdx: number, text: string) {
+    if (!text.trim()) return;
+    let next: Notes = {
+      ...notes,
+      phases: notes.phases.map((ph, i) =>
+        i !== phaseIdx
+          ? ph
+          : { ...ph, items: [...ph.items, { text: text.trim(), done: false }] }
+      ),
+    };
+    next = logActivity(next, "roteiro", `adicionou "${text.trim()}"`);
+    await saveNotes(next);
+  }
+
+  async function addPhase(name: string) {
+    if (!name.trim()) return;
+    let next: Notes = {
+      ...notes,
+      phases: [...notes.phases, { name: name.trim(), items: [] }],
+    };
+    next = logActivity(next, "roteiro", `criou a fase "${name.trim()}"`);
+    await saveNotes(next);
+  }
+
+  async function deletePhase(phaseIdx: number) {
+    const name = notes.phases[phaseIdx]?.name ?? "";
+    if (!confirm(`Remover a fase "${name}" e seus itens?`)) return;
+    let next: Notes = {
+      ...notes,
+      phases: notes.phases.filter((_, i) => i !== phaseIdx),
+    };
+    next = logActivity(next, "roteiro", `removeu a fase "${name}"`);
+    await saveNotes(next);
+  }
+
+  // ---- comentários / pedidos -----------------------------------------------
+
+  async function postActivity() {
+    const text = commentText.trim();
+    if (!text) return;
+    const next = logActivity(notes, commentKind, text);
+    setCommentText("");
+    await saveNotes(next);
   }
 
   async function claim(take: boolean) {
@@ -521,7 +661,7 @@ function ProjectCard({
         )}
 
         {/* Progresso do roteiro (fases + checklist do `notes`) */}
-        {notes && notesProgress(notes).total > 0 && (
+        {notesProgress(notes).total > 0 && (
           <div className="pt-0.5">
             <div className="mb-1 flex justify-between font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
               <span>Progresso</span>
@@ -545,31 +685,56 @@ function ProjectCard({
           </div>
         )}
 
-        {/* Roteiro interativo — checkboxes persistem no Supabase */}
-        {notes && notes.phases.length > 0 && (
+        {/* Roteiro interativo + EDITÁVEL — tudo persiste no Supabase */}
+        {(notes.phases.length > 0 || notes.questions.length > 0) && (
           <details className="text-xs">
-            <summary className="cursor-pointer select-none text-primary">
-              Roteiro (fases)
+            <summary className="flex cursor-pointer select-none items-center justify-between text-primary">
+              <span>Roteiro (fases)</span>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setEditing((v) => !v);
+                }}
+                className="rounded-full border border-border/70 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.15em] text-muted-foreground hover:text-foreground"
+              >
+                {editing ? "concluir" : "editar"}
+              </button>
             </summary>
             <div className="mt-2 space-y-3">
               {notes.phases.map((ph, i) => (
                 <div key={i}>
-                  {ph.name && (
-                    <div className="mb-1 font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
-                      {ph.name}
-                    </div>
-                  )}
+                  <div className="mb-1 flex items-center justify-between gap-2">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+                      {ph.name || "Fase"}
+                    </span>
+                    {editing && (
+                      <button
+                        type="button"
+                        onClick={() => deletePhase(i)}
+                        className="font-mono text-[9px] uppercase tracking-[0.15em] text-destructive/80 hover:text-destructive"
+                      >
+                        excluir fase
+                      </button>
+                    )}
+                  </div>
                   <ul className="space-y-1">
                     {ph.items.map((it, j) => (
-                      <li key={j}>
-                        <label className="flex cursor-pointer items-start gap-2">
+                      <li key={j} className="group/it flex items-start gap-2">
+                        <input
+                          type="checkbox"
+                          checked={it.done}
+                          onChange={() => toggleItem(i, j)}
+                          className="mt-0.5 h-3.5 w-3.5 shrink-0 cursor-pointer"
+                          style={{ accentColor: accent }}
+                        />
+                        {editing ? (
                           <input
-                            type="checkbox"
-                            checked={it.done}
-                            onChange={() => toggleItem(i, j)}
-                            className="mt-0.5 h-3.5 w-3.5 shrink-0 cursor-pointer"
-                            style={{ accentColor: accent }}
+                            defaultValue={it.text}
+                            onBlur={(e) => editItem(i, j, e.target.value)}
+                            className="min-w-0 flex-1 rounded border border-border/60 bg-background/60 px-1.5 py-0.5 text-foreground/90 outline-none focus:border-primary/60"
                           />
+                        ) : (
                           <span
                             className={
                               it.done
@@ -579,12 +744,24 @@ function ProjectCard({
                           >
                             {it.text}
                           </span>
-                        </label>
+                        )}
+                        {editing && (
+                          <button
+                            type="button"
+                            onClick={() => deleteItem(i, j)}
+                            className="shrink-0 font-mono text-[11px] text-destructive/70 hover:text-destructive"
+                            title="Remover item"
+                          >
+                            ✕
+                          </button>
+                        )}
                       </li>
                     ))}
                   </ul>
+                  {editing && <AddRow onAdd={(t) => addItem(i, t)} placeholder="+ novo item" />}
                 </div>
               ))}
+              {editing && <AddRow onAdd={addPhase} placeholder="+ nova fase" />}
               {notes.questions.length > 0 && (
                 <div>
                   <div className="mb-1 font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
@@ -600,6 +777,108 @@ function ProjectCard({
             </div>
           </details>
         )}
+
+        {/* Comentários / pedidos — pedido apita no Monitor do Fellipe */}
+        <details className="text-xs">
+          <summary className="flex cursor-pointer select-none items-center gap-2 text-primary">
+            <span>Comentários / pedidos</span>
+            {notes.activity.filter((a) => a.kind !== "roteiro").length > 0 && (
+              <span
+                className="rounded-full px-1.5 text-[10px] font-semibold text-white"
+                style={{ background: accent }}
+              >
+                {notes.activity.filter((a) => a.kind !== "roteiro").length}
+              </span>
+            )}
+          </summary>
+          <div className="mt-2 space-y-2">
+            {notes.activity.length === 0 && (
+              <p className="text-muted-foreground">Nada ainda.</p>
+            )}
+            {notes.activity.map((a, i) => (
+              <div
+                key={i}
+                className="rounded-lg border px-2.5 py-1.5"
+                style={{
+                  borderColor:
+                    a.kind === "request"
+                      ? "color-mix(in oklab, #f59e0b 45%, transparent)"
+                      : "var(--border)",
+                  background:
+                    a.kind === "request"
+                      ? "color-mix(in oklab, #f59e0b 8%, transparent)"
+                      : "color-mix(in oklab, var(--card) 60%, transparent)",
+                }}
+              >
+                <div className="mb-0.5 flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.15em] text-muted-foreground">
+                  {a.kind === "request" && (
+                    <span className="font-bold text-amber-500">● pedido</span>
+                  )}
+                  {a.kind === "roteiro" && <span>✎ roteiro</span>}
+                  {a.kind === "comment" && <span>comentário</span>}
+                  <span>{a.author}</span>
+                  <span className="text-muted-foreground/50">{shortWhen(a.at)}</span>
+                </div>
+                <div
+                  className={
+                    a.kind === "roteiro"
+                      ? "text-muted-foreground"
+                      : "text-foreground/90"
+                  }
+                >
+                  {a.text}
+                </div>
+              </div>
+            ))}
+
+            {/* composer */}
+            <div className="space-y-1.5 pt-1">
+              <div className="flex gap-1">
+                {(["comment", "request"] as const).map((k) => (
+                  <button
+                    key={k}
+                    type="button"
+                    onClick={() => setCommentKind(k)}
+                    className={`rounded-full px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] transition ${
+                      commentKind === k
+                        ? "text-white"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                    style={
+                      commentKind === k
+                        ? {
+                            background: k === "request" ? "#f59e0b" : accent,
+                          }
+                        : { border: "1px solid var(--border)" }
+                    }
+                  >
+                    {k === "request" ? "pedido" : "comentário"}
+                  </button>
+                ))}
+              </div>
+              <textarea
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                placeholder={
+                  commentKind === "request"
+                    ? "Ex.: preciso das credenciais do WordPress do cliente"
+                    : "Deixe um comentário…"
+                }
+                rows={2}
+                className="w-full resize-none rounded-lg border border-border/70 bg-background/60 px-2.5 py-1.5 text-foreground/90 outline-none focus:border-primary/60"
+              />
+              <button
+                type="button"
+                onClick={postActivity}
+                disabled={!commentText.trim()}
+                className="rounded-full px-3 py-1 text-[11px] font-semibold text-white transition disabled:opacity-40"
+                style={{ background: commentKind === "request" ? "#f59e0b" : accent }}
+              >
+                {commentKind === "request" ? "Enviar pedido" : "Comentar"}
+              </button>
+            </div>
+          </div>
+        </details>
 
         {p.description && (
           <details className="text-xs">
@@ -651,5 +930,38 @@ function ProjectCard({
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+// Input inline pra adicionar item/fase ao roteiro. Enter (ou blur com texto)
+// confirma; limpa depois.
+function AddRow({
+  onAdd,
+  placeholder,
+}: {
+  onAdd: (text: string) => void | Promise<void>;
+  placeholder: string;
+}) {
+  const [text, setText] = useState("");
+  async function commit() {
+    const t = text.trim();
+    if (!t) return;
+    setText("");
+    await onAdd(t);
+  }
+  return (
+    <input
+      value={text}
+      onChange={(e) => setText(e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          commit();
+        }
+      }}
+      onBlur={commit}
+      placeholder={placeholder}
+      className="mt-1 w-full rounded border border-dashed border-border/70 bg-transparent px-1.5 py-0.5 text-xs text-foreground/80 outline-none placeholder:text-muted-foreground/60 focus:border-primary/60"
+    />
   );
 }
