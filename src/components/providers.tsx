@@ -12,10 +12,11 @@ function ThemeWrapper({ children }: { children: React.ReactNode }) {
 	const { isDarkMode } = useTheme();
 	return (
 		<div
-			className={cn(
-				"relative min-h-screen bg-background",
-				isDarkMode ? "dark" : "",
-			)}
+			// SEM bg-background aqui: um fundo opaco no wrapper cobria o
+			// SiteBackground (canvas fixed -z-10), deixando o céu estrelado
+			// invisível. A cor base já vive no `body` (globals.css), atrás do
+			// canvas; o wrapper fica transparente pra o canvas aparecer.
+			className={cn("relative min-h-screen", isDarkMode ? "dark" : "")}
 		>
 			<PaintProvider>
 				<TransitionVeilProvider>

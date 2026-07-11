@@ -4,9 +4,10 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import type { User } from "@supabase/supabase-js";
 import { supabase, supabaseConfigured, type SharedProject } from "@/lib/supabase";
+import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight, LogOut, RefreshCw } from "lucide-react";
+import { ArrowRight, LogOut, Moon, RefreshCw, Sun } from "lucide-react";
 
 const STATUSES: {
   key: SharedProject["status"];
@@ -260,6 +261,9 @@ export default function ProjetosPage() {
 }
 
 function Shell({ children }: { children: React.ReactNode }) {
+  // Esta rota vive fora do chrome do site (sem Header), então traz o próprio
+  // botão de tema — antes só existia na home/p-cv, via Header.
+  const { isDarkMode, toggleDarkMode } = useTheme();
   return (
     <div className="relative min-h-screen overflow-hidden">
       {/* Notebook grid over the site-wide universe background */}
@@ -279,9 +283,23 @@ function Shell({ children }: { children: React.ReactNode }) {
             .dev
           </span>
         </Link>
-        <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground/70">
-          Workspace — Backlog
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="hidden font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground/70 sm:inline">
+            Workspace — Backlog
+          </span>
+          <button
+            type="button"
+            onClick={toggleDarkMode}
+            aria-label={isDarkMode ? "Tema claro" : "Tema escuro"}
+            className="grid h-9 w-9 place-items-center rounded-full border bg-card/60 text-muted-foreground backdrop-blur transition-colors hover:text-foreground"
+          >
+            {isDarkMode ? (
+              <Sun className="h-4 w-4" />
+            ) : (
+              <Moon className="h-4 w-4" />
+            )}
+          </button>
+        </div>
       </div>
 
       <div className="mx-auto max-w-7xl px-4 py-10">{children}</div>
