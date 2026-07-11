@@ -21,7 +21,8 @@ type Particle = {
 	orbitR: number;
 	orbitSpeed: number;
 	size: number;
-	color: string;
+	ci: number; // palette index (so a hue change recolours in place)
+	rgb: string; // cached "rgb(r, g, b)" — alpha applied via globalAlpha
 	twinkle: number;
 	/** Ambient dust never joins the name — it keeps the galaxy alive around it. */
 	ambient: boolean;
@@ -52,6 +53,15 @@ export function HeroParticles({
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const { isDarkMode } = useTheme();
 	const { hue } = usePaint();
+	// hue read live so the footer paint slider recolours in place instead of
+	// tearing down and re-sampling the name (getImageData) on every drag tick.
+	const hueRef = useRef(hue);
+	const recolorRef = useRef<((h: number) => void) | null>(null);
+
+	useEffect(() => {
+		hueRef.current = hue;
+		recolorRef.current?.(hue);
+	}, [hue]);
 
 	useEffect(() => {
 		const canvas = canvasRef.current;
@@ -79,23 +89,17 @@ export function HeroParticles({
 
 		// Neutral dust + the three paintable brand hues (footer slider), in the
 		// light tints (dark theme) / ink tints (light theme) of the originals.
-		const rgba = (h: number, s: number, l: number) => {
+		// Palette as solid "rgb(r, g, b)" strings — alpha is applied per particle
+		// via ctx.globalAlpha in draw(), so no rgba string is built each frame.
+		const rgb = (h: number, s: number, l: number) => {
 			const [r, g, b] = hslToRgb(h, s, l);
-			return `rgba(${r}, ${g}, ${b}, A)`;
+			return `rgb(${r}, ${g}, ${b})`;
 		};
-		const palette = isDarkMode
-			? [
-					"rgba(226, 223, 255, A)",
-					rgba(hue - 66, 89, 74),
-					rgba(hue - 29, 95, 75),
-					rgba(hue + 29, 86, 70),
-				]
-			: [
-					"rgba(76, 70, 120, A)",
-					rgba(hue - 61, 84, 67),
-					rgba(hue - 29, 74, 56),
-					rgba(hue + 33, 70, 51),
-				];
+		const buildPalette = (h: number): string[] =>
+			isDarkMode
+				? ["rgb(226, 223, 255)", rgb(h - 66, 89, 74), rgb(h - 29, 95, 75), rgb(h + 29, 86, 70)]
+				: ["rgb(76, 70, 120)", rgb(h - 61, 84, 67), rgb(h - 29, 74, 56), rgb(h + 33, 70, 51)];
+		let palette = buildPalette(hueRef.current);
 		const baseAlpha = isDarkMode ? 0.65 : 0.45;
 
 		/** Sample points inside the rendered name so particles can assemble it. */
@@ -162,7 +166,9 @@ export function HeroParticles({
 			// band of ambient dust that never converges — so the space around
 			// the assembled name still reads as a living galaxy. Denser on
 			// phones so the smaller particles still read as solid letters.
-			const formedCap = width < 640 ? 5200 : finePointer ? 5200 : 2600;
+			// Letterforms read solid well below the old 5200 cap; ~2200 is the
+			// point of diminishing return and roughly halves the per-frame work.
+			const formedCap = width < 640 ? 2600 : finePointer ? 2200 : 2000;
 			const formedCount = reduced
 				? Math.min(targets.length, 2200)
 				: Math.max(1200, Math.min(targets.length, formedCap));
@@ -172,7 +178,7 @@ export function HeroParticles({
 			// smear (finer still on phones).
 			const nameSize = width < 640 ? 0.5 : 0.68;
 			const make = (i: number, ambient: boolean, count: number): Particle => {
-				const color = palette[Math.floor(Math.random() * palette.length)];
+				const ci = Math.floor(Math.random() * palette.length);
 				// Spread particles across ALL sampled points (stride), so the
 				// whole name fills evenly instead of only the top rows.
 				const t =
@@ -195,7 +201,8 @@ export function HeroParticles({
 					size: ambient
 						? 0.4 + Math.random() * 1.1
 						: 0.35 + Math.random() * nameSize,
-					color,
+					ci,
+					rgb: palette[ci],
 					twinkle: Math.random() * Math.PI * 2,
 					ambient,
 					jphase: Math.random() * Math.PI * 2,
@@ -211,6 +218,13 @@ export function HeroParticles({
 					make(i, true, ambientCount),
 				),
 			];
+		};
+
+		// Recolour particles in place when the paint hue changes — no rebuild,
+		// no name re-sampling; the running loop picks up the new rgb next frame.
+		recolorRef.current = (h: number) => {
+			palette = buildPalette(h);
+			for (const p of particles) p.rgb = palette[p.ci];
 		};
 
 		const draw = (time: number) => {
@@ -304,11 +318,13 @@ export function HeroParticles({
 				// The name ignites as it forms — much brighter and a touch larger
 				// near full assembly, so the centre reads dense and solid.
 				const alpha = baseAlpha * tw * (p.ambient ? 0.85 : 0.5 + 0.85 * f);
-				ctx.fillStyle = p.color.replace("A", Math.min(alpha, 1).toFixed(3));
+				ctx.globalAlpha = Math.min(alpha, 1);
+				ctx.fillStyle = p.rgb;
 				ctx.beginPath();
 				ctx.arc(x, y, p.size * (1 + 0.25 * f), 0, Math.PI * 2);
 				ctx.fill();
 			}
+			ctx.globalAlpha = 1;
 		};
 
 		const step = (time: number) => {
@@ -369,13 +385,14 @@ export function HeroParticles({
 
 		return () => {
 			stop();
+			recolorRef.current = null;
 			observer.disconnect();
 			window.removeEventListener("pointermove", onPointerMove);
 			section.removeEventListener("pointerleave", onPointerLeave);
 			window.removeEventListener("resize", onResize);
 			document.removeEventListener("visibilitychange", onVisibility);
 		};
-	}, [isDarkMode, anchorRef, hue]);
+	}, [isDarkMode, anchorRef]);
 
 	return (
 		<canvas

@@ -102,15 +102,17 @@ function useHorizontalTrack(
 		});
 		observer.observe(track);
 
-		window.addEventListener("scroll", schedule, { passive: true });
-		window.addEventListener("resize", () => {
+		const onResize = () => {
 			measure();
 			schedule();
-		});
+		};
+		window.addEventListener("scroll", schedule, { passive: true });
+		window.addEventListener("resize", onResize);
 
 		return () => {
 			observer.disconnect();
 			window.removeEventListener("scroll", schedule);
+			window.removeEventListener("resize", onResize);
 			if (frame) cancelAnimationFrame(frame);
 		};
 	}, [enabled, sectionRef, trackRef, progressRef, onActiveChange]);

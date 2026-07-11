@@ -11,10 +11,12 @@ type Dust = {
 	z: number; // depth 0..1 — drives size, alpha and parallax
 	drift: number; // horizontal sway phase
 	speed: number; // upward drift
+	tint: string | null;
+	glowSprite: HTMLCanvasElement | null; // pre-rendered glow (null = no glow)
 };
 
 type Blob = {
-	hue: [number, number, number];
+	color: [number, number, number];
 	cx: number; // 0..1 of width
 	cy: number; // 0..1 of height
 	r: number; // 0..1 of min dimension
@@ -22,27 +24,54 @@ type Blob = {
 	ay: number;
 	phase: number;
 	drift: number;
+	radius: number; // px, computed on build
+	grad: CanvasGradient | null; // cached radial gradient centered at origin
 };
+
+// Pre-render a soft radial glow to an offscreen canvas ONCE per colour, so the
+// hot draw loop can drawImage it instead of allocating a gradient per star per
+// frame (createRadialGradient in the loop was the dominant cost).
+function makeGlowSprite(rgb: string): HTMLCanvasElement {
+	const S = 64;
+	const c = document.createElement("canvas");
+	c.width = S;
+	c.height = S;
+	const g = c.getContext("2d")!;
+	const grad = g.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2);
+	grad.addColorStop(0, `rgba(${rgb}, 1)`);
+	grad.addColorStop(1, `rgba(${rgb}, 0)`);
+	g.fillStyle = grad;
+	g.fillRect(0, 0, S, S);
+	return c;
+}
 
 /**
  * A fixed, full-viewport canvas that gives the flat background depth and life:
  * soft drifting brand-colour washes plus a slow dust field that parallaxes with
  * scroll. Sits behind all content (pointer-events: none). Honours reduced
  * motion (one static frame) and pauses when the tab is hidden.
+ *
+ * Perf: gradients (band, 3 blobs) and star-glow sprites are built ONCE per
+ * resize and reused; per-particle alpha is applied via globalAlpha instead of
+ * building an rgba string each frame; the paintable hue recolours in place
+ * (a ref) so dragging the footer slider never tears down the animation.
  */
 export function SiteBackground() {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const { isDarkMode } = useTheme();
 	const { hue } = usePaint();
+	// hue read live by the loop — decoupled from the heavy init effect so the
+	// footer paint slider recolours without rebuilding particles.
+	const hueRef = useRef(hue);
+	const recolorRef = useRef<((h: number) => void) | null>(null);
+
+	// Recolour in place when the slider moves — no teardown, no realloc.
+	useEffect(() => {
+		hueRef.current = hue;
+		recolorRef.current?.(hue);
+	}, [hue]);
 
 	useEffect(() => {
-		// Nebula washes follow the visitor-paintable brand hue (footer slider) —
-		// same stop offsets as the CSS --brand-from/via/to.
-		const BRAND: [number, number, number][] = [
-			hslToRgb(hue - 61, 84, 67),
-			hslToRgb(hue - 29, 91, 65),
-			hslToRgb(hue + 30, 81, 60),
-		];
 		const canvas = canvasRef.current;
 		if (!canvas) return;
 		const ctx = canvas.getContext("2d");
@@ -53,7 +82,7 @@ export function SiteBackground() {
 
 		let width = 0;
 		let height = 0;
-		let dust: (Dust & { tint: string | null })[] = [];
+		let dust: Dust[] = [];
 		let blobs: Blob[] = [];
 		let raf = 0;
 		let running = true;
@@ -64,15 +93,33 @@ export function SiteBackground() {
 		const dustAlpha = isDarkMode ? 0.55 : 0.38;
 		const blobAlpha = isDarkMode ? 0.13 : 0.1;
 
+		// Glow sprites — one per distinct dust colour (base + two giant-star tints).
+		const glowBase = makeGlowSprite(dustColor);
+		const glowWarm = makeGlowSprite("255, 220, 190");
+		const glowCool = makeGlowSprite("190, 210, 255");
+
+		// Cached band gradient (rebuilt on resize).
+		let bandGrad: CanvasGradient | null = null;
+
 		// Occasional shooting star streaking across the sky.
-		let meteor: {
-			x: number;
-			y: number;
-			vx: number;
-			vy: number;
-			life: number;
-		} | null = null;
+		let meteor: { x: number; y: number; vx: number; vy: number; life: number } | null = null;
 		let nextMeteorAt = performance.now() + 4000 + Math.random() * 5000;
+
+		const brandColors = (h: number): [number, number, number][] => [
+			hslToRgb(h - 61, 84, 67),
+			hslToRgb(h - 29, 91, 65),
+			hslToRgb(h + 30, 81, 60),
+		];
+
+		// Build the cached radial gradient for one blob, centered at the origin
+		// (drawn via ctx.translate) so it never needs recreating per frame.
+		const buildBlobGrad = (b: Blob) => {
+			const [r, g, bl] = b.color;
+			const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, b.radius || 1);
+			grad.addColorStop(0, `rgba(${r}, ${g}, ${bl}, ${blobAlpha})`);
+			grad.addColorStop(1, `rgba(${r}, ${g}, ${bl}, 0)`);
+			b.grad = grad;
+		};
 
 		const build = () => {
 			width = window.innerWidth;
@@ -83,75 +130,102 @@ export function SiteBackground() {
 			canvas.style.height = `${height}px`;
 			ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-			const count = Math.round(
-				Math.min(Math.max((width * height) / 6200, 110), 320),
-			);
-			dust = Array.from({ length: count }, (_, i) => ({
-				x: Math.random() * width,
-				y: Math.random() * height,
-				z: 0.25 + ((i * 97) % 100) / 133,
-				drift: Math.random() * Math.PI * 2,
-				speed: 0.1 + Math.random() * 0.24,
-				// Occasional warm/cool giant stars break the monochrome dust.
-				tint:
+			const minDim = Math.min(width, height);
+
+			// Band gradient (fixed in the rotated local frame) — cache once.
+			bandGrad = ctx.createLinearGradient(0, -height * 0.5, 0, height * 0.5);
+			const bandTint = isDarkMode
+				? ["rgba(120,110,220,0)", "rgba(140,120,230,0.10)", "rgba(200,150,230,0.05)", "rgba(120,110,220,0)"]
+				: ["rgba(120,110,220,0)", "rgba(150,130,235,0.06)", "rgba(210,160,235,0.04)", "rgba(120,110,220,0)"];
+			bandGrad.addColorStop(0, bandTint[0]);
+			bandGrad.addColorStop(0.42, bandTint[1]);
+			bandGrad.addColorStop(0.55, bandTint[2]);
+			bandGrad.addColorStop(1, bandTint[3]);
+
+			const count = Math.round(Math.min(Math.max((width * height) / 9000, 90), 220));
+			dust = Array.from({ length: count }, (_, i) => {
+				const tint =
 					Math.random() < 0.14
 						? Math.random() < 0.5
 							? "255, 220, 190"
 							: "190, 210, 255"
-						: null,
-			}));
+						: null;
+				const z = 0.25 + ((i * 97) % 100) / 133;
+				// giant/tinted stars get a glow sprite; the rest never glow
+				const glowSprite =
+					tint === "255, 220, 190"
+						? glowWarm
+						: tint === "190, 210, 255"
+							? glowCool
+							: z > 0.82
+								? glowBase
+								: null;
+				return {
+					x: Math.random() * width,
+					y: Math.random() * height,
+					z,
+					drift: Math.random() * Math.PI * 2,
+					speed: 0.1 + Math.random() * 0.24,
+					tint,
+					glowSprite,
+				};
+			});
 
+			const cols = brandColors(hueRef.current);
 			blobs = [
-				{ hue: BRAND[0], cx: 0.18, cy: 0.22, r: 0.6, ax: 150, ay: 100, phase: 0, drift: 0.12 },
-				{ hue: BRAND[1], cx: 0.82, cy: 0.5, r: 0.65, ax: 180, ay: 120, phase: 2.1, drift: 0.1 },
-				{ hue: BRAND[2], cx: 0.45, cy: 0.85, r: 0.55, ax: 140, ay: 95, phase: 4.2, drift: 0.14 },
+				{ color: cols[0], cx: 0.18, cy: 0.22, r: 0.6, ax: 150, ay: 100, phase: 0, drift: 0.12, radius: 0, grad: null },
+				{ color: cols[1], cx: 0.82, cy: 0.5, r: 0.65, ax: 180, ay: 120, phase: 2.1, drift: 0.1, radius: 0, grad: null },
+				{ color: cols[2], cx: 0.45, cy: 0.85, r: 0.55, ax: 140, ay: 95, phase: 4.2, drift: 0.14, radius: 0, grad: null },
 			];
+			for (const b of blobs) {
+				b.radius = b.r * minDim;
+				buildBlobGrad(b);
+			}
+		};
+
+		// Recolour blobs when the paint hue changes — rebuilds only the 3 cached
+		// gradients, no particle realloc, no loop teardown.
+		recolorRef.current = (h: number) => {
+			const cols = brandColors(h);
+			blobs.forEach((b, i) => {
+				b.color = cols[i];
+				buildBlobGrad(b);
+			});
 		};
 
 		const draw = (time: number) => {
 			ctx.clearRect(0, 0, width, height);
-			const minDim = Math.min(width, height);
 
-			// Milky-way band — a soft diagonal river of light that slowly rolls,
-			// giving the sky a sense of galactic depth behind the dust.
-			ctx.save();
-			ctx.globalCompositeOperation = "lighter";
-			ctx.translate(width / 2, height / 2);
-			ctx.rotate(-0.5 + Math.sin(time * 0.00003) * 0.05);
-			const band = ctx.createLinearGradient(0, -height * 0.5, 0, height * 0.5);
-			const bandTint = isDarkMode
-				? ["rgba(120,110,220,0)", "rgba(140,120,230,0.10)", "rgba(200,150,230,0.05)", "rgba(120,110,220,0)"]
-				: ["rgba(120,110,220,0)", "rgba(150,130,235,0.06)", "rgba(210,160,235,0.04)", "rgba(120,110,220,0)"];
-			band.addColorStop(0, bandTint[0]);
-			band.addColorStop(0.42, bandTint[1]);
-			band.addColorStop(0.55, bandTint[2]);
-			band.addColorStop(1, bandTint[3]);
-			ctx.fillStyle = band;
-			ctx.fillRect(-width, -height * 0.28, width * 2, height * 0.56);
-			ctx.restore();
+			// Milky-way band — a soft diagonal river of light that slowly rolls.
+			if (bandGrad) {
+				ctx.save();
+				ctx.globalCompositeOperation = "lighter";
+				ctx.translate(width / 2, height / 2);
+				ctx.rotate(-0.5 + Math.sin(time * 0.00003) * 0.05);
+				ctx.fillStyle = bandGrad;
+				ctx.fillRect(-width, -height * 0.28, width * 2, height * 0.56);
+				ctx.restore();
+			}
 
-			// Soft colour washes — give the flat background depth and movement.
+			// Soft colour washes — cached gradients, positioned via translate.
 			ctx.globalCompositeOperation = "lighter";
 			for (const b of blobs) {
 				const t = time * 0.0001;
 				const x = b.cx * width + Math.cos(t * b.drift * 60 + b.phase) * b.ax;
 				const y =
-					b.cy * height +
-					Math.sin(t * b.drift * 60 + b.phase) * b.ay -
-					scrollY * 0.02;
-				const radius = b.r * minDim;
-				const g = ctx.createRadialGradient(x, y, 0, x, y, radius);
-				const [r, gr, bl] = b.hue;
-				g.addColorStop(0, `rgba(${r}, ${gr}, ${bl}, ${blobAlpha})`);
-				g.addColorStop(1, `rgba(${r}, ${gr}, ${bl}, 0)`);
-				ctx.fillStyle = g;
+					b.cy * height + Math.sin(t * b.drift * 60 + b.phase) * b.ay - scrollY * 0.02;
+				if (!b.grad) continue;
+				ctx.save();
+				ctx.translate(x, y);
+				ctx.fillStyle = b.grad;
 				ctx.beginPath();
-				ctx.arc(x, y, radius, 0, Math.PI * 2);
+				ctx.arc(0, 0, b.radius, 0, Math.PI * 2);
 				ctx.fill();
+				ctx.restore();
 			}
 
-			// Starfield — dust specks parallaxed by scroll, wrapping seamlessly,
-			// the brightest of them twinkling for a deep-space feel.
+			// Starfield — dust specks; per-particle alpha via globalAlpha (no
+			// rgba string built per frame). Glow via pre-rendered sprite.
 			ctx.globalCompositeOperation = "source-over";
 			for (const p of dust) {
 				const parallax = (scrollY * (0.05 + p.z * 0.25)) % (height + 40);
@@ -161,24 +235,20 @@ export function SiteBackground() {
 				const radius = 0.4 + p.z * 1.6;
 				const twinkle = 0.7 + 0.3 * Math.sin(time * 0.002 * p.speed * 12 + p.drift);
 				const alpha = dustAlpha * (0.35 + p.z * 0.65) * twinkle;
-				const col = p.tint ?? dustColor;
-				ctx.fillStyle = `rgba(${col}, ${alpha.toFixed(3)})`;
+
+				ctx.globalAlpha = Math.min(alpha, 1);
+				ctx.fillStyle = p.tint ? `rgb(${p.tint})` : `rgb(${dustColor})`;
 				ctx.beginPath();
 				ctx.arc(x, y, radius, 0, Math.PI * 2);
 				ctx.fill();
 
-				// A soft glow around the nearest and tinted giant stars.
-				if (p.z > 0.82 || p.tint) {
+				if (p.glowSprite) {
 					const gr = radius * (p.tint ? 6 : 4);
-					const gg = ctx.createRadialGradient(x, y, 0, x, y, gr);
-					gg.addColorStop(0, `rgba(${col}, ${(alpha * 0.55).toFixed(3)})`);
-					gg.addColorStop(1, `rgba(${col}, 0)`);
-					ctx.fillStyle = gg;
-					ctx.beginPath();
-					ctx.arc(x, y, gr, 0, Math.PI * 2);
-					ctx.fill();
+					ctx.globalAlpha = Math.min(alpha * 0.55, 1);
+					ctx.drawImage(p.glowSprite, x - gr, y - gr, gr * 2, gr * 2);
 				}
 			}
+			ctx.globalAlpha = 1;
 
 			// A meteor every few seconds — the universe never sits still.
 			if (!reduced) {
@@ -263,12 +333,13 @@ export function SiteBackground() {
 
 		return () => {
 			running = false;
+			recolorRef.current = null;
 			if (raf) cancelAnimationFrame(raf);
 			window.removeEventListener("scroll", onScroll);
 			window.removeEventListener("resize", onResize);
 			document.removeEventListener("visibilitychange", onVisibility);
 		};
-	}, [isDarkMode, hue]);
+	}, [isDarkMode]);
 
 	return (
 		<canvas
