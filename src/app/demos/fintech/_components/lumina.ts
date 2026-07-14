@@ -145,7 +145,7 @@ export function isValidEmail(value: string): boolean {
 	return /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(value.trim());
 }
 
-/** Iniciais pra avatar ("Fellipe Pavin" -> "FP"). */
+/** Iniciais pra avatar ("Camila Ribeiro" -> "CR"). */
 export function initials(name: string): string {
 	const parts = name.trim().split(/\s+/).filter(Boolean);
 	if (!parts.length) return "LU";
@@ -317,12 +317,20 @@ export function variantById(id: CardVariantId): CardVariant {
  * Conta mock (usada no /app e no /cartoes)
  * ------------------------------------------------------------------ */
 
+/*
+ * A titular é a MESMA persona do /abrir-conta e do /login (Camila Ribeiro).
+ * Antes o fluxo de cadastro usava Camila e a conta logada dizia "Olá, Fellipe" —
+ * o visitante criava uma conta e entrava na de outra pessoa.
+ *
+ * E é persona fictícia de propósito: esta conta tem CPF, agência e chave Pix.
+ * Amarrar isso ao nome real do Fellipe faria o dado falso parecer dado dele.
+ */
 export const ACCOUNT = {
-	holder: "Fellipe Pavin",
+	holder: "Camila Ribeiro",
 	cpf: "472.918.305-11",
 	agencia: "0001",
 	conta: "38.204-7",
-	pixKey: "fellipe@lumina.com.br",
+	pixKey: "camila.ribeiro@email.com",
 	balance: 12480.35,
 	invested: 34210.9,
 	cardLast4: "4291",

@@ -135,7 +135,7 @@ export default function BlackPage() {
 								<div className="animate-bounce-slow w-full max-w-md">
 									<CreditCardVisual
 										variant="grafite"
-										holder="Fellipe Pavin"
+										holder="Camila Ribeiro"
 										last4="0007"
 										cvv="904"
 										exp="12/32"
