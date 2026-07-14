@@ -1,0 +1,90 @@
+/*
+ * Utilitários locais da demo Lumina (/demos/fintech).
+ *
+ * A página original usava `animate-bounce-slow` e `perspective-1000`, mas
+ * nenhuma das duas existia no globals.css nem no Tailwind v4 — eram classes
+ * mortas. Como globals.css é compartilhado com as outras demos, defino aqui,
+ * num CSS carregado só na rota /demos/fintech/*.
+ */
+
+@keyframes lumina-bounce-slow {
+	0%,
+	100% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(-10px);
+	}
+}
+
+.animate-bounce-slow {
+	animation: lumina-bounce-slow 3.5s ease-in-out infinite;
+}
+
+/* Cena 3D do cartão */
+.perspective-1000 {
+	perspective: 1000px;
+}
+
+.lumina-scene {
+	perspective: 1600px;
+}
+
+.lumina-card3d {
+	position: relative;
+	transform-style: preserve-3d;
+	transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+.lumina-card3d.is-flipped {
+	transform: rotateY(180deg);
+}
+
+.lumina-face {
+	backface-visibility: hidden;
+	-webkit-backface-visibility: hidden;
+}
+
+.lumina-face-back {
+	transform: rotateY(180deg);
+}
+
+/* Entrada suave de modais / passos do formulário */
+@keyframes lumina-fade-up {
+	from {
+		opacity: 0;
+		transform: translateY(12px);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+.lumina-fade-up {
+	animation: lumina-fade-up 0.35s ease-out both;
+}
+
+@keyframes lumina-fade-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+.lumina-fade-in {
+	animation: lumina-fade-in 0.25s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.animate-bounce-slow,
+	.lumina-fade-up,
+	.lumina-fade-in {
+		animation: none;
+	}
+	.lumina-card3d {
+		transition: none;
+	}
+}
