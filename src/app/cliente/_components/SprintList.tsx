@@ -1,0 +1,345 @@
+"use client";
+
+// Sprints do projeto. Leitura + DUAS ações do cliente por card:
+//   1. aprovar a entrega (só quando a sprint está 'delivered');
+//   2. conversar NA sprint — cada card abre uma thread estilo review de PR:
+//      os comentários daquela sprint (cliente e Fellipe) em ordem, e uma caixa
+//      pra comentar ali mesmo. O cliente não edita, não reordena, não vê backlog.
+//
+// A caixa GERAL "Precisa de algo?" (Composer) continua, pro que não é de sprint.
+
+import { useMemo, useState } from "react";
+import {
+  Check,
+  ChevronDown,
+  Loader2,
+  MessageSquare,
+  Send,
+} from "lucide-react";
+import type { ProjectEvent, Sprint, SprintStatus } from "@/lib/supabase";
+import { dateTime, shortYmd } from "../_format";
+import { Panel, SectionTitle } from "./States";
+
+type SendResult = { ok: true } | { ok: false; message: string };
+
+const STATUS: Record<
+  SprintStatus,
+  { label: string; color: string; dim?: boolean }
+> = {
+  planned: { label: "planejada", color: "var(--color-muted-foreground)", dim: true },
+  in_progress: { label: "em andamento", color: "var(--brand-via)" },
+  delivered: { label: "entregue", color: "#22c55e" },
+  approved: { label: "aprovada", color: "#22c55e" },
+  blocked: { label: "parada", color: "#f59e0b" },
+};
+
+// A cor que identifica quem falou na thread. Cliente puxa pro índigo (a mesma
+// cor de "comentário" na timeline); Fellipe puxa pro gradiente da marca.
+const CLIENT_ACCENT = "#6366f1";
+const OWNER_ACCENT = "var(--brand-via)";
+
+export function SprintList({
+  sprints,
+  events,
+  onApprove,
+  approvingId,
+  onComment,
+}: {
+  sprints: Sprint[];
+  events: ProjectEvent[];
+  onApprove: (sprint: Sprint) => void;
+  approvingId: string | null;
+  onComment: (text: string, sprintId: string) => Promise<SendResult>;
+}) {
+  // Comentários agrupados por sprint (só type='comment' com sprint_id), em ordem
+  // cronológica — como a conversa aconteceu. Um mapa, recalculado quando os
+  // eventos mudam (o realtime recarrega tudo).
+  const bySprint = useMemo(() => {
+    const m = new Map<string, ProjectEvent[]>();
+    for (const e of events) {
+      if (e.type !== "comment" || !e.sprint_id) continue;
+      const arr = m.get(e.sprint_id);
+      if (arr) arr.push(e);
+      else m.set(e.sprint_id, [e]);
+    }
+    for (const arr of m.values())
+      arr.sort((a, b) => a.created_at.localeCompare(b.created_at));
+    return m;
+  }, [events]);
+
+  return (
+    <Panel className="p-6 sm:p-8">
+      <SectionTitle>Sprints</SectionTitle>
+
+      {sprints.length === 0 ? (
+        <div className="mt-4 space-y-2">
+          <p className="text-sm font-semibold">
+            Estamos montando o plano do seu projeto
+          </p>
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            Em breve as etapas aparecem aqui, com o que cada uma entrega e a data
+            prevista.
+          </p>
+        </div>
+      ) : (
+        <ul className="mt-5 space-y-3">
+          {sprints.map((s) => (
+            <SprintRow
+              key={s.id}
+              sprint={s}
+              comments={bySprint.get(s.id) ?? []}
+              onApprove={onApprove}
+              approving={approvingId === s.id}
+              onComment={onComment}
+            />
+          ))}
+        </ul>
+      )}
+    </Panel>
+  );
+}
+
+function SprintRow({
+  sprint,
+  comments,
+  onApprove,
+  approving,
+  onComment,
+}: {
+  sprint: Sprint;
+  comments: ProjectEvent[];
+  onApprove: (s: Sprint) => void;
+  approving: boolean;
+  onComment: (text: string, sprintId: string) => Promise<SendResult>;
+}) {
+  const [descOpen, setDescOpen] = useState(false);
+  // Abre já aberta se tem conversa — o cliente vê que ali houve troca sem clicar.
+  const [threadOpen, setThreadOpen] = useState(() => comments.length > 0);
+  const st = STATUS[sprint.status] ?? STATUS.planned;
+  const canApprove = sprint.status === "delivered";
+  const current = sprint.status === "in_progress";
+  const count = comments.length;
+
+  return (
+    <li
+      className="rounded-xl border bg-background/40 p-4 transition-colors"
+      style={{
+        borderColor: current
+          ? "color-mix(in oklab, var(--brand-via) 40%, transparent)"
+          : "var(--border)",
+        background: current
+          ? "color-mix(in oklab, var(--brand-via) 6%, transparent)"
+          : undefined,
+      }}
+    >
+      <div className="flex items-start gap-3">
+        <span
+          className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md border font-mono text-[11px] font-semibold tabular-nums"
+          style={{
+            borderColor: `color-mix(in oklab, ${st.color} 40%, transparent)`,
+            color: st.dim ? "var(--color-muted-foreground)" : st.color,
+          }}
+        >
+          {sprint.idx}
+        </span>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+            <span className="text-sm font-semibold leading-snug">
+              {sprint.title}
+            </span>
+            <span
+              className="inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.14em]"
+              style={{ color: st.dim ? undefined : st.color }}
+            >
+              {sprint.status === "approved" && <Check className="h-3 w-3" />}
+              <span className={st.dim ? "text-muted-foreground" : undefined}>
+                {st.label}
+              </span>
+              {sprint.status === "planned" && sprint.planned_end && (
+                <span className="text-muted-foreground/60">
+                  · {shortYmd(sprint.planned_end)}
+                </span>
+              )}
+            </span>
+          </div>
+
+          {sprint.description && (
+            <p
+              className={`mt-1 text-sm leading-relaxed text-muted-foreground ${
+                descOpen ? "" : "line-clamp-2"
+              }`}
+              onClick={() => setDescOpen((v) => !v)}
+            >
+              {sprint.description}
+            </p>
+          )}
+
+          {sprint.status === "approved" && sprint.approved_at && (
+            <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-emerald-500">
+              aprovada por você em {dateTime(sprint.approved_at)}
+            </p>
+          )}
+
+          {canApprove && (
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={() => onApprove(sprint)}
+                disabled={approving}
+                className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500 px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-600 disabled:pointer-events-none disabled:opacity-60"
+              >
+                {approving ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Check className="h-3.5 w-3.5" />
+                )}
+                {approving ? "Registrando…" : "Aprovar entrega"}
+              </button>
+              <span className="text-xs text-muted-foreground">
+                Confere e aprova — fica registrado com a data.
+              </span>
+            </div>
+          )}
+
+          {/* --- thread da sprint (review de PR) --- */}
+          <button
+            type="button"
+            onClick={() => setThreadOpen((v) => !v)}
+            aria-expanded={threadOpen}
+            className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-background/40 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground transition hover:border-border hover:text-foreground"
+          >
+            <MessageSquare className="h-3 w-3" />
+            {count > 0
+              ? `${count} ${count === 1 ? "comentário" : "comentários"}`
+              : "Comentar nesta sprint"}
+            <ChevronDown
+              className={`h-3 w-3 transition-transform ${threadOpen ? "rotate-180" : ""}`}
+            />
+          </button>
+
+          {threadOpen && (
+            <SprintThread
+              sprint={sprint}
+              comments={comments}
+              onComment={onComment}
+            />
+          )}
+        </div>
+      </div>
+    </li>
+  );
+}
+
+function SprintThread({
+  sprint,
+  comments,
+  onComment,
+}: {
+  sprint: Sprint;
+  comments: ProjectEvent[];
+  onComment: (text: string, sprintId: string) => Promise<SendResult>;
+}) {
+  const [text, setText] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    const body = text.trim();
+    if (!body || busy) return;
+    setBusy(true);
+    setErr("");
+    const res = await onComment(body, sprint.id);
+    setBusy(false);
+    if (!res.ok) {
+      setErr(res.message);
+      return;
+    }
+    setText(""); // o reload traz o comentário novo pra lista acima
+  }
+
+  return (
+    <div className="mt-3 rounded-xl border border-border/60 bg-card/40 p-3">
+      {comments.length === 0 ? (
+        <p className="px-1 py-1 text-xs text-muted-foreground">
+          Nenhum comentário nesta sprint ainda. Escreva abaixo — cai direto comigo.
+        </p>
+      ) : (
+        <ul className="space-y-2">
+          {comments.map((c) => (
+            <CommentBubble key={c.id} comment={c} />
+          ))}
+        </ul>
+      )}
+
+      <form onSubmit={submit} className="mt-3">
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) submit(e);
+          }}
+          rows={2}
+          placeholder={`Comentar na Sprint ${sprint.idx}…`}
+          className="w-full resize-none rounded-lg border border-border/70 bg-background/60 px-3 py-2 text-sm outline-none transition placeholder:text-muted-foreground/60 focus:border-[var(--brand-via)] focus:ring-2 focus:ring-[var(--brand-via)]/25"
+        />
+        <div className="mt-2 flex items-center gap-2">
+          {err && (
+            <span className="mr-auto text-xs text-destructive" role="alert">
+              {err}
+            </span>
+          )}
+          <button
+            type="submit"
+            disabled={busy || !text.trim()}
+            className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-[var(--brand-via)]/40 bg-[var(--brand-via)]/10 px-3 py-1.5 text-xs font-semibold text-[var(--brand-via)] transition hover:bg-[var(--brand-via)]/20 disabled:pointer-events-none disabled:opacity-40"
+          >
+            {busy ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Send className="h-3.5 w-3.5" />
+            )}
+            {busy ? "Enviando…" : "Enviar"}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+function CommentBubble({ comment }: { comment: ProjectEvent }) {
+  const isClient = comment.actor === "client";
+  const accent = isClient ? CLIENT_ACCENT : OWNER_ACCENT;
+  const who = isClient ? "Você" : "Fellipe";
+
+  return (
+    <li
+      className="rounded-lg border px-3 py-2"
+      style={{
+        borderColor: `color-mix(in oklab, ${accent} 22%, var(--border))`,
+        background: `color-mix(in oklab, ${accent} 5%, transparent)`,
+      }}
+    >
+      <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5">
+        <span
+          className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em]"
+          style={{ color: accent }}
+        >
+          {who}
+        </span>
+        <time
+          className="font-mono text-[10px] tabular-nums text-muted-foreground/70"
+          title={dateTime(comment.created_at)}
+        >
+          {dateTime(comment.created_at)}
+        </time>
+      </div>
+      {comment.body && (
+        <p className="mt-1 whitespace-pre-wrap break-words text-sm leading-relaxed text-foreground/90">
+          {comment.body}
+        </p>
+      )}
+    </li>
+  );
+}

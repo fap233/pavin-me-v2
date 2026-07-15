@@ -107,9 +107,27 @@ function notesProgress(n: Notes): { done: number; total: number } {
   return { done, total };
 }
 
+/**
+ * Papeis. A migracao do portal do cliente (2026-07-14) renomeia o vocabulario:
+ *   admin  -> owner   (o Fellipe)
+ *   member -> collab  (o Gustavo)
+ *   client            (novo: o cliente final, so ve o projeto dele)
+ * Os nomes antigos continuam aceitos porque a migracao roda no banco, nao aqui:
+ * durante a janela entre o deploy do site e o ALTER TABLE, os dois convivem.
+ * Sem isso, o Fellipe vira "owner" no banco e PERDE os controles de admin aqui.
+ */
+type Role = "owner" | "collab" | "client" | "admin" | "member";
+
+function isOwner(role: Role): boolean {
+  return role === "owner" || role === "admin";
+}
+
 export default function ProjetosPage() {
   const [user, setUser] = useState<User | null>(null);
-  const [role, setRole] = useState<"admin" | "member">("member");
+  // O portal do cliente (migracao 2026-07-14) troca o vocabulario de papeis:
+// admin -> owner, member -> collab, e nasce "client" pro cliente final.
+// Aceitamos os dois enquanto a migracao nao roda em todos os ambientes.
+const [role, setRole] = useState<Role>("collab");
   const [projects, setProjects] = useState<SharedProject[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -131,7 +149,7 @@ export default function ProjetosPage() {
         .select("role")
         .eq("id", u.id)
         .maybeSingle();
-      setRole((prof?.role as "admin" | "member") ?? "member");
+      setRole((prof?.role as Role) ?? "collab");
       await loadProjects();
     },
     [loadProjects]
@@ -189,7 +207,7 @@ export default function ProjetosPage() {
             <span className="mx-2 text-muted-foreground/40">·</span>
             <span
               className={
-                role === "admin" ? "text-purple-400" : "text-muted-foreground"
+                isOwner(role) ? "text-purple-400" : "text-muted-foreground"
               }
             >
               {role}
@@ -481,7 +499,7 @@ function ProjectCard({
 }: {
   p: SharedProject;
   me: User;
-  role: "admin" | "member";
+  role: Role;
   accent: string;
   onChange: () => Promise<void>;
 }) {
@@ -977,7 +995,7 @@ function ProjectCard({
               </option>
             ))}
           </select>
-          {role === "admin" && (
+          {isOwner(role) && (
             <Button
               size="sm"
               variant="ghost"

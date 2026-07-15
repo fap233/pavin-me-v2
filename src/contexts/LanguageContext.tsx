@@ -54,6 +54,89 @@ export const content = {
 			subtitle:
 				"Open to remote roles and contract engagements. Reach out for collaborations, opportunities, or to say hello.",
 		},
+		reviews: {
+			kicker: "// reviews",
+			title: "What clients say",
+			subtitle:
+				"Real reviews from my 99freelas profile — nothing edited, nothing staged.",
+			summary: (avg: string, total: number) =>
+				`${avg} average across ${total} reviews`,
+			seeProfile: "See the profile",
+		},
+		currentWork: {
+			kicker: "// in progress",
+			title: "On the bench right now",
+			subtitle:
+				"An anonymized look at what's shipping this week — proof there's live work, not just a portfolio.",
+			sprint: "Sprint",
+			of: "of",
+			linesThisWeek: "lines this week",
+			activeProjects: "active projects",
+			updated: "updated",
+		},
+		faq: {
+			kicker: "// faq",
+			title: "Before you hire",
+			subtitle: "The questions people ask me before we start.",
+			items: [
+				{
+					q: "How long does a project take?",
+					a: "It depends on scope, but most projects run in 2–6 week sprints with something usable at the end of each one. You get a realistic estimate up front — and if the deadline moves, you see it in your portal, not after the fact.",
+				},
+				{
+					q: "How do I follow the progress?",
+					a: "You get a private client portal (pavin.me/cliente) that tracks every sprint in real time — what's in progress, what was delivered and the full timeline. You approve each delivery there and can leave a comment or request on any sprint.",
+				},
+				{
+					q: "How does payment work?",
+					a: "Usually split: a part to start and the rest on delivery, or per sprint on larger builds. Pix, bank transfer or invoice. We agree on it in writing before any code is written.",
+				},
+				{
+					q: "What if I need changes after delivery?",
+					a: "Small adjustments right after delivery are part of the deal. Anything bigger, we scope a follow-up sprint together — no surprise bills.",
+				},
+				{
+					q: "What do you need from me to start?",
+					a: "A clear idea of the problem, any references or existing access (repo, hosting, accounts) and someone I can ask questions to. The rest is on me — architecture, code, deploy and monitoring.",
+				},
+				{
+					q: "What kinds of projects do you take?",
+					a: "Web systems, marketplaces, operations SaaS, dashboards, CRM/automation, AI agents and security audits — mostly TypeScript, React/Next.js and Node.js, with production work in .NET, PHP and Python too.",
+				},
+			],
+		},
+		leadForm: {
+			kicker: "// let's talk",
+			title: "Start a project",
+			subtitle: "Tell me what you need. I usually reply within a day.",
+			nameLabel: "Name",
+			namePlaceholder: "Your name",
+			emailLabel: "E-mail",
+			emailPlaceholder: "you@company.com",
+			typeLabel: "Project type",
+			typePlaceholder: "Pick one…",
+			typeOptions: [
+				"Web system / SaaS",
+				"Marketplace",
+				"Dashboard / BI",
+				"Automation / CRM",
+				"AI agent / integration",
+				"Security audit",
+				"Other",
+			],
+			messageLabel: "Message",
+			messagePlaceholder: "A couple of lines about the problem you want solved.",
+			submit: "Send request",
+			sending: "Sending…",
+			successTitle: "Got it — talk soon.",
+			successBody:
+				"Your message reached me. I'll reply by e-mail, usually within a day.",
+			sendAnother: "Send another",
+			errorGeneric:
+				"Couldn't send your message. Try again in a moment, or e-mail me directly.",
+			errorCaptcha: "Finish the security check before sending.",
+			errorFields: "Fill in your name, a valid e-mail and a message.",
+		},
 		footer: {
 			tagline: "Crafted in Fortaleza · Available worldwide",
 		},
@@ -100,6 +183,89 @@ export const content = {
 			title: "Vamos Conversar",
 			subtitle:
 				"Aberto a vagas remotas e contratos. Me chama pra colaborações, oportunidades ou só pra dar um oi.",
+		},
+		reviews: {
+			kicker: "// avaliações",
+			title: "O que os clientes dizem",
+			subtitle:
+				"Avaliações reais do meu perfil no 99freelas — nada editado, nada montado.",
+			summary: (avg: string, total: number) =>
+				`${avg} de média em ${total} avaliações`,
+			seeProfile: "Ver o perfil",
+		},
+		currentWork: {
+			kicker: "// em andamento",
+			title: "Na bancada agora",
+			subtitle:
+				"Um retrato anonimizado do que está saindo esta semana — prova de obra rodando, não só portfólio.",
+			sprint: "Sprint",
+			of: "de",
+			linesThisWeek: "linhas esta semana",
+			activeProjects: "projetos ativos",
+			updated: "atualizado",
+		},
+		faq: {
+			kicker: "// dúvidas",
+			title: "Antes de contratar",
+			subtitle: "As perguntas que me fazem antes de começar.",
+			items: [
+				{
+					q: "Quanto tempo leva um projeto?",
+					a: "Depende do escopo, mas a maioria roda em sprints de 2 a 6 semanas, com algo utilizável ao fim de cada uma. Você recebe uma estimativa realista logo no começo — e se o prazo mudar, você vê no seu portal, não depois.",
+				},
+				{
+					q: "Como eu acompanho o andamento?",
+					a: "Você recebe um portal do cliente privado (pavin.me/cliente) que rastreia cada sprint em tempo real — o que está em andamento, o que foi entregue e a linha do tempo inteira. Você aprova cada entrega por lá e pode deixar um comentário ou pedido em qualquer sprint.",
+				},
+				{
+					q: "Como funciona o pagamento?",
+					a: "Normalmente dividido: uma parte pra começar e o restante na entrega, ou por sprint em projetos maiores. Pix, transferência ou nota fiscal. A gente combina por escrito antes de qualquer linha de código.",
+				},
+				{
+					q: "E se eu precisar de ajustes depois da entrega?",
+					a: "Ajustes pequenos logo após a entrega fazem parte. Algo maior, a gente combina uma sprint de continuidade juntos — sem cobrança surpresa.",
+				},
+				{
+					q: "O que você precisa de mim pra começar?",
+					a: "Uma ideia clara do problema, referências ou acessos que já existam (repo, hospedagem, contas) e alguém pra eu tirar dúvidas. O resto é comigo — arquitetura, código, deploy e monitoramento.",
+				},
+				{
+					q: "Que tipo de projeto você pega?",
+					a: "Sistemas web, marketplaces, SaaS de operações, dashboards, CRM/automação, agentes de IA e auditorias de segurança — principalmente TypeScript, React/Next.js e Node.js, com entregas em produção também em .NET, PHP e Python.",
+				},
+			],
+		},
+		leadForm: {
+			kicker: "// vamos conversar",
+			title: "Começar um projeto",
+			subtitle: "Me conta o que você precisa. Costumo responder em até um dia.",
+			nameLabel: "Nome",
+			namePlaceholder: "Seu nome",
+			emailLabel: "E-mail",
+			emailPlaceholder: "voce@empresa.com",
+			typeLabel: "Tipo de projeto",
+			typePlaceholder: "Escolha uma opção…",
+			typeOptions: [
+				"Sistema web / SaaS",
+				"Marketplace",
+				"Dashboard / BI",
+				"Automação / CRM",
+				"Agente de IA / integração",
+				"Auditoria de segurança",
+				"Outro",
+			],
+			messageLabel: "Mensagem",
+			messagePlaceholder: "Umas linhas sobre o problema que você quer resolver.",
+			submit: "Enviar pedido",
+			sending: "Enviando…",
+			successTitle: "Recebido — a gente se fala.",
+			successBody:
+				"Sua mensagem chegou aqui. Respondo por e-mail, normalmente em até um dia.",
+			sendAnother: "Enviar outro",
+			errorGeneric:
+				"Não consegui enviar sua mensagem. Tente de novo em instantes, ou me chame direto no e-mail.",
+			errorCaptcha: "Conclua a verificação de segurança antes de enviar.",
+			errorFields: "Preencha o nome, um e-mail válido e a mensagem.",
 		},
 		footer: {
 			tagline: "Feito em Fortaleza · Disponível pro mundo",
