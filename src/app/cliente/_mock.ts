@@ -113,6 +113,11 @@ function seed(): MockState {
       approved_at: null,
       approved_by: null,
       created_at: iso(20),
+      tasks: [
+        { id: "t2a", sprint_id: "s2", project_id: P1, idx: 1, title: "Tela de pedidos", done: true, done_at: iso(8) },
+        { id: "t2b", sprint_id: "s2", project_id: P1, idx: 2, title: "Filtro por status do pedido", done: true, done_at: iso(7) },
+        { id: "t2c", sprint_id: "s2", project_id: P1, idx: 3, title: "Exportar pedidos pra planilha", done: true, done_at: iso(6) },
+      ],
     },
     {
       id: "s3",
@@ -127,6 +132,12 @@ function seed(): MockState {
       approved_at: null,
       approved_by: null,
       created_at: iso(20),
+      tasks: [
+        { id: "t3a", sprint_id: "s3", project_id: P1, idx: 1, title: "Autenticar na API do Mercado Livre", done: true, done_at: iso(4) },
+        { id: "t3b", sprint_id: "s3", project_id: P1, idx: 2, title: "Importar anúncios que já existem", done: true, done_at: iso(2) },
+        { id: "t3c", sprint_id: "s3", project_id: P1, idx: 3, title: "Sincronizar pedidos automaticamente", done: false, done_at: null },
+        { id: "t3d", sprint_id: "s3", project_id: P1, idx: 4, title: "Atualizar estoque nos dois lados", done: false, done_at: null },
+      ],
     },
     {
       id: "s4",

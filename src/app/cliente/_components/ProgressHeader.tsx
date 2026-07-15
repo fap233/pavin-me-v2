@@ -76,7 +76,9 @@ export function ProgressHeader({
         </div>
         {p.total > 0 && (
           <p className="mt-2 text-xs text-muted-foreground">
-            {p.done} de {p.total} {p.total === 1 ? "sprint" : "sprints"} entregues
+            {p.usesTasks
+              ? `${p.tasksDone} de ${p.tasksTotal} ${p.tasksTotal === 1 ? "fase concluída" : "fases concluídas"}`
+              : `${p.done} de ${p.total} ${p.total === 1 ? "sprint entregue" : "sprints entregues"}`}
           </p>
         )}
       </div>

@@ -16,7 +16,12 @@ import {
   MessageSquare,
   Send,
 } from "lucide-react";
-import type { ProjectEvent, Sprint, SprintStatus } from "@/lib/supabase";
+import type {
+  ProjectEvent,
+  Sprint,
+  SprintStatus,
+  SprintTask,
+} from "@/lib/supabase";
 import { dateTime, shortYmd } from "../_format";
 import { Panel, SectionTitle } from "./States";
 
@@ -175,6 +180,10 @@ function SprintRow({
             </p>
           )}
 
+          {sprint.tasks && sprint.tasks.length > 0 && (
+            <SprintChecklist tasks={sprint.tasks} />
+          )}
+
           {sprint.status === "approved" && sprint.approved_at && (
             <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-emerald-500">
               aprovada por você em {dateTime(sprint.approved_at)}
@@ -228,6 +237,56 @@ function SprintRow({
         </div>
       </div>
     </li>
+  );
+}
+
+// Checklist (read-only) das fases da sprint. O cliente vê o que já está feito e o
+// que falta; quem marca é o Fellipe (pelo Monitor). Marcar move a barra lá em cima.
+function SprintChecklist({ tasks }: { tasks: SprintTask[] }) {
+  const done = tasks.filter((t) => t.done).length;
+  const pct = Math.round((done / tasks.length) * 100);
+
+  return (
+    <div className="mt-3">
+      <div className="mb-1.5 flex items-center justify-between gap-2">
+        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+          {done}/{tasks.length} fases
+        </span>
+        <span className="font-mono text-[10px] tabular-nums text-muted-foreground/70">
+          {pct}%
+        </span>
+      </div>
+      <div className="h-1 overflow-hidden rounded-full bg-secondary/70">
+        <div
+          className="h-full rounded-full bg-gradient-to-r from-[var(--brand-from)] via-[var(--brand-via)] to-[var(--brand-to)] transition-[width] duration-500"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+      <ul className="mt-2.5 space-y-1.5">
+        {tasks.map((t) => (
+          <li key={t.id} className="flex items-start gap-2 text-sm">
+            <span
+              className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
+                t.done
+                  ? "border-emerald-500 bg-emerald-500 text-white"
+                  : "border-border text-transparent"
+              }`}
+            >
+              <Check className="h-3 w-3" />
+            </span>
+            <span
+              className={
+                t.done
+                  ? "text-muted-foreground line-through decoration-muted-foreground/40"
+                  : "text-foreground/90"
+              }
+            >
+              {t.title}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 

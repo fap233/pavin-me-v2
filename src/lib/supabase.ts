@@ -55,6 +55,20 @@ export type Sprint = {
   approved_at: string | null; // ISO
   approved_by: string | null; // auth.users.id
   created_at: string;
+  // Fases (checklist) da sprint, anexadas na leitura (ordenadas por idx). O cliente
+  // vê read-only; marcá-las (só o Fellipe, pelo Monitor) move a % do projeto.
+  tasks?: SprintTask[];
+};
+
+// Uma fase (item de checklist) de uma sprint. `done` marcado conta pra % do projeto.
+export type SprintTask = {
+  id: string;
+  sprint_id: string;
+  project_id: string;
+  idx: number;
+  title: string;
+  done: boolean;
+  done_at: string | null; // ISO
 };
 
 export type ProjectEventType =

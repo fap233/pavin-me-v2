@@ -16,6 +16,7 @@ import {
   type ProjectEvent,
   type SharedProject,
   type Sprint,
+  type SprintTask,
 } from "@/lib/supabase";
 import * as mock from "./_mock";
 
@@ -204,7 +205,7 @@ export async function loadPortal(
   if (!member)
     return { ok: false, kind: "not_found", message: "Projeto não encontrado." };
 
-  const [projectRes, sprintsRes, eventsRes] = await Promise.all([
+  const [projectRes, sprintsRes, eventsRes, tasksRes] = await Promise.all([
     supabase.from("shared_projects").select("*").eq("id", projectId).maybeSingle(),
     supabase
       .from("sprints")
@@ -216,6 +217,13 @@ export async function loadPortal(
       .select("*")
       .eq("project_id", projectId)
       .order("created_at", { ascending: false }),
+    // Fases (checklist). Query à parte e NÃO-FATAL de propósito: se a tabela ainda
+    // não existe (migração 2026-07-15 pendente), o rastreio funciona sem fases.
+    supabase
+      .from("sprint_tasks")
+      .select("*")
+      .eq("project_id", projectId)
+      .order("idx", { ascending: true }),
   ]);
 
   const err = projectRes.error ?? sprintsRes.error ?? eventsRes.error;
@@ -224,11 +232,25 @@ export async function loadPortal(
   if (!projectRes.data)
     return { ok: false, kind: "not_found", message: "Projeto não encontrado." };
 
+  // Anexa as fases a cada sprint. tasksRes.error é ignorado de propósito (tabela
+  // pode não existir ainda) — nesse caso cada sprint fica com tasks: [].
+  const tasks = (tasksRes.error ? [] : (tasksRes.data as SprintTask[])) ?? [];
+  const tasksBySprint = new Map<string, SprintTask[]>();
+  for (const t of tasks) {
+    const arr = tasksBySprint.get(t.sprint_id);
+    if (arr) arr.push(t);
+    else tasksBySprint.set(t.sprint_id, [t]);
+  }
+  const sprints = ((sprintsRes.data as Sprint[]) ?? []).map((s) => ({
+    ...s,
+    tasks: tasksBySprint.get(s.id) ?? [],
+  }));
+
   return {
     ok: true,
     data: {
       project: projectRes.data as SharedProject,
-      sprints: (sprintsRes.data as Sprint[]) ?? [],
+      sprints,
       events: (eventsRes.data as ProjectEvent[]) ?? [],
     },
   };
@@ -447,6 +469,17 @@ export function subscribePortal(
       },
       onChange
     )
+    .on(
+      "postgres_changes",
+      {
+        // Fase marcada/criada/apagada -> a barra de progresso do cliente mexe ao vivo.
+        event: "*",
+        schema: "public",
+        table: "sprint_tasks",
+        filter: `project_id=eq.${projectId}`,
+      },
+      onChange
+    )
     .subscribe();
 
   return () => {
@@ -465,6 +498,9 @@ export type Progress = {
   currentIdx: number | null; // sprint "da vez"
   phase: "planning" | "building" | "done";
   phaseLabel: string;
+  tasksDone: number;
+  tasksTotal: number;
+  usesTasks: boolean; // a % veio das fases (não do status das sprints)
 };
 
 export function progressOf(sprints: Sprint[]): Progress {
@@ -472,7 +508,25 @@ export function progressOf(sprints: Sprint[]): Progress {
   const done = sprints.filter(
     (s) => s.status === "delivered" || s.status === "approved"
   ).length;
-  const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+
+  // Fases (checklist) do projeto todo. Quando existem, mandam na %; senão cai no
+  // status das sprints (entregues/aprovadas ÷ total) — sem regressão pra quem não
+  // usa fases. A FASE (planejamento/desenvolvimento/concluído) segue os marcos de
+  // sprint, não as fases: fase marcada é andamento fino, não milestone aprovado.
+  let tasksDone = 0;
+  let tasksTotal = 0;
+  for (const s of sprints) {
+    const ts = s.tasks ?? [];
+    tasksTotal += ts.length;
+    tasksDone += ts.filter((t) => t.done).length;
+  }
+  const usesTasks = tasksTotal > 0;
+
+  const pct = usesTasks
+    ? Math.round((tasksDone / tasksTotal) * 100)
+    : total === 0
+      ? 0
+      : Math.round((done / total) * 100);
 
   const current =
     sprints.find((s) => s.status === "in_progress") ??
@@ -496,5 +550,8 @@ export function progressOf(sprints: Sprint[]): Progress {
         : phase === "done"
           ? "Concluído"
           : "Em desenvolvimento",
+    tasksDone,
+    tasksTotal,
+    usesTasks,
   };
 }
