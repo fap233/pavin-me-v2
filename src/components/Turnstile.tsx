@@ -109,6 +109,25 @@ export const Turnstile = forwardRef<TurnstileHandle, TurnstileProps>(
       "loading",
     );
 
+    // O tema do WIDGET tem que seguir o tema do SITE (a classe `dark` que o
+    // ThemeContext poe no <html>), não o "auto" do Cloudflare (que segue o SO e
+    // deixava o widget claro num site escuro). Lido direto do DOM pra funcionar
+    // em qualquer página (home e /cliente/login), sem depender de provider; o
+    // observer faz o widget acompanhar o toggle claro/escuro ao vivo.
+    const [isDark, setIsDark] = useState(true);
+    useEffect(() => {
+      if (typeof document === "undefined") return;
+      const read = () =>
+        setIsDark(document.documentElement.classList.contains("dark"));
+      read();
+      const obs = new MutationObserver(read);
+      obs.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["class"],
+      });
+      return () => obs.disconnect();
+    }, []);
+
     // Guarda os callbacks numa ref pra o efeito de montagem não depender deles
     // (senão o widget re-renderiza a cada render do pai e perde o token).
     const cbRef = useRef({ onVerify, onExpire, onError });
@@ -145,7 +164,7 @@ export const Turnstile = forwardRef<TurnstileHandle, TurnstileProps>(
           if (widgetIdRef.current) return;
           widgetIdRef.current = window.turnstile.render(containerRef.current, {
             sitekey: siteKey,
-            theme: "auto",
+            theme: isDark ? "dark" : "light",
             action: "contato",
             callback: (token) => cbRef.current.onVerify(token),
             "error-callback": () => {
@@ -175,8 +194,10 @@ export const Turnstile = forwardRef<TurnstileHandle, TurnstileProps>(
           widgetIdRef.current = null;
         }
       };
+      // isDark nas deps: ao trocar o tema, o cleanup remove o widget e ele é
+      // re-renderizado com o tema novo (o token é de uso único, sem prejuízo).
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [siteKey]);
+    }, [siteKey, isDark]);
 
     return (
       <div className={className}>
