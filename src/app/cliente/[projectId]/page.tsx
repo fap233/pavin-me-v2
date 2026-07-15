@@ -11,18 +11,19 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Radio } from "lucide-react";
+import { ArrowLeft, ArrowRight, Radio, Star } from "lucide-react";
 import type { Sprint } from "@/lib/supabase";
 import { Shell } from "../_components/Shell";
 import { Composer } from "../_components/Composer";
 import { ProgressHeader } from "../_components/ProgressHeader";
 import { SprintList } from "../_components/SprintList";
 import { Timeline } from "../_components/Timeline";
-import { EmptyState, ErrorState, Loading } from "../_components/States";
+import { EmptyState, ErrorState, Loading, Panel } from "../_components/States";
 import {
   approveSprint,
   currentUser,
   href,
+  isConcluded,
   loadPortal,
   postComment,
   subscribePortal,
@@ -186,6 +187,33 @@ export default function ProjectPage() {
 
       <div className="space-y-5">
         <ProgressHeader project={portal.project} sprints={portal.sprints} />
+
+        {isConcluded(portal.project, portal.sprints) && (
+          <Link href={href(`/cliente/${projectId}/avaliar`)} className="block">
+            <Panel
+              accent
+              className="group flex flex-wrap items-center justify-between gap-4 p-5 transition-transform duration-300 hover:-translate-y-0.5 hover:border-[color-mix(in_oklab,var(--brand-via)_45%,transparent)] sm:p-6"
+            >
+              <div className="flex items-center gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-400/12 text-amber-400">
+                  <Star className="h-5 w-5 fill-amber-400" />
+                </span>
+                <div>
+                  <p className="text-sm font-semibold">
+                    Projeto concluído. Conta como foi?
+                  </p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    Sua avaliação me ajuda demais. Leva menos de um minuto.
+                  </p>
+                </div>
+              </div>
+              <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-[var(--brand-via)]">
+                Avaliar
+                <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+              </span>
+            </Panel>
+          </Link>
+        )}
 
         {actionError && (
           <p

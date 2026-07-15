@@ -22,7 +22,7 @@ export const content = {
 			badge: "Open to Work (Remote)",
 			title: "Software Engineer | Full Stack",
 			subtitle:
-				"9+ years shipping production software end-to-end — from architecture and code to deploy, monitoring and on-call. TypeScript, React/Next.js, Node.js, .NET and PostgreSQL.",
+				"9+ years shipping production software end-to-end: from architecture and code to deploy, monitoring and on-call. TypeScript, React/Next.js, Node.js, .NET and PostgreSQL.",
 			cta: "View Projects",
 			secondaryCta: "Contact Me",
 			cvCta: "Download CV",
@@ -30,7 +30,7 @@ export const content = {
 		about: {
 			title: "About Me",
 			description:
-				"I am a Full Stack Software Engineer with 9+ years of experience building and scaling web systems. I founded and scaled my own multi-tenant SaaS to 10,000+ paying recurring users at 99.9% uptime — owning product, PHP/Laravel + MySQL engineering, and Linux/Cloudflare infrastructure in production as a one-person tech team. Today I deliver software for B2B clients: marketplaces, operations SaaS, dashboards, CRM automation, AI agents and security audits — mostly in TypeScript, React/Next.js and Node.js, with production work in .NET, PHP and Python.",
+				"I am a Full Stack Software Engineer with 9+ years of experience building and scaling web systems. I founded and scaled my own multi-tenant SaaS to 10,000+ paying recurring users at 99.9% uptime (owning product, PHP/Laravel + MySQL engineering, and Linux/Cloudflare infrastructure in production as a one-person tech team). Today I deliver software for B2B clients: marketplaces, operations SaaS, dashboards, CRM automation, AI agents and security audits. Mostly in TypeScript, React/Next.js and Node.js, with production work in .NET, PHP and Python.",
 			stats: [
 				{ label: "Years of Exp.", value: "9+" },
 				{ label: "Projects Delivered", value: "20+" },
@@ -40,7 +40,7 @@ export const content = {
 		projects: {
 			title: "Featured Projects",
 			subtitle:
-				"Real-world applications in production — marketplaces, SaaS, automation and infrastructure.",
+				"Real-world applications in production: marketplaces, SaaS, automation and infrastructure.",
 		},
 		lab: {
 			kicker: "// lab",
@@ -58,16 +58,18 @@ export const content = {
 			kicker: "// reviews",
 			title: "What clients say",
 			subtitle:
-				"Real reviews from my 99freelas profile — nothing edited, nothing staged.",
+				"Real reviews from clients. Nothing edited, nothing staged.",
 			summary: (avg: string, total: number) =>
 				`${avg} average across ${total} reviews`,
 			seeProfile: "See the profile",
+			badgeClient: "pavin.me client",
+			badge99: "verified",
 		},
 		currentWork: {
 			kicker: "// in progress",
 			title: "On the bench right now",
 			subtitle:
-				"An anonymized look at what's shipping this week — proof there's live work, not just a portfolio.",
+				"An anonymized look at what's shipping this week. Proof there's live work, not just a portfolio.",
 			sprint: "Sprint",
 			of: "of",
 			linesThisWeek: "lines this week",
@@ -81,11 +83,11 @@ export const content = {
 			items: [
 				{
 					q: "How long does a project take?",
-					a: "It depends on scope, but most projects run in 2–6 week sprints with something usable at the end of each one. You get a realistic estimate up front — and if the deadline moves, you see it in your portal, not after the fact.",
+					a: "It depends on scope, but most projects run in 2–6 week sprints with something usable at the end of each one. You get a realistic estimate up front, and if the deadline moves, you see it in your portal, not after the fact.",
 				},
 				{
 					q: "How do I follow the progress?",
-					a: "You get a private client portal (pavin.me/cliente) that tracks every sprint in real time — what's in progress, what was delivered and the full timeline. You approve each delivery there and can leave a comment or request on any sprint.",
+					a: "You get a private client portal (pavin.me/cliente) that tracks every sprint in real time: what's in progress, what was delivered and the full timeline. You approve each delivery there and can leave a comment or request on any sprint.",
 				},
 				{
 					q: "How does payment work?",
@@ -93,15 +95,15 @@ export const content = {
 				},
 				{
 					q: "What if I need changes after delivery?",
-					a: "Small adjustments right after delivery are part of the deal. Anything bigger, we scope a follow-up sprint together — no surprise bills.",
+					a: "Small adjustments right after delivery are part of the deal. Anything bigger, we scope a follow-up sprint together. No surprise bills.",
 				},
 				{
 					q: "What do you need from me to start?",
-					a: "A clear idea of the problem, any references or existing access (repo, hosting, accounts) and someone I can ask questions to. The rest is on me — architecture, code, deploy and monitoring.",
+					a: "A clear idea of the problem, any references or existing access (repo, hosting, accounts) and someone I can ask questions to. The rest is on me: architecture, code, deploy and monitoring.",
 				},
 				{
 					q: "What kinds of projects do you take?",
-					a: "Web systems, marketplaces, operations SaaS, dashboards, CRM/automation, AI agents and security audits — mostly TypeScript, React/Next.js and Node.js, with production work in .NET, PHP and Python too.",
+					a: "Web systems, marketplaces, operations SaaS, dashboards, CRM/automation, AI agents and security audits. Mostly TypeScript, React/Next.js and Node.js, with production work in .NET, PHP and Python too.",
 				},
 			],
 		},
@@ -128,7 +130,7 @@ export const content = {
 			messagePlaceholder: "A couple of lines about the problem you want solved.",
 			submit: "Send request",
 			sending: "Sending…",
-			successTitle: "Got it — talk soon.",
+			successTitle: "Got it. Talk soon.",
 			successBody:
 				"Your message reached me. I'll reply by e-mail, usually within a day.",
 			sendAnother: "Send another",
@@ -152,7 +154,7 @@ export const content = {
 			badge: "Aberto a Oportunidades (Remoto)",
 			title: "Engenheiro de Software | Full Stack",
 			subtitle:
-				"9+ anos entregando software em produção ponta a ponta — da arquitetura e do código ao deploy, monitoramento e plantão. TypeScript, React/Next.js, Node.js, .NET e PostgreSQL.",
+				"9+ anos entregando software em produção ponta a ponta: da arquitetura e do código ao deploy, monitoramento e plantão. TypeScript, React/Next.js, Node.js, .NET e PostgreSQL.",
 			cta: "Ver Projetos",
 			secondaryCta: "Entrar em Contato",
 			cvCta: "Baixar CV",
@@ -160,7 +162,7 @@ export const content = {
 		about: {
 			title: "Sobre Mim",
 			description:
-				"Sou Engenheiro de Software Full Stack com 9+ anos de experiência desenvolvendo e escalando sistemas web. Fundei e escalei um SaaS multi-tenant próprio até 10.000+ usuários recorrentes pagantes com 99,9% de uptime — conduzindo produto, engenharia em PHP/Laravel + MySQL e infraestrutura Linux/Cloudflare em produção como time tech de uma pessoa só. Hoje entrego software para clientes B2B: marketplaces, SaaS operacionais, dashboards, automação de CRM, agentes de IA e auditorias de segurança — principalmente em TypeScript, React/Next.js e Node.js, com entregas em produção também em .NET, PHP e Python.",
+				"Sou Engenheiro de Software Full Stack com 9+ anos de experiência desenvolvendo e escalando sistemas web. Fundei e escalei um SaaS multi-tenant próprio até 10.000+ usuários recorrentes pagantes com 99,9% de uptime (conduzindo produto, engenharia em PHP/Laravel + MySQL e infraestrutura Linux/Cloudflare em produção como time tech de uma pessoa só). Hoje entrego software para clientes B2B: marketplaces, SaaS operacionais, dashboards, automação de CRM, agentes de IA e auditorias de segurança. Principalmente em TypeScript, React/Next.js e Node.js, com entregas em produção também em .NET, PHP e Python.",
 			stats: [
 				{ label: "Anos de Exp.", value: "9+" },
 				{ label: "Projetos Entregues", value: "20+" },
@@ -170,7 +172,7 @@ export const content = {
 		projects: {
 			title: "Projetos em Destaque",
 			subtitle:
-				"Aplicações reais em produção — marketplaces, SaaS, automação e infraestrutura.",
+				"Aplicações reais em produção: marketplaces, SaaS, automação e infraestrutura.",
 		},
 		lab: {
 			kicker: "// lab",
@@ -188,16 +190,18 @@ export const content = {
 			kicker: "// avaliações",
 			title: "O que os clientes dizem",
 			subtitle:
-				"Avaliações reais do meu perfil no 99freelas — nada editado, nada montado.",
+				"Avaliações reais de clientes. Nada editado, nada montado.",
 			summary: (avg: string, total: number) =>
 				`${avg} de média em ${total} avaliações`,
 			seeProfile: "Ver o perfil",
+			badgeClient: "cliente pavin.me",
+			badge99: "verificado",
 		},
 		currentWork: {
 			kicker: "// em andamento",
 			title: "Na bancada agora",
 			subtitle:
-				"Um retrato anonimizado do que está saindo esta semana — prova de obra rodando, não só portfólio.",
+				"Um retrato anonimizado do que está saindo esta semana. Prova de obra rodando, não só portfólio.",
 			sprint: "Sprint",
 			of: "de",
 			linesThisWeek: "linhas esta semana",
@@ -211,11 +215,11 @@ export const content = {
 			items: [
 				{
 					q: "Quanto tempo leva um projeto?",
-					a: "Depende do escopo, mas a maioria roda em sprints de 2 a 6 semanas, com algo utilizável ao fim de cada uma. Você recebe uma estimativa realista logo no começo — e se o prazo mudar, você vê no seu portal, não depois.",
+					a: "Depende do escopo, mas a maioria roda em sprints de 2 a 6 semanas, com algo utilizável ao fim de cada uma. Você recebe uma estimativa realista logo no começo, e se o prazo mudar, você vê no seu portal, não depois.",
 				},
 				{
 					q: "Como eu acompanho o andamento?",
-					a: "Você recebe um portal do cliente privado (pavin.me/cliente) que rastreia cada sprint em tempo real — o que está em andamento, o que foi entregue e a linha do tempo inteira. Você aprova cada entrega por lá e pode deixar um comentário ou pedido em qualquer sprint.",
+					a: "Você recebe um portal do cliente privado (pavin.me/cliente) que rastreia cada sprint em tempo real: o que está em andamento, o que foi entregue e a linha do tempo inteira. Você aprova cada entrega por lá e pode deixar um comentário ou pedido em qualquer sprint.",
 				},
 				{
 					q: "Como funciona o pagamento?",
@@ -223,15 +227,15 @@ export const content = {
 				},
 				{
 					q: "E se eu precisar de ajustes depois da entrega?",
-					a: "Ajustes pequenos logo após a entrega fazem parte. Algo maior, a gente combina uma sprint de continuidade juntos — sem cobrança surpresa.",
+					a: "Ajustes pequenos logo após a entrega fazem parte. Algo maior, a gente combina uma sprint de continuidade juntos. Sem cobrança surpresa.",
 				},
 				{
 					q: "O que você precisa de mim pra começar?",
-					a: "Uma ideia clara do problema, referências ou acessos que já existam (repo, hospedagem, contas) e alguém pra eu tirar dúvidas. O resto é comigo — arquitetura, código, deploy e monitoramento.",
+					a: "Uma ideia clara do problema, referências ou acessos que já existam (repo, hospedagem, contas) e alguém pra eu tirar dúvidas. O resto é comigo: arquitetura, código, deploy e monitoramento.",
 				},
 				{
 					q: "Que tipo de projeto você pega?",
-					a: "Sistemas web, marketplaces, SaaS de operações, dashboards, CRM/automação, agentes de IA e auditorias de segurança — principalmente TypeScript, React/Next.js e Node.js, com entregas em produção também em .NET, PHP e Python.",
+					a: "Sistemas web, marketplaces, SaaS de operações, dashboards, CRM/automação, agentes de IA e auditorias de segurança. Principalmente TypeScript, React/Next.js e Node.js, com entregas em produção também em .NET, PHP e Python.",
 				},
 			],
 		},
@@ -258,7 +262,7 @@ export const content = {
 			messagePlaceholder: "Umas linhas sobre o problema que você quer resolver.",
 			submit: "Enviar pedido",
 			sending: "Enviando…",
-			successTitle: "Recebido — a gente se fala.",
+			successTitle: "Recebido. A gente se fala.",
 			successBody:
 				"Sua mensagem chegou aqui. Respondo por e-mail, normalmente em até um dia.",
 			sendAnother: "Enviar outro",

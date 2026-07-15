@@ -34,8 +34,8 @@ export function FrontendPreviews() {
 			title: "Farine",
 			description:
 				language === "en"
-					? "Artisanal bakery site — warm tones, serif typography, parallax."
-					: "Padaria artesanal — tons terrosos, tipografia serifada, parallax.",
+					? "Artisanal bakery site. Warm tones, serif typography, parallax."
+					: "Padaria artesanal. Tons terrosos, tipografia serifada, parallax.",
 			tags: ["UX", "Frontend", "Responsive"],
 			liveUrl: "/demos/bakery",
 			accent: ["#f59e0b", "#f97316"],
@@ -45,8 +45,8 @@ export function FrontendPreviews() {
 			title: "Lumina",
 			description:
 				language === "en"
-					? "Minimalist fintech dashboard — Bento grid and CSS-only charts."
-					: "Dashboard fintech minimalista — Bento grid e gráficos só com CSS.",
+					? "Minimalist fintech dashboard: Bento grid and CSS-only charts."
+					: "Dashboard fintech minimalista: Bento grid e gráficos só com CSS.",
 			tags: ["Fintech", "Bento Grid", "Clean UI"],
 			liveUrl: "/demos/fintech",
 			accent: ["#06b6d4", "#3b82f6"],
@@ -56,8 +56,8 @@ export function FrontendPreviews() {
 			title: "Iron Forge",
 			description:
 				language === "en"
-					? "High-energy brutalist gym design — skewed elements, hard contrast."
-					: "Academia em brutalismo de alta energia — elementos inclinados, contraste duro.",
+					? "High-energy brutalist gym design. Skewed elements, hard contrast."
+					: "Academia em brutalismo de alta energia. Elementos inclinados, contraste duro.",
 			tags: ["Brutalist", "High Energy", "CSS"],
 			liveUrl: "/demos/gym",
 			accent: ["#ef4444", "#f97316"],
@@ -67,8 +67,8 @@ export function FrontendPreviews() {
 			title: "Aurum",
 			description:
 				language === "en"
-					? "Luxury real-estate landing — whitespace, typography, elegance."
-					: "Imobiliária de luxo — espaço em branco, tipografia, elegância.",
+					? "Luxury real-estate landing: whitespace, typography, elegance."
+					: "Imobiliária de luxo: espaço em branco, tipografia, elegância.",
 			tags: ["Luxury", "Minimalist", "Real Estate"],
 			liveUrl: "/demos/luxury",
 			accent: ["#eab308", "#a16207"],
@@ -78,8 +78,8 @@ export function FrontendPreviews() {
 			title: "Admin OS",
 			description:
 				language === "en"
-					? "Complete admin interface — sidebar, data tables, analytics widgets."
-					: "Interface administrativa completa — sidebar, tabelas e widgets de análise.",
+					? "Complete admin interface. Sidebar, data tables, analytics widgets."
+					: "Interface administrativa completa. Sidebar, tabelas e widgets de análise.",
 			tags: ["Dashboard", "Admin", "Data Viz"],
 			liveUrl: "/demos/dashboard",
 			accent: ["#22c55e", "#14b8a6"],

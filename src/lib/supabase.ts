@@ -152,6 +152,103 @@ export function parsePublicStats(raw: unknown): PublicStatsPayload {
 }
 
 // ---------------------------------------------------------------------------
+// Avaliações do cliente — client_reviews (fase 4, o loop de prova social)
+// ---------------------------------------------------------------------------
+// O cliente logado avalia o SEU projeto em /cliente/[projectId]/avaliar. A linha
+// nasce `status='pending'` e NÃO aparece em lugar nenhum público até o Fellipe
+// aprovar no Monitor. RLS (migração 2026-07-14d-avaliacoes.sql, repo
+// 99freelas-new-v1): o cliente só INSERE do projeto que é membro, só LÊ a
+// própria, nunca faz update/delete; anon não toca nesta tabela. A home lê a
+// versão publicada (public_reviews), nunca esta.
+
+export type ClientReviewStatus = "pending" | "approved" | "rejected";
+
+export type ClientReview = {
+  id: string;
+  project_id: string;
+  user_id: string;
+  rating: number; // 1..5
+  body: string;
+  status: ClientReviewStatus;
+  created_at: string;
+  approved_at: string | null;
+};
+
+// ---------------------------------------------------------------------------
+// Home pública — public_reviews (as avaliações APROVADAS, lidas por anon)
+// ---------------------------------------------------------------------------
+// Mesmo padrão do public_stats: o Monitor (service_role), ao aprovar uma
+// avaliação, publica a versão JÁ ANONIMIZADA aqui, e só aqui. A home lê com a
+// ANON key (grant select to anon) e mescla com as 10 estáticas do 99freelas.
+// `author` já vem pronto do Monitor: nome real SÓ se o cliente consentiu; por
+// padrão "Cliente verificado" ou primeiro nome + inicial. O texto (`body`) vem
+// do cliente — a home escapa no render (React já escapa; nada de innerHTML).
+//
+// O parser abaixo é tolerante de propósito (aceita alguns aliases de nome de
+// coluna) pra a home não quebrar se o Monitor nomear um campo de forma um pouco
+// diferente. Contrato canônico das colunas: id, rating, body, author, context,
+// published_at.
+
+export type PublicReview = {
+  id: string;
+  rating: number; // 1..5
+  body: string; // texto do cliente — escapar no render
+  author: string; // nome já anonimizado ("Maria S." | "Cliente verificado")
+  context: string | null; // rótulo do projeto anonimizado (opcional)
+  published_at: string | null; // ISO — quando foi aprovada/publicada
+};
+
+/** Normaliza uma linha crua de `public_reviews` num shape confiável, ou null se
+ *  a linha não tem o mínimo (id + body + rating válido). Aceita aliases de nome
+ *  de coluna pra sobreviver a pequenas divergências com o que o Monitor grava. */
+export function parsePublicReview(raw: unknown): PublicReview | null {
+  const o = (raw ?? {}) as Record<string, unknown>;
+
+  const id =
+    typeof o.id === "string" && o.id
+      ? o.id
+      : typeof o.review_id === "string"
+        ? o.review_id
+        : "";
+  if (!id) return null;
+
+  const ratingRaw = typeof o.rating === "number" ? o.rating : NaN;
+  if (!Number.isFinite(ratingRaw)) return null;
+  const rating = Math.min(5, Math.max(1, Math.round(ratingRaw)));
+
+  const bodyRaw =
+    typeof o.body === "string"
+      ? o.body
+      : typeof o.text === "string"
+        ? o.text
+        : "";
+  const body = bodyRaw.trim().slice(0, 2000);
+  if (!body) return null;
+
+  const authorRaw =
+    (typeof o.author === "string" && o.author) ||
+    (typeof o.display_name === "string" && o.display_name) ||
+    (typeof o.name === "string" && o.name) ||
+    "";
+  const author = authorRaw.trim().slice(0, 80) || "Cliente verificado";
+
+  const contextRaw =
+    (typeof o.context === "string" && o.context) ||
+    (typeof o.project_label === "string" && o.project_label) ||
+    (typeof o.label === "string" && o.label) ||
+    "";
+  const context = contextRaw.trim().slice(0, 160) || null;
+
+  const published =
+    (typeof o.published_at === "string" && o.published_at) ||
+    (typeof o.approved_at === "string" && o.approved_at) ||
+    (typeof o.created_at === "string" && o.created_at) ||
+    null;
+
+  return { id, rating, body, author, context, published_at: published };
+}
+
+// ---------------------------------------------------------------------------
 // Home pública — contact_requests (leads do formulário "Vamos conversar")
 // ---------------------------------------------------------------------------
 // O form NÃO fala com o Supabase direto: o submit vai pro Route Handler

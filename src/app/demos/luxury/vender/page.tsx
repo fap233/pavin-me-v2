@@ -162,7 +162,7 @@ export default function VenderPage() {
 						no lugar certo.
 					</>
 				}
-				texto="Uma avaliação preliminar em segundos — e, se fizer sentido, a visita de um consultor com a proposta completa em 48 horas."
+				texto="Uma avaliação preliminar em segundos. E, se fizer sentido, a visita de um consultor com a proposta completa em 48 horas."
 			/>
 
 			<section className="px-8 pb-32 max-w-[1800px] mx-auto grid lg:grid-cols-[1.2fr_1fr] gap-16 lg:gap-32">
@@ -268,7 +268,7 @@ export default function VenderPage() {
 								Avaliar meu imóvel
 							</button>
 							<p className="text-[10px] uppercase tracking-wider text-stone-400 mt-6">
-								Estimativa preliminar — não substitui a avaliação presencial
+								Estimativa preliminar: não substitui a avaliação presencial
 							</p>
 						</form>
 					)}
@@ -291,7 +291,7 @@ export default function VenderPage() {
 							{
 								n: "03",
 								t: "Mercado fechado",
-								d: "O imóvel vai primeiro à nossa carteira de compradores — muitos vendem sem nunca ser anunciados.",
+								d: "O imóvel vai primeiro à nossa carteira de compradores. Muitos vendem sem nunca ser anunciados.",
 							},
 						].map((passo) => (
 							<li
@@ -314,7 +314,7 @@ export default function VenderPage() {
 					</ol>
 
 					<p className="mt-10 text-stone-500 font-serif leading-relaxed">
-						Comissão de 5% sobre a venda, sem custo antecipado — a apresentação
+						Comissão de 5% sobre a venda, sem custo antecipado. A apresentação
 						do imóvel é por nossa conta.
 					</p>
 				</aside>

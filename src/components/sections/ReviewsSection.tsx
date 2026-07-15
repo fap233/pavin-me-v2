@@ -1,13 +1,45 @@
 "use client";
 
-// Avaliações — prova social real. Os textos vêm de src/data/reviews.ts (10
-// depoimentos reais do perfil do Fellipe no 99freelas) e NÃO são editados aqui.
-// Cabeçalho traz o selo "4,92 de média em 28 avaliações" com link pro perfil.
+// Avaliações — prova social real. Duas procedências, uma parede só:
+//   1. As 10 estáticas do perfil do Fellipe no 99freelas (src/data/reviews.ts),
+//      texto NÃO editado — são depoimentos reais.
+//   2. As avaliações de cliente do portal pavin.me que o Fellipe JÁ APROVOU. A
+//      home lê elas de `public_reviews` com a ANON key (o Monitor publica lá só
+//      as aprovadas, já anonimizadas). Nada aparece aqui sem aprovação.
+//
+// O texto do cliente é conteúdo não-confiável: renderizamos como TEXTO (React
+// escapa {expr} por padrão) — nunca dangerouslySetInnerHTML —, então não há
+// caminho de XSS/HTML injection vindo do banco. Se não houver aprovadas (ou a
+// tabela ainda não existir), a seção fica idêntica a antes: só as do 99freelas.
 
-import { ArrowUpRight, Star } from "lucide-react";
+import { useEffect, useState } from "react";
+import { BadgeCheck, Star } from "lucide-react";
 import { REVIEWS, REVIEW_SUMMARY } from "@/data/reviews";
+import { supabase, parsePublicReview, type PublicReview } from "@/lib/supabase";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useInView } from "@/lib/useInView";
+
+type WallReview = {
+	key: string;
+	rating: number;
+	text: string;
+	date: string;
+	caption: string;
+	source: "client" | "99freelas";
+};
+
+/** "jul. 2026" a partir de um ISO — mesmo estilo curto das estáticas. */
+function monthYear(iso: string | null, lang: "pt" | "en"): string {
+	if (!iso) return "";
+	const d = new Date(iso);
+	if (isNaN(d.getTime())) return "";
+	return d
+		.toLocaleDateString(lang === "pt" ? "pt-BR" : "en-US", {
+			month: "short",
+			year: "numeric",
+		})
+		.replace(" de ", " ");
+}
 
 /** Fila de 5 estrelas; preenche floor(rating) e meia estrela no resto. */
 function Stars({ rating }: { rating: number }) {
@@ -43,10 +75,54 @@ export function ReviewsSection() {
 	const { t, language } = useLanguage();
 	const { ref, inView } = useInView<HTMLElement>(0.12);
 
+	// Avaliações de cliente aprovadas (public_reviews). Fetch client-side com a
+	// anon key; erro (ex.: tabela ainda não criada) cai em silêncio → só as do 99.
+	const [approved, setApproved] = useState<PublicReview[]>([]);
+	useEffect(() => {
+		if (!supabase) return;
+		let alive = true;
+		supabase
+			.from("public_reviews")
+			.select("*")
+			.then(({ data, error }) => {
+				if (!alive || error || !data) return;
+				const parsed = data
+					.map(parsePublicReview)
+					.filter((r): r is PublicReview => r !== null);
+				setApproved(parsed);
+			});
+		return () => {
+			alive = false;
+		};
+	}, []);
+
 	const avg = REVIEW_SUMMARY.average.toLocaleString(
 		language === "pt" ? "pt-BR" : "en-US",
 		{ minimumFractionDigits: 2, maximumFractionDigits: 2 },
 	);
+
+	// Parede mesclada: as de cliente aprovadas primeiro (prova mais recente e
+	// nativa), depois as 10 do 99freelas. O texto do cliente entra como string —
+	// React escapa no render.
+	const clientWall: WallReview[] = approved.map((r) => ({
+		key: `client-${r.id}`,
+		rating: r.rating,
+		text: r.body,
+		date: monthYear(r.published_at, language),
+		caption: r.context ? `${r.author} · ${r.context}` : r.author,
+		source: "client",
+	}));
+
+	const staticWall: WallReview[] = REVIEWS.map((r, i) => ({
+		key: `99-${i}`,
+		rating: r.rating,
+		text: language === "en" ? r.text_en : r.text,
+		date: monthYear(r.date, language),
+		caption: language === "en" ? r.project_en : r.project,
+		source: "99freelas",
+	}));
+
+	const wall = [...clientWall, ...staticWall];
 
 	return (
 		<section
@@ -72,13 +148,8 @@ export function ReviewsSection() {
 						{t.reviews.subtitle}
 					</p>
 
-					{/* Selo 4,92 / 28 + link pro perfil */}
-					<a
-						href={REVIEW_SUMMARY.profileUrl}
-						target="_blank"
-						rel="noopener noreferrer"
-						className="in-view-anim in-view-anim-3 group mt-6 inline-flex items-center gap-3 rounded-full border bg-card/60 px-4 py-2 backdrop-blur transition-colors hover:border-[var(--brand-via)]/50"
-					>
+					{/* Selo 4,92 / 28 — só o número, sem link externo (decisão do Fellipe). */}
+					<div className="in-view-anim in-view-anim-3 mt-6 inline-flex items-center gap-3 rounded-full border bg-card/60 px-4 py-2 backdrop-blur">
 						<span className="flex items-center gap-1.5">
 							<Star className="h-4 w-4 fill-amber-400 text-amber-400" />
 							<span className="text-sm font-bold tabular-nums">{avg}</span>
@@ -87,16 +158,15 @@ export function ReviewsSection() {
 						<span className="text-sm text-muted-foreground">
 							{t.reviews.summary(avg, REVIEW_SUMMARY.total)}
 						</span>
-						<ArrowUpRight className="h-4 w-4 text-muted-foreground transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-foreground" />
-					</a>
+					</div>
 				</div>
 
 				{/* Parede de depoimentos — colunas (masonry) pra textos de tamanhos
 				    diferentes assentarem sem buraco. */}
 				<div className="in-view-anim in-view-anim-4 mt-12 gap-5 [column-fill:balance] sm:columns-2 lg:columns-3">
-					{REVIEWS.map((r, i) => (
+					{wall.map((r) => (
 						<figure
-							key={i}
+							key={r.key}
 							className="mb-5 break-inside-avoid rounded-2xl border bg-card/70 p-5 shadow-[0_18px_50px_-32px_rgb(0_0_0/0.55)] backdrop-blur-md transition-colors duration-300 hover:border-[var(--brand-via)]/45"
 						>
 							<div className="flex items-center justify-between gap-3">
@@ -108,8 +178,18 @@ export function ReviewsSection() {
 							<blockquote className="mt-3 text-sm leading-relaxed text-foreground/90">
 								“{r.text}”
 							</blockquote>
-							<figcaption className="mt-3 border-t pt-3 text-xs leading-snug text-muted-foreground">
-								{r.project}
+							<figcaption className="mt-3 flex items-center justify-between gap-3 border-t pt-3 text-xs leading-snug text-muted-foreground">
+								<span className="min-w-0 truncate">{r.caption}</span>
+								{r.source === "client" ? (
+									<span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-[var(--brand-via)]/30 bg-[var(--brand-via)]/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-[var(--brand-via)]">
+										<BadgeCheck className="h-3 w-3" />
+										{t.reviews.badgeClient}
+									</span>
+								) : (
+									<span className="inline-flex shrink-0 items-center rounded-full border px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-muted-foreground/70">
+										{t.reviews.badge99}
+									</span>
+								)}
 							</figcaption>
 						</figure>
 					))}

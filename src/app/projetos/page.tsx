@@ -413,7 +413,7 @@ function Login({ onAuthed }: { onAuthed: (u: User) => Promise<void> }) {
             Backlog de projetos
           </h1>
           <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-            pavin.dev — workspace de colaboradores
+            pavin.dev, workspace de colaboradores
           </p>
 
           <form onSubmit={submit} className="mt-7 space-y-4">

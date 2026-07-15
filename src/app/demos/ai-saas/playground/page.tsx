@@ -69,7 +69,7 @@ const EXAMPLES: Example[] = [
 			"Triage this ticket and draft a reply:\n\n\"Third time this week the export job dies at 80%. We're on the Pro plan and this is blocking our month-end close.\"",
 		response: `TRIAGE
 ------
-Severity:  P1 — recurring failure, blocks a financial deadline
+Severity:  P1 (recurring failure, blocks a financial deadline)
 Category:  Exports / job runner
 Sentiment: Frustrated (3rd occurrence, escalation likely)
 Churn risk: HIGH (Pro plan, 14 months tenure, 2 prior P1s)
@@ -77,13 +77,13 @@ Churn risk: HIGH (Pro plan, 14 months tenure, 2 prior P1s)
 ROOT CAUSE (probable)
 Export jobs that die around 80% almost always hit the 120s worker
 timeout on the CSV serialization step. The account has 4.2M rows in
-the events table — well past the streaming threshold.
+the events table, well past the streaming threshold.
 
 DRAFT REPLY
 -----------
 Hi Dana,
 
-You are right to escalate — three failures in one week is not the
+You are right to escalate. Three failures in one week is not the
 experience you pay for, and I am sorry it landed on your month-end
 close.
 
@@ -164,7 +164,7 @@ NOTES
 }
 
 Confidence: 0.97. The unit price was derived (1497 / 3), not stated
-explicitly on the line — everything else is verbatim from the source.`,
+explicitly on the line. Everything else is verbatim from the source.`,
 	},
 	{
 		label: "Explain the run in plain English",
@@ -173,8 +173,8 @@ explicitly on the line — everything else is verbatim from the source.`,
 			"Explain what an autonomous agent run is to a non-technical stakeholder, in under 120 words.",
 		response: `Think of an agent run as one errand you hand to a very fast assistant.
 
-You describe the goal — "find every invoice that is 30 days overdue
-and draft the follow-up email" — and give the assistant access to the
+You describe the goal ("find every invoice that is 30 days overdue
+and draft the follow-up email") and give the assistant access to the
 tools it needs: your billing database, your email templates.
 
 It then works the errand on its own. It decides which tool to open
@@ -189,8 +189,8 @@ outcome, and paying only for the tokens the errand actually consumed.`,
 
 const FALLBACK = `Here is how I would approach that.
 
-1. Restate the goal. You want a concrete, verifiable outcome — not a
-   vague summary — so the first move is to pin down what "done" looks
+1. Restate the goal. You want a concrete, verifiable outcome (not a
+   vague summary) so the first move is to pin down what "done" looks
    like.
 2. Gather only what is needed. An agent that pulls every row of your
    database burns tokens and adds noise; scope the retrieval to the
@@ -200,7 +200,7 @@ const FALLBACK = `Here is how I would approach that.
 4. Return a structured result, not prose, when a machine will read it.
 
 Try one of the example prompts on the left to see a full run with tool
-calls and a structured response — or keep going here and I will follow
+calls and a structured response, or keep going here and I will follow
 your lead.`;
 
 function pickResponse(prompt: string): string {
@@ -497,7 +497,7 @@ export default function PlaygroundPage() {
 									className="w-full accent-purple-500 cursor-pointer"
 								/>
 								<p className="text-[10px] text-slate-600 mt-1 leading-snug">
-									Hard ceiling — the completion is truncated here, exactly like
+									Hard ceiling: the completion is truncated here, exactly like
 									the API does.
 								</p>
 							</div>
@@ -577,7 +577,7 @@ export default function PlaygroundPage() {
 									</p>
 									<p className="text-slate-500 text-sm max-w-sm">
 										Write a prompt below, or pick one of the examples. Responses
-										stream token by token — hit Stop whenever you have seen
+										stream token by token. Hit Stop whenever you have seen
 										enough.
 									</p>
 								</div>
@@ -634,7 +634,7 @@ export default function PlaygroundPage() {
 								onChange={(e) => setPrompt(e.target.value)}
 								onKeyDown={onKeyDown}
 								rows={4}
-								placeholder="Ask the agent to do something — triage a ticket, write a query, extract JSON…"
+								placeholder="Ask the agent to do something: triage a ticket, write a query, extract JSON…"
 								aria-label="Prompt"
 								className="w-full bg-transparent resize-none outline-none text-sm text-white placeholder:text-slate-500 leading-relaxed"
 							/>
@@ -670,7 +670,7 @@ export default function PlaygroundPage() {
 						</div>
 
 						<p className="text-xs text-slate-500 text-center">
-							This is a sandbox with canned responses — no requests leave your
+							This is a sandbox with canned responses. No requests leave your
 							browser.{" "}
 							<Link
 								href={`${BASE}/docs/quickstart`}

@@ -310,7 +310,7 @@ function ProjectPanel({
 			<div className="relative z-10 flex h-full flex-col">
 				<div className="flex items-center justify-between px-5 pt-5 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
 					<span>
-						{String(index + 1).padStart(2, "0")} — {project.category[language]}
+						{String(index + 1).padStart(2, "0")} · {project.category[language]}
 					</span>
 					<span>{project.year}</span>
 				</div>

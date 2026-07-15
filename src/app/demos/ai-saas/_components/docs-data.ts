@@ -73,9 +73,9 @@ export const DOC_SECTIONS: DocSection[] = [
 					{
 						kind: "list",
 						items: [
-							"Authentication — create scoped keys per environment.",
-							"Streaming — render tokens as they are produced.",
-							"Rate limits — understand your tier's ceilings before you scale.",
+							"Authentication: create scoped keys per environment.",
+							"Streaming: render tokens as they are produced.",
+							"Rate limits: understand your tier's ceilings before you scale.",
 						],
 					},
 				],
@@ -137,7 +137,7 @@ export const DOC_SECTIONS: DocSection[] = [
 				blocks: [
 					{
 						kind: "p",
-						text: "Streaming turns a 6-second wait into a 300 ms one — perceptually. The API emits server-sent events, one per delta, and closes the stream with a usage summary.",
+						text: "Streaming turns a 6-second wait into a 300 ms one, perceptually. The API emits server-sent events, one per delta, and closes the stream with a usage summary.",
 					},
 					{ kind: "h2", id: "consume", text: "Consuming a stream" },
 					{
@@ -250,7 +250,7 @@ export const DOC_SECTIONS: DocSection[] = [
 							["401", "invalid_api_key", "Missing, revoked, or mistyped key"],
 							["404", "model_not_found", "The model id does not exist on your plan"],
 							["429", "rate_limited", "RPM or TPM ceiling reached"],
-							["503", "capacity", "Region saturated — retry with backoff"],
+							["503", "capacity", "Region saturated, retry with backoff"],
 						],
 					},
 				],
@@ -287,9 +287,9 @@ export const DOC_SECTIONS: DocSection[] = [
 					{
 						kind: "list",
 						items: [
-							"Ruby — nexus-rb (community maintained)",
-							"Rust — nexus-rs (community maintained)",
-							"Elixir — ex_nexus (community maintained)",
+							"Ruby: nexus-rb (community maintained)",
+							"Rust: nexus-rs (community maintained)",
+							"Elixir: ex_nexus (community maintained)",
 						],
 					},
 				],

@@ -69,7 +69,7 @@ const cv: Record<"en" | "pt", CVContent> = {
 			certifications: "Certifications",
 		},
 		summary:
-			"Full Stack Software Engineer with 9+ years of production experience owning the entire lifecycle — architecture, code, tests, CI/CD, deployment, monitoring, incident response and support. Founded and scaled a multi-tenant SaaS from zero to 10,000+ paying recurring users at 99.9% uptime as a single-person tech team. Since 2024, working as an independent engineer for B2B clients with 20+ engagements delivered across healthcare, real estate, tourism, e-commerce, entertainment and legal — marketplaces, SaaS platforms, dashboards, CRM automation, AI agents, security audits and production infrastructure. Core stack: TypeScript, React/Next.js and Node.js, with shipped production work in C#/.NET, PHP/Laravel and Python. Fluent English, remote-async by default.",
+			"Full Stack Software Engineer with 9+ years of production experience owning the entire lifecycle: architecture, code, tests, CI/CD, deployment, monitoring, incident response and support. Founded and scaled a multi-tenant SaaS from zero to 10,000+ paying recurring users at 99.9% uptime as a single-person tech team. Since 2024, working as an independent engineer for B2B clients with 20+ engagements delivered across healthcare, real estate, tourism, e-commerce, entertainment and legal (marketplaces, SaaS platforms, dashboards, CRM automation, AI agents, security audits and production infrastructure). Core stack: TypeScript, React/Next.js and Node.js, with shipped production work in C#/.NET, PHP/Laravel and Python. Fluent English, remote-async by default.",
 		skills: [
 			{
 				label: "Languages",
@@ -132,10 +132,10 @@ const cv: Record<"en" | "pt", CVContent> = {
 				period: "January 2024 — Present",
 				location: "Fortaleza, Brazil · Remote",
 				bullets: [
-					"Delivered 20+ B2B engagements end-to-end — scoping, architecture, implementation, tests, deploy and support — across healthcare, real estate, tourism, e-commerce, entertainment and legal verticals, as sole engineer from first call to production.",
-					"Built and operate MEDSPACE (medspacebrasil.com.br), a marketplace connecting doctors to clinics: Next.js 16, React 19, Prisma/PostgreSQL and Auth.js — MVP live in ~4 weeks, evolved in paid cycles with multi-advertiser accounts (CPF/CNPJ validation), a medical-education module, end-to-end LGPD compliance, 105 automated tests (unit/integration/E2E) and Google Ads/Meta conversion instrumentation.",
-					"Ran a self-initiated security audit on that same production platform and fixed all 13 findings (1 critical, 3 high — moderation bypass, fail-open rate limiting, login timing oracle), shipping CSP/HSTS headers and fail-closed rate limiting (Upstash Redis).",
-					"Modernized a legacy PHP/MySQL tourism portal: responsive redesign of 8 pages refactored into 23 reusable components, real-time search and SEO — accepted and paid in 8 days against a 12-day contract, including a read-only staging environment running over the production database and fail-safe automated FTP deploy tooling.",
+					"Delivered 20+ B2B engagements end-to-end (scoping, architecture, implementation, tests, deploy and support) across healthcare, real estate, tourism, e-commerce, entertainment and legal verticals, as sole engineer from first call to production.",
+					"Built and operate MEDSPACE (medspacebrasil.com.br), a marketplace connecting doctors to clinics: Next.js 16, React 19, Prisma/PostgreSQL and Auth.js. MVP live in ~4 weeks, evolved in paid cycles with multi-advertiser accounts (CPF/CNPJ validation), a medical-education module, end-to-end LGPD compliance, 105 automated tests (unit/integration/E2E) and Google Ads/Meta conversion instrumentation.",
+					"Ran a self-initiated security audit on that same production platform and fixed all 13 findings (1 critical, 3 high: moderation bypass, fail-open rate limiting, login timing oracle), shipping CSP/HSTS headers and fail-closed rate limiting (Upstash Redis).",
+					"Modernized a legacy PHP/MySQL tourism portal: responsive redesign of 8 pages refactored into 23 reusable components, real-time search and SEO. Accepted and paid in 8 days against a 12-day contract, including a read-only staging environment running over the production database and fail-safe automated FTP deploy tooling.",
 					"Developed a Mercado Livre seller dashboard in .NET 8 (ASP.NET Core) + Blazor WebAssembly + EF Core/MySQL: OAuth 2.0 with automatic background token refresh, listing sync with competitor (Buy Box) analysis, a 3-mode price-suggestion algorithm writing back through the official API, and 17 REST endpoints.",
 					"Automated a real-estate auction CRM on Zoho: consolidated 11 modules into 3, migrated 2,051 properties and 49 deduplicated clients with zero failures, and operate a daily Python capture robot (AWS Lambda + n8n) generating flyers and WhatsApp notifications in production.",
 					"Security & infrastructure: white/black-box audit of a multi-tenant ERP SaaS (Supabase RLS across 14 tables) uncovering tenant-breakout and privilege-escalation vulnerabilities, delivered with a prioritized SQL fix plan; designed a 3-2-1 client-side-encrypted backup pipeline (rclone crypt + Backblaze B2) covering 7 MongoDB databases and 6.15M files with bit-for-bit validated restores at ~US$0.30/month; led ransomware incident forensics and server hardening (fail2ban, service isolation).",
@@ -151,12 +151,12 @@ const cv: Record<"en" | "pt", CVContent> = {
 				period: "January 2018 — December 2023 (6 years)",
 				location: "Fortaleza, Brazil",
 				bullets: [
-					"Founded, launched and scaled a multi-tenant SaaS platform from zero to 10,000+ paying recurring users — full-cycle ownership across engineering, product, billing, customer support and infrastructure as a single-person tech team.",
+					"Founded, launched and scaled a multi-tenant SaaS platform from zero to 10,000+ paying recurring users: full-cycle ownership across engineering, product, billing, customer support and infrastructure as a single-person tech team.",
 					"Sustained 99.9% production uptime on a PHP/Laravel + MySQL monolith over 6 years; ran an on-call rotation of one, from incident detection to root-cause fix.",
 					"Reduced legacy SQL query response times by ~40% via targeted refactoring and indexing, eliminating bottlenecks during peak-traffic windows.",
 					"Operated production infrastructure end-to-end: Cloudflare edge (WAF, DDoS mitigation, CDN, DNS, SSL), Nginx reverse proxy, Docker-containerized Linux servers (Ubuntu/Debian) and automated CI/CD deployment pipelines.",
 					"Authored Shell automation that eliminated hundreds of hours of manual operational toil per year and sustained the unit-economics of running engineering + ops solo.",
-					"Drove the full product lifecycle — discovery, scope, build, ship, support, retention — translating user feedback into roadmap and shipped features without a PM in the loop.",
+					"Drove the full product lifecycle (discovery, scope, build, ship, support, retention), translating user feedback into roadmap and shipped features without a PM in the loop.",
 				],
 			},
 		],
@@ -165,39 +165,39 @@ const cv: Record<"en" | "pt", CVContent> = {
 				title: "MEDSPACE",
 				url: "medspacebrasil.com.br",
 				description:
-					"Marketplace connecting doctors to clinics (rooms, equipment, medical education). Next.js 16, Prisma/PostgreSQL — in production with LGPD compliance and 105 automated tests.",
+					"Marketplace connecting doctors to clinics (rooms, equipment, medical education). Next.js 16, Prisma/PostgreSQL, in production with LGPD compliance and 105 automated tests.",
 			},
 			{
 				title: "Fresh Cleaning 4U",
 				description:
-					"Operations SaaS for an Australian cleaning company — recurring-jobs engine, offline employee PWA, geofenced clock-in/out, GST-compliant PDF invoicing, Twilio SMS, payroll (Next.js 15, Prisma, PostgreSQL).",
+					"Operations SaaS for an Australian cleaning company: recurring-jobs engine, offline employee PWA, geofenced clock-in/out, GST-compliant PDF invoicing, Twilio SMS, payroll (Next.js 15, Prisma, PostgreSQL).",
 			},
 			{
 				title: "Lorflux",
 				url: "lorflux.com",
 				description:
-					"Vertical streaming & cinematic comics PWA — Stripe subscriptions, Bunny.net HLS, BullMQ/Redis, multi-audio dubbing (React 19, Node.js, MongoDB).",
+					"Vertical streaming & cinematic comics PWA: Stripe subscriptions, Bunny.net HLS, BullMQ/Redis, multi-audio dubbing (React 19, Node.js, MongoDB).",
 			},
 			{
 				title: "CidadeTur",
 				url: "cidadetur.com.br",
 				description:
-					"Legacy tourism portal modernization — 8 pages redesigned into 23 reusable PHP components, SEO, real-time search; delivered in 8 of 12 contracted days.",
+					"Legacy tourism portal modernization: 8 pages redesigned into 23 reusable PHP components, SEO, real-time search; delivered in 8 of 12 contracted days.",
 			},
 			{
 				title: "Mercado Livre Seller Dashboard",
 				description:
-					".NET 8 + Blazor WebAssembly + EF Core — OAuth 2.0 auto-refresh, competitor analysis, 3-mode price-suggestion algorithm, 17 REST endpoints.",
+					".NET 8 + Blazor WebAssembly + EF Core: OAuth 2.0 auto-refresh, competitor analysis, 3-mode price-suggestion algorithm, 17 REST endpoints.",
 			},
 			{
 				title: "Auction Real-Estate CRM Automation",
 				description:
-					"Zoho CRM restructure (11 → 3 modules) + Python/AWS Lambda capture robot + n8n WhatsApp flyers — 2,051 properties migrated with zero failures.",
+					"Zoho CRM restructure (11 → 3 modules) + Python/AWS Lambda capture robot + n8n WhatsApp flyers. 2,051 properties migrated with zero failures.",
 			},
 			{
 				title: "Multi-tenant ERP Security Audit",
 				description:
-					"White/black-box pentest of a SaaS ERP (Supabase RLS, 14 tables) — found tenant-breakout and privilege-escalation flaws; prioritized SQL remediation plan.",
+					"White/black-box pentest of a SaaS ERP (Supabase RLS, 14 tables): found tenant-breakout and privilege-escalation flaws; prioritized SQL remediation plan.",
 			},
 			{
 				title: "VPS Backup & Hardening",
@@ -208,26 +208,26 @@ const cv: Record<"en" | "pt", CVContent> = {
 				title: "Macroluz",
 				url: "macroluz.com.br",
 				description:
-					"Corporate site for a natural-lighting engineering firm — industrial product catalog and lead capture (Next.js).",
+					"Corporate site for a natural-lighting engineering firm: industrial product catalog and lead capture (Next.js).",
 			},
 			{
 				title: "LastMile Brasil",
 				url: "projeto-lastmile-brasil.vercel.app",
 				description:
-					"Last-mile coverage platform for ISPs — PostGIS geographic viability search and integrated checkout.",
+					"Last-mile coverage platform for ISPs: PostGIS geographic viability search and integrated checkout.",
 			},
 			{
 				title: "Veritas Task Manager",
 				url: "github.com/fap233/desafio-fullstack-veritas",
 				description:
-					"Full-stack Kanban — Go backend, React frontend, Docker, CI/CD.",
+					"Full-stack Kanban: Go backend, React frontend, Docker, CI/CD.",
 			},
 		],
 		projectsFootnote: "Full portfolio: ",
 		educationSchool: "Descomplica Faculdade Digital",
 		educationPeriod: "Apr 2024 — Oct 2026 (Expected)",
 		educationDegree:
-			"Associate's Degree in Systems Analysis and Development (CST — Análise e Desenvolvimento de Sistemas).",
+			"Associate's Degree in Systems Analysis and Development (CST: Análise e Desenvolvimento de Sistemas).",
 		certifications:
 			"Back-End Developer · Front-End Developer · Basic Front-End · Programmer",
 	},
@@ -247,7 +247,7 @@ const cv: Record<"en" | "pt", CVContent> = {
 			certifications: "Certificações",
 		},
 		summary:
-			"Engenheiro de Software Full Stack com 9+ anos de experiência em produção conduzindo o ciclo completo — arquitetura, código, testes, CI/CD, deploy, monitoramento, resposta a incidentes e suporte. Fundei e escalei uma plataforma SaaS multi-tenant de zero a 10.000+ usuários recorrentes pagantes com 99,9% de uptime como time tech de uma pessoa só. Desde 2024 atuo como engenheiro independente para clientes B2B, com 20+ projetos entregues nas verticais de saúde, imobiliário, turismo, e-commerce, entretenimento e jurídico — marketplaces, plataformas SaaS, dashboards, automação de CRM, agentes de IA, auditorias de segurança e infraestrutura de produção. Stack principal: TypeScript, React/Next.js e Node.js, com entregas em produção também em C#/.NET, PHP/Laravel e Python. Inglês fluente, remoto-async por padrão.",
+			"Engenheiro de Software Full Stack com 9+ anos de experiência em produção conduzindo o ciclo completo: arquitetura, código, testes, CI/CD, deploy, monitoramento, resposta a incidentes e suporte. Fundei e escalei uma plataforma SaaS multi-tenant de zero a 10.000+ usuários recorrentes pagantes com 99,9% de uptime como time tech de uma pessoa só. Desde 2024 atuo como engenheiro independente para clientes B2B, com 20+ projetos entregues nas verticais de saúde, imobiliário, turismo, e-commerce, entretenimento e jurídico (marketplaces, plataformas SaaS, dashboards, automação de CRM, agentes de IA, auditorias de segurança e infraestrutura de produção). Stack principal: TypeScript, React/Next.js e Node.js, com entregas em produção também em C#/.NET, PHP/Laravel e Python. Inglês fluente, remoto-async por padrão.",
 		skills: [
 			{
 				label: "Linguagens",
@@ -310,10 +310,10 @@ const cv: Record<"en" | "pt", CVContent> = {
 				period: "Janeiro 2024 — Atual",
 				location: "Fortaleza, Brasil · Remoto",
 				bullets: [
-					"Entreguei 20+ projetos B2B ponta a ponta — escopo, arquitetura, implementação, testes, deploy e suporte — nas verticais de saúde, imobiliário, turismo, e-commerce, entretenimento e jurídico, como único engenheiro da primeira call até a produção.",
-					"Construí e mantenho o MEDSPACE (medspacebrasil.com.br), marketplace que conecta médicos a clínicas: Next.js 16, React 19, Prisma/PostgreSQL e Auth.js — MVP no ar em ~4 semanas, evoluído em ciclos pagos com contas multi-anunciante (validação CPF/CNPJ), módulo de educação médica, conformidade LGPD ponta a ponta, 105 testes automatizados (unit/integração/E2E) e instrumentação de conversão Google Ads/Meta.",
-					"Conduzi auditoria de segurança por iniciativa própria nessa mesma plataforma em produção e corrigi os 13 achados (1 crítico, 3 altos — bypass de moderação, rate limiting fail-open, timing oracle no login), entregando headers CSP/HSTS e rate limiting fail-closed (Upstash Redis).",
-					"Modernizei um portal de turismo legado em PHP/MySQL: redesign responsivo de 8 páginas refatoradas em 23 componentes reutilizáveis, busca em tempo real e SEO — entrega aceita e paga em 8 dias num contrato de 12, incluindo ambiente de homologação read-only sobre o banco de produção e deploy FTP automatizado com trava de segurança.",
+					"Entreguei 20+ projetos B2B ponta a ponta (escopo, arquitetura, implementação, testes, deploy e suporte) nas verticais de saúde, imobiliário, turismo, e-commerce, entretenimento e jurídico, como único engenheiro da primeira call até a produção.",
+					"Construí e mantenho o MEDSPACE (medspacebrasil.com.br), marketplace que conecta médicos a clínicas: Next.js 16, React 19, Prisma/PostgreSQL e Auth.js. MVP no ar em ~4 semanas, evoluído em ciclos pagos com contas multi-anunciante (validação CPF/CNPJ), módulo de educação médica, conformidade LGPD ponta a ponta, 105 testes automatizados (unit/integração/E2E) e instrumentação de conversão Google Ads/Meta.",
+					"Conduzi auditoria de segurança por iniciativa própria nessa mesma plataforma em produção e corrigi os 13 achados (1 crítico, 3 altos: bypass de moderação, rate limiting fail-open, timing oracle no login), entregando headers CSP/HSTS e rate limiting fail-closed (Upstash Redis).",
+					"Modernizei um portal de turismo legado em PHP/MySQL: redesign responsivo de 8 páginas refatoradas em 23 componentes reutilizáveis, busca em tempo real e SEO. Entrega aceita e paga em 8 dias num contrato de 12, incluindo ambiente de homologação read-only sobre o banco de produção e deploy FTP automatizado com trava de segurança.",
 					"Desenvolvi dashboard de gestão para vendedores do Mercado Livre em .NET 8 (ASP.NET Core) + Blazor WebAssembly + EF Core/MySQL: OAuth 2.0 com refresh automático em background, sincronização de anúncios com análise de concorrência (Buy Box), algoritmo de sugestão de preço com 3 modos gravando via API oficial e 17 endpoints REST.",
 					"Automatizei o CRM de uma imobiliária de leilões no Zoho: consolidei 11 módulos em 3, migrei 2.051 imóveis e 49 clientes deduplicados com zero falhas, e opero robô diário de captura em Python (AWS Lambda + n8n) gerando flyers e notificações WhatsApp em produção.",
 					"Segurança & infraestrutura: auditoria white/black-box de ERP SaaS multi-tenant (Supabase RLS em 14 tabelas) revelando falhas de tenant-breakout e escalação de privilégio, entregue com plano de correção SQL priorizado; pipeline de backup 3-2-1 com criptografia client-side (rclone crypt + Backblaze B2) cobrindo 7 bancos MongoDB e 6,15 milhões de arquivos, restauração validada bit a bit a ~US$0,30/mês; conduzi forense de incidente de ransomware e hardening de servidor (fail2ban, isolamento de serviços).",
@@ -329,12 +329,12 @@ const cv: Record<"en" | "pt", CVContent> = {
 				period: "Janeiro 2018 — Dezembro 2023 (6 anos)",
 				location: "Fortaleza, Brasil",
 				bullets: [
-					"Fundei, lancei e escalei uma plataforma SaaS multi-tenant de zero a 10.000+ usuários recorrentes pagantes — ownership full-cycle em engenharia, produto, billing, suporte e infraestrutura como time tech de uma pessoa só.",
+					"Fundei, lancei e escalei uma plataforma SaaS multi-tenant de zero a 10.000+ usuários recorrentes pagantes: ownership full-cycle em engenharia, produto, billing, suporte e infraestrutura como time tech de uma pessoa só.",
 					"Sustentei 99,9% de uptime em produção num monolito PHP/Laravel + MySQL ao longo de 6 anos; rodei plantão on-call de uma pessoa só, da detecção do incidente até a correção da raiz.",
 					"Reduzi tempo de resposta de queries SQL legadas em ~40% via refatoração e indexação direcionadas, eliminando gargalos em picos de tráfego.",
 					"Operei infraestrutura de produção ponta a ponta: borda Cloudflare (WAF, mitigação de DDoS, CDN, DNS, SSL), Nginx reverse proxy, servidores Linux (Ubuntu/Debian) containerizados com Docker e pipelines CI/CD automatizadas.",
 					"Desenvolvi automação em Shell que eliminou centenas de horas de trabalho manual por ano e sustentou a unit-economics de rodar engenharia + ops sozinho.",
-					"Conduzi o ciclo completo de produto — discovery, escopo, build, ship, suporte, retenção — traduzindo feedback de usuário em roadmap e features entregues sem um PM no loop.",
+					"Conduzi o ciclo completo de produto (discovery, escopo, build, ship, suporte, retenção), traduzindo feedback de usuário em roadmap e features entregues sem um PM no loop.",
 				],
 			},
 		],
@@ -343,39 +343,39 @@ const cv: Record<"en" | "pt", CVContent> = {
 				title: "MEDSPACE",
 				url: "medspacebrasil.com.br",
 				description:
-					"Marketplace que conecta médicos a clínicas (salas, aparelhos, educação médica). Next.js 16, Prisma/PostgreSQL — em produção com conformidade LGPD e 105 testes automatizados.",
+					"Marketplace que conecta médicos a clínicas (salas, aparelhos, educação médica). Next.js 16, Prisma/PostgreSQL, em produção com conformidade LGPD e 105 testes automatizados.",
 			},
 			{
 				title: "Fresh Cleaning 4U",
 				description:
-					"SaaS operacional para empresa de limpeza australiana — engine de jobs recorrentes, PWA offline do funcionário, ponto com geofence, faturas PDF com GST, SMS Twilio, folha de pagamento (Next.js 15, Prisma, PostgreSQL).",
+					"SaaS operacional para empresa de limpeza australiana: engine de jobs recorrentes, PWA offline do funcionário, ponto com geofence, faturas PDF com GST, SMS Twilio, folha de pagamento (Next.js 15, Prisma, PostgreSQL).",
 			},
 			{
 				title: "Lorflux",
 				url: "lorflux.com",
 				description:
-					"PWA de streaming vertical e cinematic comics — assinaturas Stripe, HLS Bunny.net, BullMQ/Redis, dublagens multi-áudio (React 19, Node.js, MongoDB).",
+					"PWA de streaming vertical e cinematic comics: assinaturas Stripe, HLS Bunny.net, BullMQ/Redis, dublagens multi-áudio (React 19, Node.js, MongoDB).",
 			},
 			{
 				title: "CidadeTur",
 				url: "cidadetur.com.br",
 				description:
-					"Modernização de portal de turismo legado — 8 páginas redesenhadas em 23 componentes PHP reutilizáveis, SEO, busca em tempo real; entregue em 8 dos 12 dias contratados.",
+					"Modernização de portal de turismo legado: 8 páginas redesenhadas em 23 componentes PHP reutilizáveis, SEO, busca em tempo real; entregue em 8 dos 12 dias contratados.",
 			},
 			{
 				title: "Dashboard de Vendas Mercado Livre",
 				description:
-					".NET 8 + Blazor WebAssembly + EF Core — OAuth 2.0 com refresh automático, análise de concorrência, algoritmo de sugestão de preço com 3 modos, 17 endpoints REST.",
+					".NET 8 + Blazor WebAssembly + EF Core: OAuth 2.0 com refresh automático, análise de concorrência, algoritmo de sugestão de preço com 3 modos, 17 endpoints REST.",
 			},
 			{
 				title: "Automação CRM Imobiliária de Leilões",
 				description:
-					"Reestruturação do Zoho CRM (11 → 3 módulos) + robô de captura Python/AWS Lambda + flyers WhatsApp via n8n — 2.051 imóveis migrados com zero falhas.",
+					"Reestruturação do Zoho CRM (11 → 3 módulos) + robô de captura Python/AWS Lambda + flyers WhatsApp via n8n. 2.051 imóveis migrados com zero falhas.",
 			},
 			{
 				title: "Auditoria de Segurança em ERP Multi-tenant",
 				description:
-					"Pentest white/black-box de ERP SaaS (Supabase RLS, 14 tabelas) — falhas de tenant-breakout e escalação de privilégio encontradas; plano de correção SQL priorizado.",
+					"Pentest white/black-box de ERP SaaS (Supabase RLS, 14 tabelas): falhas de tenant-breakout e escalação de privilégio encontradas; plano de correção SQL priorizado.",
 			},
 			{
 				title: "Backup & Hardening de VPS",
@@ -386,19 +386,19 @@ const cv: Record<"en" | "pt", CVContent> = {
 				title: "Macroluz",
 				url: "macroluz.com.br",
 				description:
-					"Site corporativo de engenharia de iluminação natural — catálogo industrial e captura de leads (Next.js).",
+					"Site corporativo de engenharia de iluminação natural: catálogo industrial e captura de leads (Next.js).",
 			},
 			{
 				title: "LastMile Brasil",
 				url: "projeto-lastmile-brasil.vercel.app",
 				description:
-					"Plataforma de cobertura de última milha para provedores — busca geográfica de viabilidade com PostGIS e checkout integrado.",
+					"Plataforma de cobertura de última milha para provedores: busca geográfica de viabilidade com PostGIS e checkout integrado.",
 			},
 			{
 				title: "Veritas Task Manager",
 				url: "github.com/fap233/desafio-fullstack-veritas",
 				description:
-					"Kanban full-stack — backend Go, frontend React, Docker, CI/CD.",
+					"Kanban full-stack: backend Go, frontend React, Docker, CI/CD.",
 			},
 		],
 		projectsFootnote: "Portfólio completo: ",

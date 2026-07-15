@@ -508,7 +508,7 @@ function AgendarVisita({
 							Confirmar visita
 						</button>
 						<p className="text-center text-[10px] uppercase tracking-wider text-stone-400 mt-6">
-							Atendimento discreto — nenhum dado é compartilhado
+							Atendimento discreto: nenhum dado é compartilhado
 						</p>
 					</form>
 				)}

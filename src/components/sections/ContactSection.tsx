@@ -91,7 +91,7 @@ const ContactSection = () => {
 							<dt className="w-28 shrink-0 text-muted-foreground/60">
 								{isEN ? "Location" : "Base"}
 							</dt>
-							<dd>Fortaleza, BR — UTC-3</dd>
+							<dd>Fortaleza, BR · UTC-3</dd>
 						</div>
 						<div className="flex items-baseline gap-4">
 							<dt className="w-28 shrink-0 text-muted-foreground/60">
@@ -105,7 +105,7 @@ const ContactSection = () => {
 							</dt>
 							<dd className="inline-flex items-center gap-2">
 								<span className="contact-status-dot" aria-hidden="true" />
-								{isEN ? "Open to work — remote" : "Aberto a oportunidades — remoto"}
+								{isEN ? "Open to work · remote" : "Aberto a oportunidades · remoto"}
 							</dd>
 						</div>
 					</dl>

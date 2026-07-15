@@ -14,7 +14,12 @@
 // mesmo caminho de código do realtime, então o pulso da timeline e a barra de
 // progresso reagem igual ao que o Supabase faria.
 
-import type { ProjectEvent, SharedProject, Sprint } from "@/lib/supabase";
+import type {
+  ClientReview,
+  ProjectEvent,
+  SharedProject,
+  Sprint,
+} from "@/lib/supabase";
 
 export const MOCK_USER = {
   id: "00000000-0000-4000-8000-000000000001",
@@ -43,6 +48,7 @@ type MockState = {
   projects: SharedProject[];
   sprints: Sprint[];
   events: ProjectEvent[];
+  reviews: ClientReview[];
 };
 
 function seed(): MockState {
@@ -268,7 +274,7 @@ function seed(): MockState {
     },
   ];
 
-  return { projects, sprints, events };
+  return { projects, sprints, events, reviews: [] };
 }
 
 let state: MockState = seed();
@@ -360,4 +366,38 @@ export function mockComment(
     ],
   };
   emit();
+}
+
+// --- Avaliação de fim de projeto -------------------------------------------
+
+export function mockMyReview(
+  projectId: string,
+  userId: string
+): ClientReview | null {
+  return (
+    state.reviews.find(
+      (r) => r.project_id === projectId && r.user_id === userId
+    ) ?? null
+  );
+}
+
+export function mockSubmitReview(
+  projectId: string,
+  userId: string,
+  rating: number,
+  body: string
+): ClientReview {
+  const review: ClientReview = {
+    id: `r${Date.now()}`,
+    project_id: projectId,
+    user_id: userId,
+    rating,
+    body,
+    status: "pending",
+    created_at: new Date().toISOString(),
+    approved_at: null,
+  };
+  state = { ...state, reviews: [...state.reviews, review] };
+  emit();
+  return review;
 }

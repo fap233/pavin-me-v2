@@ -60,7 +60,7 @@ export default function DemosLayout({
 			<div className="fixed bottom-5 left-5 z-[100] flex flex-col items-start gap-2">
 				<span className="inline-flex items-center gap-1.5 rounded-full border border-amber-400/25 bg-amber-950/85 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-amber-200 shadow-[0_8px_24px_-8px_rgba(0,0,0,0.7)] backdrop-blur-md">
 					<Info className="h-3.5 w-3.5" aria-hidden="true" />
-					Demo — dados fictícios
+					Demo · dados fictícios
 				</span>
 
 				<Link

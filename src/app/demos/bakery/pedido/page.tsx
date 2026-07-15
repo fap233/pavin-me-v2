@@ -141,7 +141,7 @@ export default function PedidoPage() {
 				where:
 					fulfillment === "entrega"
 						? endereco.trim()
-						: `${selectedUnit.name} — ${selectedUnit.address}`,
+						: `${selectedUnit.name} (${selectedUnit.address})`,
 				nome: nome.trim().split(" ")[0],
 			});
 			setSending(false);
@@ -264,7 +264,7 @@ export default function PedidoPage() {
 						<span className="italic text-stone-500">vazio por enquanto.</span>
 					</h1>
 					<p className="font-sans text-stone-600 leading-relaxed mt-6 max-w-md mx-auto">
-						A fornada das 07h já saiu. Comece por um destes — ou veja o cardápio
+						A fornada das 07h já saiu. Comece por um destes, ou veja o cardápio
 						inteiro.
 					</p>
 
@@ -315,7 +315,7 @@ export default function PedidoPage() {
 		<section className="pt-36 pb-24 px-6">
 			<div className="max-w-6xl mx-auto">
 				<span className="font-sans text-orange-700 font-bold tracking-widest text-xs uppercase">
-					Seu pedido — {count} {count === 1 ? "item" : "itens"}
+					Seu pedido: {count} {count === 1 ? "item" : "itens"}
 				</span>
 				<h1 className="text-5xl md:text-6xl text-stone-900 mt-4 mb-14 leading-[1.1]">
 					Quase no <span className="italic text-stone-500">forno.</span>
@@ -459,7 +459,7 @@ export default function PedidoPage() {
 									>
 										{UNITS.map((unit) => (
 											<option key={unit.id} value={unit.id}>
-												{unit.name} — {unit.address}
+												{unit.name} ({unit.address})
 											</option>
 										))}
 									</select>
@@ -497,7 +497,7 @@ export default function PedidoPage() {
 									<Field
 										id="endereco"
 										label="Endereço"
-										placeholder="Rua Harmonia, 587 — Vila Madalena"
+										placeholder="Rua Harmonia, 587, Vila Madalena"
 										value={endereco}
 										onChange={setEndereco}
 										error={errors.endereco}
@@ -570,7 +570,7 @@ export default function PedidoPage() {
 						</button>
 
 						<p className="text-xs text-stone-400 text-center leading-relaxed">
-							Pagamento na entrega ou na retirada. Demo — nada é cobrado.
+							Pagamento na entrega ou na retirada. Demo: nada é cobrado.
 						</p>
 					</form>
 				</div>

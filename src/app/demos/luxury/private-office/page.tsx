@@ -14,7 +14,7 @@ const SERVICOS = [
 		n: "01",
 		titulo: "Mercado fechado",
 		texto:
-			"Cerca de 60% do que negociamos nunca é anunciado. Trabalhamos a partir do que você procura, não do que está na vitrine — inclusive batendo à porta de quem ainda não decidiu vender.",
+			"Cerca de 60% do que negociamos nunca é anunciado. Trabalhamos a partir do que você procura, não do que está na vitrine, inclusive batendo à porta de quem ainda não decidiu vender.",
 	},
 	{
 		n: "02",
@@ -26,7 +26,7 @@ const SERVICOS = [
 		n: "03",
 		titulo: "Patrimônio e sucessão",
 		texto:
-			"Reorganização de carteira imobiliária, holding familiar e partilha — em conjunto com o seu escritório de advocacia e o seu family office.",
+			"Reorganização de carteira imobiliária, holding familiar e partilha, em conjunto com o seu escritório de advocacia e o seu family office.",
 	},
 	{
 		n: "04",
@@ -83,7 +83,7 @@ export default function PrivateOfficePage() {
 				<Regua className="mb-10" />
 				<p className="font-serif text-2xl md:text-3xl leading-snug text-stone-800">
 					Existe um mercado imobiliário que não tem anúncio, não tem placa e não
-					tem visita aberta. Ele funciona por reputação — e é nele que a Aurum
+					tem visita aberta. Ele funciona por reputação. E é nele que a Aurum
 					trabalha há dezoito anos.
 				</p>
 				<p className="text-stone-500 font-serif italic mt-10">
@@ -151,7 +151,7 @@ export default function PrivateOfficePage() {
 			{/* Convite */}
 			<section className="border-t border-stone-200 px-8 py-24 md:py-32 text-center">
 				<h2 className="font-serif text-3xl md:text-5xl text-stone-900 leading-snug max-w-2xl mx-auto mb-10">
-					A primeira conversa é reservada — e não custa nada.
+					A primeira conversa é reservada, e não custa nada.
 				</h2>
 				<p className="text-stone-500 font-serif text-lg max-w-md mx-auto mb-12 leading-relaxed">
 					Atendemos um número limitado de mandatos por ano para manter o padrão

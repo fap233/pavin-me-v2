@@ -119,7 +119,7 @@ export function HeroSection() {
 				aria-hidden="true"
 				className="hero-anim hero-anim-5 absolute inset-x-0 bottom-5 hidden md:flex items-center justify-between gap-4 px-8 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground/60"
 			>
-				<span>Fortaleza · BR — UTC-3</span>
+				<span>Fortaleza · BR · UTC-3</span>
 				<span className="hero-status-bars" />
 				<span>{language === "en" ? "Scroll" : "Role"} ↓</span>
 			</div>

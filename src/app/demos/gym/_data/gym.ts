@@ -198,7 +198,7 @@ export const COACHES: Coach[] = [
 	{
 		id: "rafael-drumond",
 		name: "Rafael Drumond",
-		role: "Head Coach — Crossfit",
+		role: "Head Coach, Crossfit",
 		specialty: "Crossfit",
 		bio: "Ex-atleta de levantamento olímpico, comanda o box desde 2016. Odeia repetição malfeita mais do que odeia segunda-feira.",
 		credentials: [
@@ -213,12 +213,12 @@ export const COACHES: Coach[] = [
 	{
 		id: "camila-arruda",
 		name: "Camila Arruda",
-		role: "Coach — Musculação & Hipertrofia",
+		role: "Coach, Musculação & Hipertrofia",
 		specialty: "Musculação",
 		bio: "Montou a periodização de mais de 400 alunos. Se você quer ganhar massa, ela vai te fazer comer e dormir direito primeiro.",
 		credentials: [
 			"CREF 027119-G/SP",
-			"Mestre em Fisiologia do Exercício — USP",
+			"Mestre em Fisiologia do Exercício (USP)",
 			"Certificação NSCA-CSCS",
 		],
 		years: 9,
@@ -228,9 +228,9 @@ export const COACHES: Coach[] = [
 	{
 		id: "diego-sampaio",
 		name: "Diego Sampaio",
-		role: "Coach — Boxe & Muay Thai",
+		role: "Coach, Boxe & Muay Thai",
 		specialty: "Boxe",
-		bio: "18 lutas profissionais, 15 vitórias. Ensina que o soco começa no pé — e que ninguém sobe no ringue sem antes suar no saco.",
+		bio: "18 lutas profissionais, 15 vitórias. Ensina que o soco começa no pé, e que ninguém sobe no ringue sem antes suar no saco.",
 		credentials: [
 			"CREF 031884-G/SP",
 			"Faixa-preta Muay Thai (Kru)",
@@ -243,7 +243,7 @@ export const COACHES: Coach[] = [
 	{
 		id: "juliana-menezes",
 		name: "Juliana Menezes",
-		role: "Coach — Cardio & Condicionamento",
+		role: "Coach, Cardio & Condicionamento",
 		specialty: "Cardio",
 		bio: "Maratonista com 6 provas oficiais no currículo. Especialista em transformar fôlego curto em VO2 máx de atleta.",
 		credentials: [
@@ -260,7 +260,7 @@ export const COACHES: Coach[] = [
 		name: "Marcos Tavares",
 		role: "Personal Trainer Sênior",
 		specialty: "Personal",
-		bio: "Atende executivos às 5h da manhã há uma década. Reabilitação, postura e força — nessa ordem.",
+		bio: "Atende executivos às 5h da manhã há uma década. Reabilitação, postura e força. Nessa ordem.",
 		credentials: [
 			"CREF 014522-G/SP",
 			"Especialista em Treinamento Funcional",
@@ -273,7 +273,7 @@ export const COACHES: Coach[] = [
 	{
 		id: "beatriz-nakamura",
 		name: "Beatriz Nakamura",
-		role: "Coach — Mobilidade & Prevenção",
+		role: "Coach, Mobilidade & Prevenção",
 		specialty: "Mobilidade",
 		bio: "Cuida do que ninguém quer treinar: ombro, quadril e tornozelo. Quem passa por ela levanta mais e se machuca menos.",
 		credentials: [
@@ -327,7 +327,7 @@ export const PROGRAMS: Program[] = [
 		name: "Crossfit",
 		tagline: "O WOD não negocia",
 		description:
-			"Treino funcional de alta intensidade que mistura levantamento olímpico, ginástica e condicionamento metabólico. Cada aula tem um WOD diferente, cronometrado e escalável — do iniciante ao competidor. Você entra pelo aquecimento, passa pela técnica e termina no chão.",
+			"Treino funcional de alta intensidade que mistura levantamento olímpico, ginástica e condicionamento metabólico. Cada aula tem um WOD diferente, cronometrado e escalável, do iniciante ao competidor. Você entra pelo aquecimento, passa pela técnica e termina no chão.",
 		intensity: 5,
 		duration: "60 min",
 		calories: "600–850 kcal",
@@ -360,7 +360,7 @@ export const PROGRAMS: Program[] = [
 		name: "Musculação",
 		tagline: "Ferro, série e progressão",
 		description:
-			"Área de peso livre com 50+ equipamentos, plataformas de agachamento e rack de barras. O treino é periodizado pelo coach a partir da sua avaliação física e revisado a cada ciclo — nada de ficha genérica colada na parede desde 2019.",
+			"Área de peso livre com 50+ equipamentos, plataformas de agachamento e rack de barras. O treino é periodizado pelo coach a partir da sua avaliação física e revisado a cada ciclo. Nada de ficha genérica colada na parede desde 2019.",
 		intensity: 3,
 		duration: "45–75 min",
 		calories: "350–500 kcal",
@@ -393,7 +393,7 @@ export const PROGRAMS: Program[] = [
 		name: "Cardio",
 		tagline: "Fôlego é músculo",
 		description:
-			"Do HIIT de 25 minutos ao treino longo de esteira e bike. Trabalhamos zonas de frequência cardíaca com monitor no peito, projetadas no telão da sala — você vê exatamente em que zona está e por quanto tempo aguentou nela.",
+			"Do HIIT de 25 minutos ao treino longo de esteira e bike. Trabalhamos zonas de frequência cardíaca com monitor no peito, projetadas no telão da sala: você vê exatamente em que zona está e por quanto tempo aguentou nela.",
 		intensity: 4,
 		duration: "25–50 min",
 		calories: "400–700 kcal",
@@ -478,7 +478,7 @@ export const UNITS: Unit[] = [
 		id: "vila-madalena",
 		name: "Iron Forge — Vila Madalena",
 		city: "São Paulo / SP",
-		address: "Rua Harmonia, 1.284 — Vila Madalena, São Paulo/SP — CEP 05435-001",
+		address: "Rua Harmonia, 1.284, Vila Madalena, São Paulo/SP, CEP 05435-001",
 		phone: "(11) 3812-4477",
 		flagship: true,
 		hours: [
@@ -502,7 +502,7 @@ export const UNITS: Unit[] = [
 		id: "moema",
 		name: "Iron Forge — Moema",
 		city: "São Paulo / SP",
-		address: "Av. Jamaris, 590 — Moema, São Paulo/SP — CEP 04078-001",
+		address: "Av. Jamaris, 590, Moema, São Paulo/SP, CEP 04078-001",
 		phone: "(11) 3045-9120",
 		hours: [
 			{ label: "Segunda a Sexta", value: "05h – 23h" },
@@ -525,7 +525,7 @@ export const UNITS: Unit[] = [
 		id: "santo-andre",
 		name: "Iron Forge — Santo André",
 		city: "Santo André / SP",
-		address: "Rua Oliveira Lima, 77 — Centro, Santo André/SP — CEP 09010-160",
+		address: "Rua Oliveira Lima, 77, Centro, Santo André/SP, CEP 09010-160",
 		phone: "(11) 4438-2260",
 		hours: [
 			{ label: "Segunda a Sexta", value: "06h – 22h" },

@@ -12,6 +12,7 @@ import type { RealtimeChannel } from "@supabase/supabase-js";
 import {
   supabase,
   supabaseConfigured,
+  type ClientReview,
   type ProjectEvent,
   type SharedProject,
   type Sprint,
@@ -307,6 +308,103 @@ export async function postComment(
   if (error)
     return { ok: false, message: "Não consegui enviar sua mensagem. Tente de novo." };
   return { ok: true };
+}
+
+// ---------------------------------------------------------------------------
+// Avaliação de fim de projeto (o loop de prova social)
+// ---------------------------------------------------------------------------
+
+export const REVIEW_MAX = 1000; // teto do texto — espelha o limite da RLS
+
+/** A avaliação que ESTE cliente já deu pra ESTE projeto (ou null). Serve pra não
+ *  pedir de novo: a tela mostra "já avaliou" em vez do formulário. A RLS deixa o
+ *  cliente ler só a própria linha, então isto nunca traz a de outro cliente. */
+export async function myReview(
+  projectId: string,
+  userId: string
+): Promise<LoadResult<ClientReview | null>> {
+  if (isMockMode())
+    return { ok: true, data: mock.mockMyReview(projectId, userId) };
+  if (!supabase)
+    return { ok: false, kind: "error", message: dataMessage("network") };
+  if (!UUID_RE.test(projectId)) return { ok: true, data: null };
+
+  const { data, error } = await supabase
+    .from("client_reviews")
+    .select("*")
+    .eq("project_id", projectId)
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(1);
+  if (error)
+    return { ok: false, kind: "error", message: dataMessage(error.message) };
+  return { ok: true, data: ((data as ClientReview[]) ?? [])[0] ?? null };
+}
+
+/** Envia a avaliação (estrelas + texto). Nasce `status='pending'` — nada aparece
+ *  público até o Fellipe aprovar no Monitor. A RLS confere o resto (que o cliente
+ *  é membro, que o rating é 1..5, que o texto cabe); aqui só validamos pra dar
+ *  mensagem boa antes de bater no banco. */
+export async function submitReview(
+  projectId: string,
+  userId: string,
+  rating: number,
+  body: string
+): Promise<{ ok: true; data: ClientReview } | { ok: false; message: string }> {
+  const r = Math.round(rating);
+  if (!Number.isFinite(r) || r < 1 || r > 5)
+    return { ok: false, message: "Escolha de 1 a 5 estrelas." };
+  const text = body.trim();
+  if (!text)
+    return { ok: false, message: "Escreva algumas palavras sobre o projeto." };
+  if (text.length > REVIEW_MAX)
+    return {
+      ok: false,
+      message: `O texto passou do limite (${REVIEW_MAX} caracteres).`,
+    };
+
+  if (isMockMode()) {
+    const data = mock.mockSubmitReview(projectId, userId, r, text);
+    return { ok: true, data };
+  }
+  if (!supabase) return { ok: false, message: dataMessage("network") };
+
+  const { data, error } = await supabase
+    .from("client_reviews")
+    .insert({
+      project_id: projectId,
+      user_id: userId,
+      rating: r,
+      body: text,
+      status: "pending",
+    })
+    .select()
+    .single();
+
+  if (error) {
+    const m = error.message.toLowerCase();
+    if (m.includes("duplicate") || m.includes("unique"))
+      return {
+        ok: false,
+        message: "Você já enviou uma avaliação deste projeto. Obrigado!",
+      };
+    return {
+      ok: false,
+      message: "Não consegui registrar sua avaliação agora. Tente de novo.",
+    };
+  }
+  return { ok: true, data: data as ClientReview };
+}
+
+/** Projeto concluído? Fecha quando o Fellipe marca `status='done'` no Monitor OU
+ *  quando todas as sprints foram aprovadas. É o gatilho de mostrar o convite pra
+ *  avaliar no rastreio. */
+export function isConcluded(
+  project: SharedProject,
+  sprints: Sprint[]
+): boolean {
+  if (project.status === "done") return true;
+  return sprints.length > 0 && sprints.every((s) => s.status === "approved");
 }
 
 // ---------------------------------------------------------------------------

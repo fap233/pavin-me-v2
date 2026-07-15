@@ -175,7 +175,7 @@ export const PROPERTIES: Property[] = [
 			"Residência de vidro e concreto aparente sobre um terreno de esquina, com jardim de Burle Marx restaurado.",
 		descricao: [
 			"Projetada como um pavilhão de vidro suspenso sobre um embasamento de concreto, a casa dissolve a fronteira entre interior e jardim. Os caixilhos de piso a teto correm por 24 metros de fachada e desaparecem por completo dentro da alvenaria.",
-			"O pavimento social é um único plano contínuo — estar, jantar e música — articulado apenas pela lareira central de mármore travertino. No pavimento superior, quatro suítes voltadas para o miolo de quadra, sem vizinho de frente.",
+			"O pavimento social é um único plano contínuo (estar, jantar e música) articulado apenas pela lareira central de mármore travertino. No pavimento superior, quatro suítes voltadas para o miolo de quadra, sem vizinho de frente.",
 			"O jardim, de traço original dos anos 70, foi recuperado por paisagista especializado e mantém as espécies nativas do desenho inicial.",
 		],
 		sobreOBairro:
@@ -215,7 +215,7 @@ export const PROPERTIES: Property[] = [
 		descricao: [
 			"Implantada no ponto mais alto do condomínio, a villa abre-se para o oitavo buraco do campo de golfe assinado por Randall Thompson. Pedra portuguesa, telha vã e madeira de demolição compõem a materialidade.",
 			"O programa social se organiza em torno de um pátio interno com espelho d água e oliveiras adultas trazidas da Puglia. A ala íntima é independente, com acesso próprio e elevador.",
-			"Casa de hóspedes autônoma com duas suítes, cozinha e estar — ideal para famílias que recebem por temporadas longas.",
+			"Casa de hóspedes autônoma com duas suítes, cozinha e estar. Ideal para famílias que recebem por temporadas longas.",
 		],
 		sobreOBairro:
 			"Fazenda Boa Vista concentra o mais exigente mercado de casas de campo do país, a 100 km de São Paulo, com heliponto próprio, dois campos de golfe e spa Kayamã.",
@@ -255,7 +255,7 @@ export const PROPERTIES: Property[] = [
 		descricao: [
 			"São 32 metros de frente para o Atlântico, do Arpoador ao Leblon, sem nenhuma obstrução. O living corrido acompanha toda a fachada e recebe o sol da tarde filtrado por brises de madeira.",
 			"O piso superior é dedicado ao lazer: terraço com piscina de borda infinita, churrasqueira e pergolado, além de um lounge envidraçado que funciona nas noites de inverno.",
-			"Reforma integral concluída em 2020, com projeto de interiores e mobiliário desenhado sob medida — o imóvel pode ser negociado mobiliado.",
+			"Reforma integral concluída em 2020, com projeto de interiores e mobiliário desenhado sob medida. O imóvel pode ser negociado mobiliado.",
 		],
 		sobreOBairro:
 			"A Vieira Souto é o endereço mais valorizado do Rio de Janeiro. Frente de praia contínua, a três quadras do Jardim de Alah e a dez minutos do Leblon.",
@@ -292,7 +292,7 @@ export const PROPERTIES: Property[] = [
 		resumo:
 			"Cobertura duplex em edifício de quatro unidades, com pé-direito de 4,2m no living e terraço voltado ao Parque do Povo.",
 		descricao: [
-			"Edifício boutique de apenas quatro unidades, uma por andar, com entrada de serviço independente e portaria discreta — o tipo de implantação que praticamente não se constrói mais nos Jardins.",
+			"Edifício boutique de apenas quatro unidades, uma por andar, com entrada de serviço independente e portaria discreta: o tipo de implantação que praticamente não se constrói mais nos Jardins.",
 			"O living de pé-direito duplo recebe luz de leste e oeste, e o terraço gourmet abre para o verde contínuo do Parque do Povo. Cozinha Boffi, marcenaria em nogueira americana.",
 			"Entregue em 2022, nunca habitada. Documentação regular e pronta para escritura imediata.",
 		],
@@ -331,12 +331,12 @@ export const PROPERTIES: Property[] = [
 		resumo:
 			"Casa de costão sobre a enseada de Iporanga, com acesso privativo à praia e píer próprio.",
 		descricao: [
-			"Assentada no costão sul da enseada, a casa desce em três platôs até o mar. Cada platô abriga um programa: social, íntimo e lazer — todos com vista frontal para a água.",
+			"Assentada no costão sul da enseada, a casa desce em três platôs até o mar. Cada platô abriga um programa: social, íntimo e lazer, todos com vista frontal para a água.",
 			"O acesso à faixa de areia é privativo, por escada de pedra iluminada, e o píer particular comporta embarcação de até 42 pés.",
 			"Estrutura completa para receber: sete suítes, cozinha industrial de apoio, casa de caseiro independente e gerador para autonomia total.",
 		],
 		sobreOBairro:
-			"Iporanga é o condomínio mais fechado do litoral paulista — acesso controlado por guarita única, praia de uso exclusivo dos moradores e marina interna.",
+			"Iporanga é o condomínio mais fechado do litoral paulista: acesso controlado por guarita única, praia de uso exclusivo dos moradores e marina interna.",
 		destaques: [
 			"Acesso privativo à praia",
 			"Píer próprio para embarcação de 42 pés",
@@ -408,7 +408,7 @@ export const PROPERTIES: Property[] = [
 		resumo:
 			"Casa contemporânea a duas quadras do Parque Ibirapuera, com fachada cega e pátio central.",
 		descricao: [
-			"Da rua, vê-se apenas um muro de concreto e uma porta de aço corten — toda a vida da casa acontece para dentro, ao redor de um pátio central com espelho d água.",
+			"Da rua, vê-se apenas um muro de concreto e uma porta de aço corten. Toda a vida da casa acontece para dentro, ao redor de um pátio central com espelho d água.",
 			"O partido resolve o principal problema do bairro: privacidade absoluta em um terreno urbano de 600m², sem abrir mão de luz natural em cem por cento dos ambientes.",
 			"Cinco suítes, home theater isolado acusticamente e escritório com entrada independente para receber clientes sem cruzar a área íntima.",
 		],
@@ -416,7 +416,7 @@ export const PROPERTIES: Property[] = [
 			"Vila Nova Conceição tem o metro quadrado mais caro do Brasil. Baixo gabarito, comércio de bairro sofisticado e o Ibirapuera a pé.",
 		destaques: [
 			"Duas quadras do Parque Ibirapuera",
-			"Fachada cega — privacidade total",
+			"Fachada cega: privacidade total",
 			"Pátio central com espelho d água",
 			"Escritório com acesso independente",
 			"Home theater com isolamento acústico",
@@ -486,9 +486,9 @@ export const PROPERTIES: Property[] = [
 		resumo:
 			"Casa de frente para o Quadrado, com estrutura em madeira de demolição e piscina de pedra sabão.",
 		descricao: [
-			"Uma das poucas casas com frente direta para o gramado do Quadrado — endereço que, na prática, não entra no mercado.",
+			"Uma das poucas casas com frente direta para o gramado do Quadrado: endereço que, na prática, não entra no mercado.",
 			"A construção usa madeira de demolição certificada, telha colonial recuperada e piso em cimento queimado branco. O resultado é uma casa que parece ter cem anos e foi entregue em 2021.",
-			"Seis suítes distribuídas em dois blocos, separadas por um jardim de coqueiros — arranjo pensado para receber duas famílias com privacidade.",
+			"Seis suítes distribuídas em dois blocos, separadas por um jardim de coqueiros, arranjo pensado para receber duas famílias com privacidade.",
 		],
 		sobreOBairro:
 			"O Quadrado é o centro histórico de Trancoso: gramado, igrejinha do século XVI e as melhores mesas do litoral baiano, tudo a pé. Praia dos Nativos a dez minutos.",
@@ -526,7 +526,7 @@ export const PROPERTIES: Property[] = [
 			"Duplex novo a uma quadra da Faria Lima, com home office isolado e vista livre para o skyline.",
 		descricao: [
 			"O apartamento urbano da coleção: 340m² em dois pavimentos, no 21º andar, com vista desimpedida para a Faria Lima e a Vila Olímpia.",
-			"O pavimento inferior é social e flexível — o estar se converte em sala de jantar para 14 pessoas em minutos. O superior abriga três suítes e um home office com entrada independente pelo hall privativo.",
+			"O pavimento inferior é social e flexível. O estar se converte em sala de jantar para 14 pessoas em minutos. O superior abriga três suítes e um home office com entrada independente pelo hall privativo.",
 			"Edifício entregue em 2023, com lazer completo, concierge 24h e quatro vagas com carregador elétrico.",
 		],
 		sobreOBairro:

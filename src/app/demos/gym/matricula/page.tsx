@@ -220,7 +220,7 @@ function MatriculaFlow() {
 		else if (tel.length < 10) e.telefone = "Celular incompleto (DDD + número)";
 
 		if (!form.cpf) e.cpf = "Informe seu CPF";
-		else if (!isValidCPF(form.cpf)) e.cpf = "CPF inválido — confira os dígitos";
+		else if (!isValidCPF(form.cpf)) e.cpf = "CPF inválido. Confira os dígitos";
 
 		if (!form.nascimento) e.nascimento = "Informe sua data de nascimento";
 		else {
@@ -334,7 +334,7 @@ function MatriculaFlow() {
 									label="Pagamento"
 									value={
 										form.metodo === "pix"
-											? "Pix — QR Code enviado por e-mail"
+											? "Pix: QR Code enviado por e-mail"
 											: `Cartão final ${onlyDigits(form.cardNumber).slice(-4)}`
 									}
 								/>
@@ -346,7 +346,7 @@ function MatriculaFlow() {
 								<span className="text-white font-bold">
 									{form.email.trim()}
 								</span>
-								. É só aparecer — a primeira semana é por nossa conta.
+								. É só aparecer, a primeira semana é por nossa conta.
 							</p>
 
 							<div className="flex flex-col sm:flex-row gap-4">
@@ -361,7 +361,7 @@ function MatriculaFlow() {
 					</div>
 
 					<p className="text-center text-[10px] font-bold uppercase tracking-widest text-neutral-700 mt-6">
-						Demo fictícia — nenhum pagamento foi processado
+						Demo fictícia: nenhum pagamento foi processado
 					</p>
 				</div>
 			</section>
@@ -742,8 +742,8 @@ function StepDados({
 			</div>
 
 			<p className="mt-8 text-[10px] font-bold uppercase tracking-widest text-neutral-600">
-				Usamos o CPF só pra emitir a carteirinha. Nada é enviado a lugar nenhum —
-				esta é uma demo.
+				Usamos o CPF só pra emitir a carteirinha. Nada é enviado a lugar nenhum.
+				Esta é uma demo.
 			</p>
 		</div>
 	);
