@@ -24,6 +24,19 @@ const ACCENTS: [string, string][] = [
 	["#f59e0b", "#ec4899"],
 ];
 
+/** Amostra pra VER o layout sem cliente vinculado. Só liga em DEV com ?mock=1
+ *  (em produção, NODE_ENV==="production", nunca aparece — visitante não vê dado
+ *  falso). Espelha o que o Monitor publica: rótulo anônimo + sprint X/Y + LOC. */
+const MOCK_STATS: PublicStatsPayload = {
+	projects: [
+		{ label: "Projeto 1", sprint_current: 3, sprint_total: 6, loc_week: 4200 },
+		{ label: "Projeto 2", sprint_current: 2, sprint_total: 4, loc_week: 1800 },
+		{ label: "Projeto 3", sprint_current: 1, sprint_total: 5, loc_week: null },
+	],
+	totals: { active_projects: 3, loc_week: 6000 },
+	generated_at: null,
+};
+
 export function CurrentWorkSection() {
 	const { t, language } = useLanguage();
 	const { ref, inView } = useInView<HTMLElement>(0.15);
@@ -31,6 +44,16 @@ export function CurrentWorkSection() {
 
 	useEffect(() => {
 		let alive = true;
+		// Preview local: ?mock=1 em DEV mostra a amostra, sem tocar no banco nem na
+		// produção. Serve pro Fellipe conferir o layout antes de vincular um cliente.
+		if (
+			process.env.NODE_ENV !== "production" &&
+			typeof window !== "undefined" &&
+			new URLSearchParams(window.location.search).get("mock") === "1"
+		) {
+			setData(MOCK_STATS);
+			return;
+		}
 		if (!supabase) return;
 		supabase
 			.from("public_stats")

@@ -16,11 +16,12 @@ export default function Home() {
 		<div className="select-none">
 			<HeroSection />
 			<AboutSection />
-			{/* Prova social perto do topo: avaliações reais logo após o "sobre". */}
+			{/* Projetos atuais (anonimizado) logo após o "sobre" — some quando não há
+			    obra rodando. */}
+			<CurrentWorkSection />
+			{/* Prova social perto do topo: avaliações reais. */}
 			<ReviewsSection />
 			<ProjectsSection />
-			{/* Projetos atuais (anonimizado) — some quando não há obra rodando. */}
-			<CurrentWorkSection />
 			<FrontendPreviews />
 			{/* Quebra de objeção -> o pedido -> o contato direto (e-mail/redes). */}
 			<FaqSection />
