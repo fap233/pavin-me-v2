@@ -18,10 +18,15 @@ export function Shell({
   children,
   label = "Portal do cliente",
   email,
+  wide = false,
 }: {
   children: React.ReactNode;
   label?: string;
   email?: string | null;
+  /** Alarga o miolo (max-w-3xl → max-w-7xl). O portal é leitura em coluna única
+   *  e nunca pede isto; quem pede é o back-office quando mostra o Kanban, que é
+   *  um quadro de 4 colunas e não cabe na medida de ler. */
+  wide?: boolean;
 }) {
   const { isDarkMode, toggleDarkMode } = useTheme();
   const router = useRouter();
@@ -85,7 +90,11 @@ export function Shell({
         className="absolute inset-0 -z-10 section-grid-bg [mask-image:radial-gradient(ellipse_85%_75%_at_50%_20%,#000_55%,transparent_100%)]"
       />
 
-      <header className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3 px-4 pt-6">
+      <header
+        className={`mx-auto flex ${
+          wide ? "max-w-7xl" : "max-w-3xl"
+        } flex-wrap items-center justify-between gap-3 px-4 pt-6`}
+      >
         <Link
           href="/"
           className="group text-lg font-bold tracking-tight transition-colors hover:text-primary"
@@ -133,7 +142,13 @@ export function Shell({
         </div>
       </header>
 
-      <main className="mx-auto max-w-3xl px-4 pb-24 pt-8 sm:pt-10">{children}</main>
+      <main
+        className={`mx-auto ${
+          wide ? "max-w-7xl" : "max-w-3xl"
+        } px-4 pb-24 pt-8 sm:pt-10`}
+      >
+        {children}
+      </main>
     </div>
   );
 }

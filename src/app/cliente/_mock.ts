@@ -180,6 +180,8 @@ function seed(): MockState {
     },
   ];
 
+  // `author_id: null` em tudo de propósito: a demo não tem equipe cadastrada, e
+  // null é a linha legada — assina "Fellipe", igual ao que a demo sempre mostrou.
   const events: ProjectEvent[] = [
     {
       id: "e1",
@@ -189,6 +191,7 @@ function seed(): MockState {
       title: "Projeto iniciado",
       body: "Combinado fechado. Começamos pela fundação da loja.",
       actor: "owner",
+      author_id: null,
       created_at: iso(20),
     },
     {
@@ -199,6 +202,7 @@ function seed(): MockState {
       title: "Sprint 1 entregue",
       body: "Fundação e catálogo no ar pra você conferir.",
       actor: "owner",
+      author_id: null,
       created_at: iso(17),
     },
     {
@@ -209,6 +213,7 @@ function seed(): MockState {
       title: "Sprint 1 aprovada por você",
       body: null,
       actor: "client",
+      author_id: null,
       created_at: iso(13),
     },
     {
@@ -219,6 +224,7 @@ function seed(): MockState {
       title: "Sprint 2 entregue",
       body: "Painel admin pronto: dá pra ver e despachar pedido por lá.",
       actor: "owner",
+      author_id: null,
       created_at: iso(6),
     },
     {
@@ -229,6 +235,7 @@ function seed(): MockState {
       title: "Comentário do cliente",
       body: "Dá pra deixar o botão de finalizar compra em verde?",
       actor: "client",
+      author_id: null,
       created_at: iso(5),
     },
     {
@@ -239,6 +246,7 @@ function seed(): MockState {
       title: "Resposta do Fellipe",
       body: "Dá sim — já ajustei, entra junto com a sprint 3.",
       actor: "owner",
+      author_id: null,
       created_at: iso(4),
     },
     {
@@ -249,6 +257,7 @@ function seed(): MockState {
       title: "Sprint 3 iniciada",
       body: "Integração com a API do Mercado Livre.",
       actor: "owner",
+      author_id: null,
       created_at: iso(1),
     },
     // Thread da Sprint 1 (aprovada): um comentário só — mostra o contador "1".
@@ -260,6 +269,7 @@ function seed(): MockState {
       title: "Comentário do cliente",
       body: "Ficou ótimo o catálogo, muito fácil de cadastrar produto. Obrigado!",
       actor: "client",
+      author_id: null,
       created_at: iso(12),
     },
     // Thread da Sprint 2 (entregue): cliente pergunta, Fellipe responde na sprint.
@@ -271,6 +281,7 @@ function seed(): MockState {
       title: "Comentário do cliente",
       body: "No painel, dá pra ter uma busca de pedido por nome do cliente?",
       actor: "client",
+      author_id: null,
       created_at: iso(5),
     },
     {
@@ -281,6 +292,7 @@ function seed(): MockState {
       title: "Resposta do Fellipe",
       body: "Dá sim — coloco busca por nome e por status do pedido. Entra ainda nesta sprint.",
       actor: "owner",
+      author_id: null,
       created_at: iso(4),
     },
   ];
@@ -347,6 +359,7 @@ export function mockApproveSprint(sprintId: string, userId: string) {
         title: `Sprint ${sprint.idx} aprovada por você`,
         body: null,
         actor: "client",
+        author_id: null,
         created_at: now,
       },
     ],
@@ -372,6 +385,7 @@ export function mockComment(
         title: "Comentário do cliente",
         body,
         actor: "client",
+        author_id: null,
         created_at: new Date().toISOString(),
       },
     ],

@@ -3,6 +3,11 @@
 // Login do cliente: e-mail + senha (o cliente RECEBEU uma senha — magic link
 // seria contraintuitivo aqui). Erro traduzido, e "esqueci a senha" que dispara
 // o e-mail de redefinição pra /cliente/nova-senha.
+//
+// É TAMBÉM o login do back-office (/admin): mesmo Supabase Auth, mesma tabela de
+// usuários — um segundo login seria a mesma tela com outro bug. Quem vem do
+// /admin manda ?next=/admin e volta pra lá; sem `next`, cai em /cliente como
+// sempre caiu.
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -11,6 +16,20 @@ import { supabase } from "@/lib/supabase";
 import { Turnstile, type TurnstileHandle } from "@/components/Turnstile";
 import { Shell } from "../_components/Shell";
 import { authMessage, currentUser, href, isMockMode } from "../_data";
+
+/** Pra onde ir depois de entrar. Só caminho INTERNO simples: um `next` de fora
+ *  (`https://…`, ou o `//evil.com` que o browser trata como protocolo-relativo)
+ *  transformaria esta tela num open redirect com a marca do site em cima. Na
+ *  dúvida, /cliente — o destino de sempre.
+ *
+ *  Lido do window (e não com useSearchParams) de propósito: useSearchParams
+ *  exigiria envolver a página num <Suspense> por causa do prerender. */
+function nextPath(): string {
+  if (typeof window === "undefined") return "/cliente";
+  const raw = new URLSearchParams(window.location.search).get("next");
+  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/cliente";
+  return /^\/[A-Za-z0-9/_-]*$/.test(raw) ? raw : "/cliente";
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -43,7 +62,7 @@ export default function LoginPage() {
     }
     currentUser().then((u) => {
       if (!alive) return;
-      if (u) router.replace(href("/cliente"));
+      if (u) router.replace(href(nextPath()));
       else setChecking(false);
     });
     return () => {
@@ -54,7 +73,7 @@ export default function LoginPage() {
   async function signIn(e: React.FormEvent) {
     e.preventDefault();
     if (isMockMode()) {
-      router.replace(href("/cliente"));
+      router.replace(href(nextPath()));
       return;
     }
     if (!supabase) {
@@ -74,7 +93,7 @@ export default function LoginPage() {
       refreshCaptcha();
       return;
     }
-    if (data.session) router.replace(href("/cliente"));
+    if (data.session) router.replace(href(nextPath()));
   }
 
   async function sendReset(e: React.FormEvent) {

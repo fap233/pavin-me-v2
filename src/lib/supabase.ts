@@ -88,7 +88,31 @@ export type ProjectEvent = {
   title: string;
   body: string | null;
   actor: "owner" | "client";
+  // QUEM escreveu, quando `actor='owner'` (migração 2026-07-16b). Existe porque
+  // `actor` só diz de que LADO veio: com o Gustavo respondendo, "owner" virou
+  // duas pessoas. Resolvido contra `staff_directory` (ver authorName() em
+  // src/app/cliente/_data.ts).
+  //
+  // NULL = legado: antes desta coluna, quem escrevia como owner era só o
+  // Fellipe — então null vira "Fellipe", que é a única verdade possível pras
+  // linhas antigas. Também é null nos eventos que nascem de trigger/Monitor
+  // (sprint entregue, prazo mudou), onde não há autor humano nenhum.
+  author_id: string | null;
   created_at: string; // ISO
+};
+
+// Uma linha de `public.staff_directory` — a view só-leitura com o MÍNIMO
+// publicável de quem trabalha nos projetos (id + nome, jamais e-mail; só
+// owner/collab). É o que deixa o portal assinar uma resposta com o nome certo.
+//
+// A view não tem `security_invoker`: roda com o dono e por isso ignora a RLS da
+// `profiles` de propósito. `grant select to authenticated` — o cliente logado lê
+// (nome de quem toca o projeto dele não é segredo); deslogado (anon) não
+// enumera a equipe. Ver supabase/migrations/2026-07-16b-escopo-colaborador.sql
+// no repo 99freelas-new-v1.
+export type StaffMember = {
+  id: string;
+  display_name: string | null;
 };
 
 export type ProjectMember = {

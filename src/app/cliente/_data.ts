@@ -17,15 +17,21 @@ import {
   type SharedProject,
   type Sprint,
   type SprintTask,
+  type StaffMember,
 } from "@/lib/supabase";
 import * as mock from "./_mock";
 
 export type PortalUser = { id: string; email: string | null };
 
+/** Nome de quem trabalha no projeto, por `author_id`. Mapa cru (id -> nome) —
+ *  as telas só olham nomes, nunca o resto do perfil. */
+export type StaffNames = Record<string, string>;
+
 export type Portal = {
   project: SharedProject;
   sprints: Sprint[]; // ordenadas por idx
   events: ProjectEvent[]; // mais recente primeiro
+  authors: StaffNames; // quem assina cada resposta (ver authorName())
 };
 
 export type LoadResult<T> =
@@ -126,9 +132,127 @@ function dataMessage(raw: string): string {
   return "Não consegui carregar os dados agora.";
 }
 
+/** O erro REAL do Supabase no console do cliente.
+ *
+ *  Existe por um caso concreto (2026-07-16): a primeira cliente real relatou "deu
+ *  erro" ao comentar. O comentário TINHA gravado (linha no banco, sessão de 9 min,
+ *  RLS ok, e o mesmo caminho reproduzido 20/20 na produção) — mas a tela só disse
+ *  "tente de novo" e o motivo morreu aqui dentro. Sem isto, a próxima ocorrência é
+ *  outra investigação às cegas: a mensagem de tela é pro cliente, esta linha é pra
+ *  nós. Não muda a lógica de nada — só para de esconder a causa. */
+function reportError(where: string, error: unknown): void {
+  const e = (error ?? {}) as {
+    message?: string;
+    code?: string;
+    details?: string;
+    hint?: string;
+  };
+  console.error(`[portal:${where}]`, {
+    code: e.code,
+    message: e.message,
+    details: e.details,
+    hint: e.hint,
+  });
+}
+
+/** Mensagem de uma AÇÃO do cliente que falhou (comentar, aprovar). Diferente de
+ *  dataMessage (que é de leitura de tela): aqui o texto dele está na caixa e o
+ *  que importa é saber se vale tentar de novo, e por quê. */
+function actionMessage(raw: string, fallback: string): string {
+  const m = raw.toLowerCase();
+  if (m.includes("failed to fetch") || m.includes("network"))
+    return "Não consegui falar com o servidor. Verifique sua internet e tente de novo — seu texto continua aí.";
+  if (m.includes("jwt") || m.includes("expired") || m.includes("401"))
+    return "Sua sessão expirou. Recarregue a página e tente de novo.";
+  if (m.includes("does not exist") || m.includes("schema cache"))
+    return "O portal está sendo atualizado no servidor. Tente de novo em instantes.";
+  return fallback;
+}
+
 // ---------------------------------------------------------------------------
 // Leitura
 // ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// Autoria — quem assina o que o cliente lê
+// ---------------------------------------------------------------------------
+// Até 2026-07-16 toda resposta era assinada "Fellipe", literal, no componente:
+// era verdade, porque só ele escrevia. Com o Gustavo respondendo também como
+// `actor='owner'`, o literal virou mentira — e mentira na tela de quem paga.
+//
+// A verdade agora está em `project_events.author_id` + a view `staff_directory`
+// (migração 2026-07-16b). Tudo aqui é DEFAULT-PRESERVING: se o nome não vier
+// (view ausente, leitura negada, id desconhecido, linha legada), a assinatura
+// volta a ser "Fellipe" — o que o cliente já via. Nome é enfeite; o portal dela
+// não pode cair por causa de um.
+
+/** A assinatura de quando não dá pra saber o nome. NÃO é um chute: `author_id`
+ *  nulo é linha anterior à coluna, e naquela época o único autor possível era
+ *  ele. Vale também de rede de segurança pro resto. */
+export const OWNER_FALLBACK_NAME = "Fellipe";
+
+/** O nome de quem escreveu o evento. Só faz sentido pra `actor='owner'` — a fala
+ *  do cliente é rotulada pela tela ("Você"/"Cliente"), não por aqui. */
+export function authorName(
+  event: Pick<ProjectEvent, "author_id">,
+  authors?: StaffNames
+): string {
+  if (!event.author_id) return OWNER_FALLBACK_NAME; // legado
+  return authors?.[event.author_id] || OWNER_FALLBACK_NAME;
+}
+
+// O título das respostas do staff é gerado pelo NOSSO código, e hardcodado em
+// dois lugares ("Resposta do Fellipe": Monitor `_portal_reply_comment` e
+// admin/_data.ts REPLY_TITLE). Só reescrevemos ESSE título — se algum dia a
+// resposta nascer com um título escrito à mão, ele passa intacto.
+const STAFF_REPLY_TITLE_RE = /^resposta do\b/i;
+
+/** O título do evento como o cliente deve LER. Para uma resposta do staff, quem
+ *  assina vem do `author_id`, não do literal gravado: a linha do Gustavo nasce
+ *  titulada "Resposta do Fellipe" e a timeline não pode repetir isso.
+ *
+ *  Sem `author_id` (legado) o resultado é idêntico ao de hoje, caractere por
+ *  caractere — de propósito. */
+export function eventTitle(event: ProjectEvent, authors?: StaffNames): string {
+  if (
+    event.actor === "owner" &&
+    event.type === "comment" &&
+    STAFF_REPLY_TITLE_RE.test(event.title)
+  )
+    return `Resposta do ${authorName(event, authors)}`;
+  return event.title;
+}
+
+/** Nome de quem é owner/collab, por id. NÃO-FATAL por contrato: qualquer
+ *  problema devolve `{}`, e aí tudo cai no rótulo antigo.
+ *
+ *  Exportada porque o /admin precisa da MESMA resolução. Se as duas telas
+ *  resolvessem nome por caminhos diferentes, a cliente veria "Gustavo" e o dono
+ *  veria "Fellipe" na mesma linha — a divergência que o progressOf importado já
+ *  evita no número. Uma função só. */
+export async function loadStaffNames(): Promise<StaffNames> {
+  if (!supabase) return {};
+  try {
+    const { data, error } = await supabase
+      .from("staff_directory")
+      .select("id, display_name");
+    if (error) {
+      // Migração não aplicada, grant faltando, sessão expirada... nada disso é
+      // motivo pra tela dela não abrir. Fica no console pra gente.
+      reportError("loadPortal:staff_directory", error);
+      return {};
+    }
+    const names: StaffNames = {};
+    for (const row of (data as StaffMember[]) ?? []) {
+      const name = (row.display_name ?? "").trim();
+      if (row.id && name) names[row.id] = name;
+    }
+    return names;
+  } catch (e) {
+    reportError("loadPortal:staff_directory", e);
+    return {};
+  }
+}
 
 /** Data prevista de entrega. A migração do portal cria `delivery_date`; o
  *  backlog antigo usa `delivery_at`. Aceitamos as duas. */
@@ -182,6 +306,9 @@ export async function loadPortal(
         project,
         sprints: mock.mockSprints(projectId),
         events: mock.mockEvents(projectId),
+        // O mock não tem equipe: os eventos dele são todos legados (author_id
+        // null), então tudo assina "Fellipe" — a demo continua igual.
+        authors: {},
       },
     };
   }
@@ -205,7 +332,7 @@ export async function loadPortal(
   if (!member)
     return { ok: false, kind: "not_found", message: "Projeto não encontrado." };
 
-  const [projectRes, sprintsRes, eventsRes, tasksRes] = await Promise.all([
+  const [projectRes, sprintsRes, eventsRes, tasksRes, authors] = await Promise.all([
     supabase.from("shared_projects").select("*").eq("id", projectId).maybeSingle(),
     supabase
       .from("sprints")
@@ -224,16 +351,23 @@ export async function loadPortal(
       .select("*")
       .eq("project_id", projectId)
       .order("idx", { ascending: true }),
+    // Quem assina as respostas. Também NÃO-FATAL (a própria loadStaffNames
+    // engole tudo e devolve {}), e no mesmo Promise.all pra não custar um
+    // round-trip a mais na abertura da tela.
+    loadStaffNames(),
   ]);
 
   const err = projectRes.error ?? sprintsRes.error ?? eventsRes.error;
-  if (err)
+  if (err) {
+    reportError("loadPortal", err);
     return { ok: false, kind: "error", message: dataMessage(err.message) };
+  }
   if (!projectRes.data)
     return { ok: false, kind: "not_found", message: "Projeto não encontrado." };
 
   // Anexa as fases a cada sprint. tasksRes.error é ignorado de propósito (tabela
   // pode não existir ainda) — nesse caso cada sprint fica com tasks: [].
+  if (tasksRes.error) reportError("loadPortal:sprint_tasks", tasksRes.error);
   const tasks = (tasksRes.error ? [] : (tasksRes.data as SprintTask[])) ?? [];
   const tasksBySprint = new Map<string, SprintTask[]>();
   for (const t of tasks) {
@@ -251,7 +385,10 @@ export async function loadPortal(
     data: {
       project: projectRes.data as SharedProject,
       sprints,
+      // `select("*")` já traz o author_id novo — a coluna existe no banco desde
+      // a 2026-07-16b. Nas linhas gravadas antes dela vem null (= "Fellipe").
       events: (eventsRes.data as ProjectEvent[]) ?? [],
+      authors,
     },
   };
 }
@@ -288,11 +425,16 @@ export async function approveSprint(
     .eq("id", sprintId)
     .eq("status", "delivered");
 
-  if (error)
+  if (error) {
+    reportError("approveSprint", error);
     return {
       ok: false,
-      message: "Não consegui registrar a aprovação. Tente de novo.",
+      message: actionMessage(
+        error.message,
+        "Não consegui registrar a aprovação. Tente de novo."
+      ),
     };
+  }
   return { ok: true };
 }
 
@@ -327,8 +469,16 @@ export async function postComment(
     actor: "client",
   });
 
-  if (error)
-    return { ok: false, message: "Não consegui enviar sua mensagem. Tente de novo." };
+  if (error) {
+    reportError("postComment", error);
+    return {
+      ok: false,
+      message: actionMessage(
+        error.message,
+        "Não consegui enviar sua mensagem. Tente de novo."
+      ),
+    };
+  }
   return { ok: true };
 }
 

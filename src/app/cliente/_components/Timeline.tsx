@@ -16,6 +16,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import type { ProjectEvent, ProjectEventType, Sprint } from "@/lib/supabase";
+import { eventTitle, type StaffNames } from "../_data";
 import { dateTime, relative, shortDate } from "../_format";
 import { Panel, SectionTitle } from "./States";
 
@@ -44,9 +45,19 @@ const COLORS: Record<ProjectEventType, string> = {
 export function Timeline({
   events,
   sprints,
+  viewer = "client",
+  authors,
 }: {
   events: ProjectEvent[];
   sprints: Sprint[];
+  // O back-office mostra esta mesma timeline pro staff. Lá, a etiqueta "você" de
+  // um evento do cliente seria mentira — vira "cliente". Padrão "client": no
+  // portal, nada mudou.
+  viewer?: "client" | "staff";
+  // Quem assina as respostas do staff (id -> nome), de `staff_directory`. Opcional:
+  // sem ele, toda resposta volta a assinar "Fellipe" — exatamente o que a tela
+  // fazia antes de existir `author_id`.
+  authors?: StaffNames;
 }) {
   // Pra rotular o comentário com a sprint em que ele grudou ("sobre a Sprint 2 —
   // Painel admin") em vez do genérico. Mapa por id, refeito quando muda.
@@ -74,6 +85,8 @@ export function Timeline({
               sprint={e.sprint_id ? sprintById.get(e.sprint_id) ?? null : null}
               first={i === 0}
               last={i === events.length - 1}
+              viewer={viewer}
+              authors={authors}
             />
           ))}
         </ol>
@@ -87,15 +100,22 @@ function Row({
   sprint,
   first,
   last,
+  viewer,
+  authors,
 }: {
   event: ProjectEvent;
   sprint: Sprint | null;
   first: boolean;
   last: boolean;
+  viewer: "client" | "staff";
+  authors?: StaffNames;
 }) {
   const Icon = ICONS[event.type] ?? StickyNote;
   const color = COLORS[event.type] ?? "var(--brand-via)";
   const isClient = event.actor === "client";
+  // O título é a assinatura na timeline ("Resposta do Fellipe"). Quem respondeu
+  // sai do author_id, não do literal gravado na linha. Ver eventTitle().
+  const title = eventTitle(event, authors);
 
   return (
     <li className="relative flex gap-4 pb-6 last:pb-0">
@@ -142,11 +162,11 @@ function Row({
               first ? "text-foreground" : "text-foreground/80"
             }`}
           >
-            {event.title}
+            {title}
           </span>
           {isClient && (
             <span className="rounded-full border border-border/70 px-1.5 py-px font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground">
-              você
+              {viewer === "staff" ? "cliente" : "você"}
             </span>
           )}
           {event.type === "comment" && sprint && (

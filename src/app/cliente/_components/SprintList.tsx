@@ -7,6 +7,12 @@
 //      pra comentar ali mesmo. O cliente não edita, não reordena, não vê backlog.
 //
 // A caixa GERAL "Precisa de algo?" (Composer) continua, pro que não é de sprint.
+//
+// `viewer` existe porque o back-office (/admin/clientes/[id]) mostra ESTE mesmo
+// componente pro staff, e lá duas coisas mudam: não há botão de aprovar (staff
+// não aprova no lugar do cliente — a RLS recusaria de qualquer forma) e o "Você"
+// da bolha vira "Cliente" (quem está lendo é o outro lado da conversa). O padrão
+// é "client": pro portal, nada mudou.
 
 import { useMemo, useState } from "react";
 import {
@@ -22,10 +28,14 @@ import type {
   SprintStatus,
   SprintTask,
 } from "@/lib/supabase";
+import { authorName, type StaffNames } from "../_data";
 import { dateTime, shortYmd } from "../_format";
 import { Panel, SectionTitle } from "./States";
 
 type SendResult = { ok: true } | { ok: false; message: string };
+
+/** De que lado da conversa está quem olha a tela. */
+export type Viewer = "client" | "staff";
 
 const STATUS: Record<
   SprintStatus,
@@ -49,12 +59,18 @@ export function SprintList({
   onApprove,
   approvingId,
   onComment,
+  viewer = "client",
+  authors,
 }: {
   sprints: Sprint[];
   events: ProjectEvent[];
-  onApprove: (sprint: Sprint) => void;
-  approvingId: string | null;
+  onApprove?: (sprint: Sprint) => void;
+  approvingId?: string | null;
   onComment: (text: string, sprintId: string) => Promise<SendResult>;
+  viewer?: Viewer;
+  // Quem assina a bolha do nosso lado (id -> nome), de `staff_directory`.
+  // Opcional: sem ele a bolha volta a dizer "Fellipe", como antes do author_id.
+  authors?: StaffNames;
 }) {
   // Comentários agrupados por sprint (só type='comment' com sprint_id), em ordem
   // cronológica — como a conversa aconteceu. Um mapa, recalculado quando os
@@ -96,6 +112,8 @@ export function SprintList({
               onApprove={onApprove}
               approving={approvingId === s.id}
               onComment={onComment}
+              viewer={viewer}
+              authors={authors}
             />
           ))}
         </ul>
@@ -110,18 +128,23 @@ function SprintRow({
   onApprove,
   approving,
   onComment,
+  viewer,
+  authors,
 }: {
   sprint: Sprint;
   comments: ProjectEvent[];
-  onApprove: (s: Sprint) => void;
+  onApprove?: (s: Sprint) => void;
   approving: boolean;
   onComment: (text: string, sprintId: string) => Promise<SendResult>;
+  viewer: Viewer;
+  authors?: StaffNames;
 }) {
   const [descOpen, setDescOpen] = useState(false);
   // Abre já aberta se tem conversa — o cliente vê que ali houve troca sem clicar.
   const [threadOpen, setThreadOpen] = useState(() => comments.length > 0);
   const st = STATUS[sprint.status] ?? STATUS.planned;
-  const canApprove = sprint.status === "delivered";
+  // Aprovar é do CLIENTE, e só. O staff vê a sprint entregue mas não tem o botão.
+  const canApprove = viewer === "client" && sprint.status === "delivered" && !!onApprove;
   const current = sprint.status === "in_progress";
   const count = comments.length;
 
@@ -186,7 +209,8 @@ function SprintRow({
 
           {sprint.status === "approved" && sprint.approved_at && (
             <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.14em] text-emerald-500">
-              aprovada por você em {dateTime(sprint.approved_at)}
+              {viewer === "staff" ? "aprovada pelo cliente em" : "aprovada por você em"}{" "}
+              {dateTime(sprint.approved_at)}
             </p>
           )}
 
@@ -194,7 +218,7 @@ function SprintRow({
             <div className="mt-3 flex flex-wrap items-center gap-3">
               <button
                 type="button"
-                onClick={() => onApprove(sprint)}
+                onClick={() => onApprove?.(sprint)}
                 disabled={approving}
                 className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500 px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-600 disabled:pointer-events-none disabled:opacity-60"
               >
@@ -221,7 +245,9 @@ function SprintRow({
             <MessageSquare className="h-3 w-3" />
             {count > 0
               ? `${count} ${count === 1 ? "comentário" : "comentários"}`
-              : "Comentar nesta sprint"}
+              : viewer === "staff"
+                ? "Responder nesta sprint"
+                : "Comentar nesta sprint"}
             <ChevronDown
               className={`h-3 w-3 transition-transform ${threadOpen ? "rotate-180" : ""}`}
             />
@@ -232,6 +258,8 @@ function SprintRow({
               sprint={sprint}
               comments={comments}
               onComment={onComment}
+              viewer={viewer}
+              authors={authors}
             />
           )}
         </div>
@@ -294,10 +322,14 @@ function SprintThread({
   sprint,
   comments,
   onComment,
+  viewer,
+  authors,
 }: {
   sprint: Sprint;
   comments: ProjectEvent[];
   onComment: (text: string, sprintId: string) => Promise<SendResult>;
+  viewer: Viewer;
+  authors?: StaffNames;
 }) {
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
@@ -322,12 +354,19 @@ function SprintThread({
     <div className="mt-3 rounded-xl border border-border/60 bg-card/40 p-3">
       {comments.length === 0 ? (
         <p className="px-1 py-1 text-xs text-muted-foreground">
-          Nenhum comentário nesta sprint ainda. Escreva abaixo — cai direto comigo.
+          {viewer === "staff"
+            ? "Nenhum comentário nesta sprint ainda. O que você escrever aqui aparece no portal do cliente."
+            : "Nenhum comentário nesta sprint ainda. Escreva abaixo — cai direto comigo."}
         </p>
       ) : (
         <ul className="space-y-2">
           {comments.map((c) => (
-            <CommentBubble key={c.id} comment={c} />
+            <CommentBubble
+              key={c.id}
+              comment={c}
+              viewer={viewer}
+              authors={authors}
+            />
           ))}
         </ul>
       )}
@@ -340,7 +379,11 @@ function SprintThread({
             if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) submit(e);
           }}
           rows={2}
-          placeholder={`Comentar na Sprint ${sprint.idx}…`}
+          placeholder={
+            viewer === "staff"
+              ? `Responder na Sprint ${sprint.idx}…`
+              : `Comentar na Sprint ${sprint.idx}…`
+          }
           className="w-full resize-none rounded-lg border border-border/70 bg-background/60 px-3 py-2 text-sm outline-none transition placeholder:text-muted-foreground/60 focus:border-[var(--brand-via)] focus:ring-2 focus:ring-[var(--brand-via)]/25"
         />
         <div className="mt-2 flex items-center gap-2">
@@ -367,10 +410,28 @@ function SprintThread({
   );
 }
 
-function CommentBubble({ comment }: { comment: ProjectEvent }) {
+function CommentBubble({
+  comment,
+  viewer,
+  authors,
+}: {
+  comment: ProjectEvent;
+  viewer: Viewer;
+  authors?: StaffNames;
+}) {
   const isClient = comment.actor === "client";
   const accent = isClient ? CLIENT_ACCENT : OWNER_ACCENT;
-  const who = isClient ? "Você" : "Fellipe";
+  // "Você" é sempre quem está lendo. No portal, o cliente; no back-office, quem
+  // lê é o outro lado — então a fala do cliente vira "Cliente", não "Você".
+  //
+  // Do nosso lado, o nome sai do author_id (2026-07-16b): `actor='owner'` já não
+  // é uma pessoa só. Sem author_id, ou sem o diretório, cai em "Fellipe" — a
+  // única verdade possível pras linhas escritas antes da coluna existir.
+  const who = isClient
+    ? viewer === "staff"
+      ? "Cliente"
+      : "Você"
+    : authorName(comment, authors);
 
   return (
     <li

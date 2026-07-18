@@ -224,7 +224,11 @@ export default function ProjectPage() {
           </p>
         )}
 
-        <Timeline events={portal.events} sprints={portal.sprints} />
+        <Timeline
+          events={portal.events}
+          sprints={portal.sprints}
+          authors={portal.authors}
+        />
 
         <SprintList
           sprints={portal.sprints}
@@ -232,6 +236,7 @@ export default function ProjectPage() {
           onApprove={onApprove}
           approvingId={approvingId}
           onComment={onSend}
+          authors={portal.authors}
         />
 
         <Composer onSend={onSend} />
