@@ -29,9 +29,9 @@ const ACCENTS: [string, string][] = [
  *  falso). Espelha o que o Monitor publica: rótulo anônimo + sprint X/Y + LOC. */
 const MOCK_STATS: PublicStatsPayload = {
 	projects: [
-		{ label: "Projeto 1", sprint_current: 3, sprint_total: 6, loc_week: 4200 },
-		{ label: "Projeto 2", sprint_current: 2, sprint_total: 4, loc_week: 1800 },
-		{ label: "Projeto 3", sprint_current: 1, sprint_total: 5, loc_week: null },
+		{ label: "Projeto 1", label_en: "Project 1", sprint_current: 3, sprint_total: 6, loc_week: 4200 },
+		{ label: "Projeto 2", label_en: "Project 2", sprint_current: 2, sprint_total: 4, loc_week: 1800 },
+		{ label: "Projeto 3", label_en: "Project 3", sprint_current: 1, sprint_total: 5, loc_week: null },
 	],
 	totals: { active_projects: 3, loc_week: 6000 },
 	generated_at: null,
@@ -159,7 +159,7 @@ export function CurrentWorkSection() {
 								</div>
 
 								<h3 className="mt-3 text-lg font-semibold leading-snug">
-									{p.label}
+									{language === "en" ? p.label_en : p.label}
 								</h3>
 
 								{/* Sprint X de Y + barra */}

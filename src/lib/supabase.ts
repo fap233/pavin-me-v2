@@ -134,7 +134,8 @@ export type ProjectMember = {
 /** Um projeto em andamento, já anonimizado. `loc_week` é null quando o projeto
  *  não tem repositório mapeado (o Monitor não inventa número). */
 export type PublicProjectStat = {
-  label: string; // rótulo genérico — NUNCA o nome do cliente/título real
+  label: string; // rótulo genérico (pt) — NUNCA o nome do cliente/título real
+  label_en: string; // o mesmo em inglês (cai no `label` quando não há tradução)
   sprint_current: number;
   sprint_total: number;
   loc_week: number | null;
@@ -159,8 +160,13 @@ export function parsePublicStats(raw: unknown): PublicStatsPayload {
       const num = (v: unknown) =>
         typeof v === "number" && Number.isFinite(v) ? v : 0;
       const locRaw = o.loc_week;
+      const labelEn =
+        typeof o.label_en === "string" && o.label_en.trim()
+          ? o.label_en.trim()
+          : label; // sem tradução? usa o pt — a home nunca fica sem rótulo
       return {
         label,
+        label_en: labelEn,
         sprint_current: Math.max(0, Math.round(num(o.sprint_current))),
         sprint_total: Math.max(0, Math.round(num(o.sprint_total))),
         loc_week:
