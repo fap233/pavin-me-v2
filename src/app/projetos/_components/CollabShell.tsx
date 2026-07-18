@@ -45,6 +45,9 @@ type Nav = { href: string; label: string; away?: boolean };
 //                  mover de coluna, roteiro).
 //   Meus         — o recorte dele: o que ele pegou.
 //   Disponíveis  — o backlog livre: o que ele PODE pegar.
+//   Marcos       — o que já foi entregue nos projetos dele (a MESMA tela do
+//                  back-office; a RLS recorta pra só mostrar os dele). Existe
+//                  pra ele não ter que ir no /admin, onde é barrado.
 // O /admin NÃO entra aqui: o colaborador é barrado lá, e link pra porta trancada
 // é convite pra tela de "sem acesso". Pro owner (que também cai neste quadro) o
 // atalho de volta é acrescentado no Nav, embaixo.
@@ -52,6 +55,7 @@ const LINKS: Nav[] = [
   { href: "/projetos", label: "Quadro" },
   { href: "/projetos/meus", label: "Meus projetos" },
   { href: "/projetos/disponiveis", label: "Disponíveis" },
+  { href: "/projetos/marcos", label: "Marcos" },
 ];
 
 export function CollabShell({ children }: { children: React.ReactNode }) {

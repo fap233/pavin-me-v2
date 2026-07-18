@@ -44,6 +44,7 @@ const LINKS = [
   { href: "/admin/kanban", label: "Kanban" },
   { href: "/admin/meus", label: "Meus" },
   { href: "/admin/clientes", label: "Clientes" },
+  { href: "/admin/marcos", label: "Marcos" },
 ];
 
 /** O Kanban são 4 colunas; o resto do back-office é leitura em coluna única.
