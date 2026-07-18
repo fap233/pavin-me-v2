@@ -371,8 +371,19 @@ export async function toggleMilestone(
   // notes.phases não tem id estável: a única defesa contra marcar o item errado
   // (se o roteiro foi editado embaixo da lista) é conferir que o texto na âncora
   // ainda é o que a lista mostrava. Divergiu -> recusa em vez de marcar o vizinho.
-  const current = items[m.item_index] as { text?: string; done?: boolean };
-  if (String(current?.text ?? "") !== m.text) {
+  // O item pode estar no formato LEGADO de string pura ("Fazer X"): o readPhases
+  // normaliza isso na LEITURA, então o marco APARECE na lista clicável — mas aqui
+  // relemos o raw e precisamos normalizar do mesmo jeito ANTES da conferência de
+  // drift. Sem isto, current.text é undefined e a guarda recusaria um item
+  // legítimo ("O roteiro mudou"), deixando o marco impossível de marcar pelo site
+  // (o writer do Monitor não sofre disso porque nem emite item string como marco).
+  // Marcar reescreve o item na forma canônica {text,done}, curando o legado.
+  const rawItem = items[m.item_index];
+  const current =
+    typeof rawItem === "string"
+      ? { text: rawItem, done: false }
+      : (rawItem as { text?: string; done?: boolean });
+  if (String(current.text ?? "") !== m.text) {
     return {
       ok: false,
       message: "O roteiro mudou desde que a lista carregou. Recarregue a página.",
@@ -381,7 +392,7 @@ export async function toggleMilestone(
 
   // Muta SÓ o done do item alvo; todo o resto do blob (outras fases, questions,
   // activity, public_label...) passa intacto.
-  items[m.item_index] = { ...current, done };
+  items[m.item_index] = { ...current, text: String(current.text ?? ""), done };
 
   const { error: writeErr } = await supabase
     .from("shared_projects")
