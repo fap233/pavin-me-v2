@@ -116,6 +116,16 @@ export function MarcosView() {
     setLoading(false);
   }, []);
 
+  // Re-sync SILENCIOSO: atualiza os dados sem tocar em `loading`. O load() acima
+  // liga o spinner, e o early-return de loading DESMONTA a lista inteira — ao
+  // remontar, o scroll volta pro topo. Marcar vários itens assim é sofrível.
+  // Aqui a lista continua montada; só os dados são substituídos no lugar.
+  const reloadSilent = useCallback(async () => {
+    const res = await loadMilestones();
+    if (res.ok) setList(res.data);
+    // Falha no re-sync não derruba a tela: o update otimista já mostra o certo.
+  }, []);
+
   useEffect(() => {
     load();
   }, [load]);
@@ -149,11 +159,12 @@ export function MarcosView() {
         setToggleError(res.message);
         return;
       }
-      // Sucesso: recarrega em segundo plano pra pegar o done_at real (portal) e
-      // qualquer mudança concorrente. A tela já mostra o estado certo.
-      load();
+      // Sucesso: re-sincroniza EM SEGUNDO PLANO DE VERDADE (sem spinner) pra pegar
+      // o done_at real (portal) e mudanças concorrentes — sem desmontar a lista
+      // nem perder o scroll. A tela já mostra o estado certo pelo otimista.
+      reloadSilent();
     },
-    [load]
+    [reloadSilent]
   );
 
   if (loading) return <Loading label="Carregando os marcos" />;
