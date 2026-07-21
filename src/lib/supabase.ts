@@ -141,8 +141,16 @@ export type PublicProjectStat = {
   loc_week: number | null;
 };
 
+/** §5.2 — "Concluídos recentemente": rótulo anônimo + quando concluiu. */
+export type PublicCompletedStat = {
+  label: string;
+  label_en: string;
+  done_at: string | null; // ISO (updated_at de quando o status virou done)
+};
+
 export type PublicStatsPayload = {
   projects: PublicProjectStat[];
+  completed: PublicCompletedStat[]; // 10 últimos concluídos (pode vir vazio)
   totals: { active_projects: number; loc_week: number | null };
   generated_at: string | null; // ISO — null antes da 1ª publicação do Monitor
 };
@@ -187,8 +195,29 @@ export function parsePublicStats(raw: unknown): PublicStatsPayload {
       ? Math.max(0, Math.round(totalsRaw.loc_week))
       : projects.reduce((sum, p) => sum + (p.loc_week ?? 0), 0);
 
+  // §5.2 — concluídos: mesmo rigor dos projetos (label obrigatório; resto
+  // tolerante). Snapshot antigo sem `completed` -> lista vazia, seção some.
+  const rawCompleted = Array.isArray(obj.completed) ? obj.completed : [];
+  const completed: PublicCompletedStat[] = rawCompleted
+    .map((c): PublicCompletedStat | null => {
+      const o = (c ?? {}) as Record<string, unknown>;
+      const label = typeof o.label === "string" ? o.label.trim() : "";
+      if (!label) return null;
+      return {
+        label,
+        label_en:
+          typeof o.label_en === "string" && o.label_en.trim()
+            ? o.label_en.trim()
+            : label,
+        done_at: typeof o.done_at === "string" ? o.done_at : null,
+      };
+    })
+    .filter((c): c is PublicCompletedStat => c !== null)
+    .slice(0, 10);
+
   return {
     projects,
+    completed,
     totals: { active_projects: active, loc_week: totalsLoc },
     generated_at:
       typeof obj.generated_at === "string" ? obj.generated_at : null,

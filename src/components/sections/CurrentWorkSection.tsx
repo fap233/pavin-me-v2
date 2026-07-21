@@ -7,7 +7,7 @@
 // seção SOME (não renderiza vazia).
 
 import { useEffect, useState } from "react";
-import { Activity, Code2 } from "lucide-react";
+import { Activity, Check, Code2 } from "lucide-react";
 import {
 	supabase,
 	parsePublicStats,
@@ -32,6 +32,9 @@ const MOCK_STATS: PublicStatsPayload = {
 		{ label: "Projeto 1", label_en: "Project 1", sprint_current: 3, sprint_total: 6, loc_week: 4200 },
 		{ label: "Projeto 2", label_en: "Project 2", sprint_current: 2, sprint_total: 4, loc_week: 1800 },
 		{ label: "Projeto 3", label_en: "Project 3", sprint_current: 1, sprint_total: 5, loc_week: null },
+	],
+	completed: [
+		{ label: "Projeto entregue", label_en: "Shipped project", done_at: null },
 	],
 	totals: { active_projects: 3, loc_week: 6000 },
 	generated_at: null,
@@ -69,9 +72,20 @@ export function CurrentWorkSection() {
 		};
 	}, []);
 
-	// Regra da home: sem projeto em andamento, a seção não aparece. (Também cobre
-	// o estado de carregamento e o Supabase não configurado — nada de placeholder.)
-	if (!data || data.projects.length === 0) return null;
+	// Regra da home: sem projeto em andamento NEM concluído, a seção não aparece.
+	// (Também cobre carregamento e Supabase não configurado — nada de placeholder.)
+	if (!data || (data.projects.length === 0 && data.completed.length === 0))
+		return null;
+
+	// §5.2 — data curta de conclusão, no idioma da página.
+	const fmtDone = (iso: string) => {
+		const d = new Date(iso);
+		if (isNaN(d.getTime())) return "";
+		return d.toLocaleDateString(language === "pt" ? "pt-BR" : "en-US", {
+			day: "2-digit",
+			month: "short",
+		});
+	};
 
 	const nf = (n: number) =>
 		n.toLocaleString(language === "pt" ? "pt-BR" : "en-US");
@@ -199,6 +213,39 @@ export function CurrentWorkSection() {
 						);
 					})}
 				</div>
+
+				{/* §5.2 — Concluídos recentemente: os 10 últimos que viraram 'done'
+				    no kanban, anônimos (rótulo de stack), com a data curta. Some
+				    sozinha quando não há concluído (lista vazia). */}
+				{data.completed.length > 0 && (
+					<div className="in-view-anim in-view-anim-4 mt-14">
+						<p className="font-[family-name:var(--font-caveat)] text-base tracking-wide text-muted-foreground/80">
+							{t.currentWork.completedKicker}
+						</p>
+						<h3 className="mt-1 text-xl font-bold tracking-tight">
+							{t.currentWork.completedTitle}
+						</h3>
+						<ul className="mt-4 flex flex-wrap gap-2.5">
+							{data.completed.map((c, i) => (
+								<li
+									key={i}
+									className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/60 px-3.5 py-1.5 text-sm backdrop-blur"
+								>
+									<Check
+										className="h-3.5 w-3.5 text-emerald-500"
+										aria-hidden="true"
+									/>
+									<span>{language === "en" ? c.label_en : c.label}</span>
+									{c.done_at && (
+										<span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+											{fmtDone(c.done_at)}
+										</span>
+									)}
+								</li>
+							))}
+						</ul>
+					</div>
+				)}
 			</div>
 		</section>
 	);
