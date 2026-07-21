@@ -70,7 +70,7 @@ export const content = {
 			title: "On the bench right now",
 			subtitle:
 				"An anonymized look at what's shipping this week. Proof there's live work, not just a portfolio.",
-			sprint: "Sprint",
+			sprint: "Steps",
 			of: "of",
 			linesThisWeek: "lines this week",
 			activeProjects: "active projects",
@@ -202,7 +202,7 @@ export const content = {
 			title: "Na bancada agora",
 			subtitle:
 				"Um retrato anonimizado do que está saindo esta semana. Prova de obra rodando, não só portfólio.",
-			sprint: "Sprint",
+			sprint: "Etapas",
 			of: "de",
 			linesThisWeek: "linhas esta semana",
 			activeProjects: "projetos ativos",
