@@ -75,6 +75,8 @@ export const content = {
 			linesThisWeek: "lines this week",
 			activeProjects: "active projects",
 			updated: "updated",
+			completedKicker: "// shipped",
+			completedTitle: "Recently shipped",
 		},
 		faq: {
 			kicker: "// faq",
@@ -207,6 +209,8 @@ export const content = {
 			linesThisWeek: "linhas esta semana",
 			activeProjects: "projetos ativos",
 			updated: "atualizado",
+			completedKicker: "// entregues",
+			completedTitle: "Concluídos recentemente",
 		},
 		faq: {
 			kicker: "// dúvidas",
