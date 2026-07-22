@@ -317,6 +317,11 @@ function ProjectCard({
   // Roteiro/atividade local (otimista): edições aplicam na hora e persistem.
   const [notes, setNotes] = useState<Notes>(() => parseNotes(p.notes) ?? EMPTY_NOTES);
   useEffect(() => setNotes(parseNotes(p.notes) ?? EMPTY_NOTES), [p.notes]);
+  // Card COMPACTO por padrão (§8): só nome + meta + barra de progresso. Clicar
+  // expande pro card completo (roteiro, comentários, briefing, ações) — o mesmo
+  // conteúdo de antes, só que sob demanda. Nada de modal: expande no lugar, o
+  // estado otimista do roteiro continua intacto.
+  const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [commentKind, setCommentKind] =
@@ -521,24 +526,91 @@ function ProjectCard({
         }}
       />
       <CardContent className="space-y-2 pt-4">
-        <div className="text-sm font-semibold leading-snug transition-colors duration-300 group-hover:text-[var(--acc)]">
-          {p.title}
-        </div>
-        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-          {dl && (
+        {/* CABEÇALHO (sempre visível) — clicar alterna compacto <-> completo.
+            É um button de verdade (a11y: Enter/Espaço funcionam); os controles
+            internos do detalhe ficam FORA dele, então não há botão-dentro-de-
+            botão. */}
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          aria-expanded={expanded}
+          className="block w-full cursor-pointer select-none text-left"
+          title={expanded ? "Recolher" : "Abrir o card"}
+        >
+          <div className="flex items-start justify-between gap-2">
+            <div className="text-sm font-semibold leading-snug transition-colors duration-300 group-hover:text-[var(--acc)]">
+              {p.title}
+            </div>
             <span
-              className={
-                dl.urgent
-                  ? "font-semibold text-destructive"
-                  : "text-muted-foreground"
-              }
+              aria-hidden="true"
+              className={`mt-0.5 shrink-0 font-mono text-[10px] text-muted-foreground transition-transform duration-200 ${
+                expanded ? "rotate-90" : ""
+              }`}
             >
-              ⏳ {dl.label} · {dl.fmt}
+              ▸
             </span>
+          </div>
+          <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+            {dl && (
+              <span
+                className={
+                  dl.urgent
+                    ? "font-semibold text-destructive"
+                    : "text-muted-foreground"
+                }
+              >
+                ⏳ {dl.label} · {dl.fmt}
+              </span>
+            )}
+            {p.client && <span>{p.client}</span>}
+          </div>
+          {p.claimed_email && (
+            <div className="mt-1 text-xs text-green-600 dark:text-green-500">
+              🙋 {p.claimed_email}
+            </div>
           )}
-          {p.client && <span>{p.client}</span>}
-          {/* origem (99freelas) escondida do colaborador — não revelar de onde veio */}
-          {p.link && (
+
+          {/* Progresso do roteiro (fases + checklist do `notes`) */}
+          {notesProgress(notes).total > 0 && (
+            <div className="mt-1.5">
+              <div className="mb-1 flex justify-between font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+                <span>Progresso</span>
+                <span style={{ color: accent }}>
+                  {notesProgress(notes).done}/{notesProgress(notes).total}
+                </span>
+              </div>
+              <div className="h-1 overflow-hidden rounded-full bg-secondary/70">
+                <div
+                  className="h-full rounded-full transition-all duration-300"
+                  style={{
+                    width: `${
+                      (notesProgress(notes).done /
+                        Math.max(1, notesProgress(notes).total)) *
+                      100
+                    }%`,
+                    background: accent,
+                  }}
+                />
+              </div>
+            </div>
+          )}
+        </button>
+
+        {/* "Pegar" também no COMPACTO: é a ação primária do backlog livre — o
+            colaborador não deveria ter que expandir o card só pra pegar. */}
+        {!expanded && !p.claimed_by && (
+          <Button size="sm" className="rounded-full" onClick={() => claim(true)}>
+            Pegar
+          </Button>
+        )}
+
+        {/* ------- DETALHE (só expandido) — todo o conteúdo de antes ------- */}
+        {expanded && (
+        <>
+        {/* Link do repositório: fora do cabeçalho-botão (link dentro de botão
+            não funciona), aparece junto do detalhe. */}
+        {p.link && (
+          <div className="text-xs">
             <a
               href={p.link}
               target="_blank"
@@ -547,36 +619,6 @@ function ProjectCard({
             >
               repositório
             </a>
-          )}
-        </div>
-        {p.claimed_email && (
-          <div className="text-xs text-green-600 dark:text-green-500">
-            🙋 {p.claimed_email}
-          </div>
-        )}
-
-        {/* Progresso do roteiro (fases + checklist do `notes`) */}
-        {notesProgress(notes).total > 0 && (
-          <div className="pt-0.5">
-            <div className="mb-1 flex justify-between font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
-              <span>Progresso</span>
-              <span style={{ color: accent }}>
-                {notesProgress(notes).done}/{notesProgress(notes).total}
-              </span>
-            </div>
-            <div className="h-1 overflow-hidden rounded-full bg-secondary/70">
-              <div
-                className="h-full rounded-full transition-all duration-300"
-                style={{
-                  width: `${
-                    (notesProgress(notes).done /
-                      Math.max(1, notesProgress(notes).total)) *
-                    100
-                  }%`,
-                  background: accent,
-                }}
-              />
-            </div>
           </div>
         )}
 
@@ -823,6 +865,9 @@ function ProjectCard({
             </Button>
           )}
         </div>
+        </>
+        )}
+        {/* ------------------- fim do detalhe expandido ------------------- */}
       </CardContent>
     </Card>
   );
