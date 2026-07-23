@@ -2,7 +2,10 @@
 
 // O "resumão" de UM projeto — modal estilo overlay do portfólio (MEDSPACE),
 // pedido do Fellipe (2026-07-22): clicar num projeto do "Meus" abre ISTO em vez
-// de navegar pro Kanban. Mostra e OPERA num lugar só:
+// de navegar pro Kanban/Quadro. Mora em projetos/_components (precedente do
+// KanbanBoard): /admin/meus E /projetos/meus|disponiveis renderizam o MESMO
+// modal — quem recorta o que cada papel vê/marca é a RLS, não a tela.
+// Mostra e OPERA num lugar só:
 //   • marcos (fases do roteiro OU do portal) com marcar/desmarcar;
 //   • conversa (atividade do kanban + comentários do cliente) com resposta;
 //   • briefing/valor (description) e links (repo).
@@ -15,12 +18,12 @@ import { Check, Github, Send, X } from "lucide-react";
 import { supabase, type SharedProject } from "@/lib/supabase";
 import { deliveryDate } from "../../cliente/_data";
 import { longDate } from "../../cliente/_format";
-import { postStaffReply, type StaffUser } from "../_data";
+import { postStaffReply, type StaffUser } from "../../admin/_data";
 import {
   loadMilestones,
   toggleMilestone,
   type Milestone,
-} from "../_marcos-data";
+} from "../../admin/_marcos-data";
 
 const STATUS: Record<SharedProject["status"], { label: string; accent: string }> = {
   backlog: { label: "backlog", accent: "#64748b" },
@@ -57,7 +60,7 @@ function shortWhen(iso: string): string {
   );
 }
 
-export function ProjectAdminOverlay({
+export function ProjectOverlay({
   project,
   staff,
   onClose,
