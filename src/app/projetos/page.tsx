@@ -9,10 +9,11 @@
 // "Disponíveis" tenham a mesma moldura desta tela. O que sobrou aqui é o que é
 // só desta página: o formulário de login.
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabase, supabaseConfigured } from "@/lib/supabase";
 import { ArrowRight } from "lucide-react";
+import { Turnstile, type TurnstileHandle } from "@/components/Turnstile";
 import { KanbanBoard, type Role } from "./_components/KanbanBoard";
 
 export default function ProjetosPage() {
@@ -84,6 +85,17 @@ function Login({ onAuthed }: { onAuthed: (u: User) => Promise<void> }) {
   const [pass, setPass] = useState("");
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
+  // Token do Turnstile — o Supabase Auth está com CAPTCHA ligado, então TODO
+  // signInWithPassword precisa mandar captchaToken (o /cliente/login já manda;
+  // este form ficou de fora e o Gustavo tomava "no captcha_token found").
+  const [captchaToken, setCaptchaToken] = useState("");
+  const turnstileRef = useRef<TurnstileHandle>(null);
+
+  // Token é de uso único: depois de uma tentativa que falhou, renova.
+  function refreshCaptcha() {
+    setCaptchaToken("");
+    turnstileRef.current?.reset();
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -93,10 +105,12 @@ function Login({ onAuthed }: { onAuthed: (u: User) => Promise<void> }) {
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email.trim(),
       password: pass,
+      options: { captchaToken },
     });
     setBusy(false);
     if (error) {
       setErr(error.message);
+      refreshCaptcha();
       return;
     }
     if (data.session) await onAuthed(data.session.user);
@@ -154,6 +168,8 @@ function Login({ onAuthed }: { onAuthed: (u: User) => Promise<void> }) {
               className="w-full rounded-lg border border-border/70 bg-background/60 px-3.5 py-2.5 text-sm outline-none backdrop-blur transition focus:border-purple-500/60 focus:ring-2 focus:ring-purple-500/25"
             />
           </label>
+
+          <Turnstile ref={turnstileRef} onVerify={setCaptchaToken} />
 
           <button
             type="submit"
