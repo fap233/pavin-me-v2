@@ -144,6 +144,7 @@ export default function MeusPage() {
         <ProjectOverlay
           project={selected}
           staff={staff}
+          canToggleHome // /admin é portão de owner: o dono decide a vitrine
           onClose={() => {
             setSelected(null);
             load(); // marcos/comentários podem ter mudado — a lista reflete

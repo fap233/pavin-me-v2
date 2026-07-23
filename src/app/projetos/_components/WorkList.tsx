@@ -19,7 +19,7 @@ import {
 import { deliveryDate } from "../../cliente/_data";
 import { longDate } from "../../cliente/_format";
 import type { StaffUser } from "../../admin/_data";
-import { listWorkable, mine, unclaimed } from "../_data";
+import { isOwnerRole, listWorkable, mine, unclaimed } from "../_data";
 import { useWorker } from "./CollabShell";
 import { ProjectOverlay } from "./ProjectOverlay";
 import { SortChips, sortProjects, type SortKey } from "./sort";
@@ -144,6 +144,8 @@ export function ScopedList({
         <ProjectOverlay
           project={selected}
           staff={staff}
+          // Vitrine da home é decisão editorial do DONO; o collab não vê o toggle.
+          canToggleHome={isOwnerRole(worker.role)}
           onClose={() => {
             setSelected(null);
             load(); // marcos/conversa podem ter mudado — a lista reflete
