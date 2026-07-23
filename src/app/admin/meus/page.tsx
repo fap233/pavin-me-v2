@@ -22,6 +22,7 @@ import { deliveryDate } from "../../cliente/_data";
 import { longDate } from "../../cliente/_format";
 import { listClaimed } from "../_data";
 import { useStaff } from "../_components/AdminShell";
+import { ProjectAdminOverlay } from "./_overlay";
 
 // Mesmas cores de coluna do Kanban — a mesma informação não pode ter duas
 // linguagens visuais no mesmo produto.
@@ -37,6 +38,9 @@ export default function MeusPage() {
   const [projects, setProjects] = useState<SharedProject[] | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  // Projeto aberto no modal de detalhe (o "resumão"). Clicar num card abre isto
+  // — antes navegava pro Kanban, que não tem âncora por card (pedido 2026-07-22).
+  const [selected, setSelected] = useState<SharedProject | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -95,9 +99,13 @@ export default function MeusPage() {
             const due = longDate(deliveryDate(p));
             return (
               <li key={p.id}>
-                {/* O Kanban não tem âncora por card, então o link leva pra tela
-                    dele — é o mais perto que dá sem inventar rota. */}
-                <Link href="/admin/kanban" className="block">
+                {/* Clicar abre o modal de detalhe (marcos, conversa, briefing) —
+                    o Kanban continua a um clique no topo pra quem quer o quadro. */}
+                <button
+                  type="button"
+                  onClick={() => setSelected(p)}
+                  className="block w-full text-left"
+                >
                   <Panel className="group p-5 transition-transform duration-300 hover:-translate-y-0.5 hover:border-[color-mix(in_oklab,var(--brand-via)_45%,transparent)]">
                     <div className="flex items-start justify-between gap-4">
                       <div className="min-w-0">
@@ -120,11 +128,22 @@ export default function MeusPage() {
                       </span>
                     </div>
                   </Panel>
-                </Link>
+                </button>
               </li>
             );
           })}
         </ul>
+      )}
+
+      {selected && (
+        <ProjectAdminOverlay
+          project={selected}
+          staff={staff}
+          onClose={() => {
+            setSelected(null);
+            load(); // marcos/comentários podem ter mudado — a lista reflete
+          }}
+        />
       )}
     </div>
   );
