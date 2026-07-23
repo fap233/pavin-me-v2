@@ -2,10 +2,10 @@
 
 // A lista de projetos das telas "Meus projetos" e "Disponíveis".
 //
-// Cards de LEITURA, de propósito. Pegar, largar, mover de coluna e mexer no
-// roteiro continua sendo o Quadro — duplicar a escrita aqui seria duas fontes
-// pra mesma gravação, e é a mesma decisão que o /admin/meus já tinha tomado.
-// Por isso todo card leva pro Quadro, que é onde as coisas acontecem.
+// Clicar num card abre o MODAL de detalhe (ProjectOverlay — marcos, conversa,
+// briefing), não navega mais pro Quadro (pedido do Fellipe, 2026-07-22: o
+// Quadro não tem âncora por card, "mandava errado"). Pegar/largar/mover de
+// coluna continuam sendo do Quadro, que segue a um clique na navegação.
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
@@ -18,8 +18,11 @@ import {
 } from "../../cliente/_components/States";
 import { deliveryDate } from "../../cliente/_data";
 import { longDate } from "../../cliente/_format";
-import { listWorkable, mine, unclaimed } from "../_data";
+import type { StaffUser } from "../../admin/_data";
+import { isOwnerRole, listWorkable, mine, unclaimed } from "../_data";
 import { useWorker } from "./CollabShell";
+import { ProjectOverlay } from "./ProjectOverlay";
+import { SortChips, sortProjects, type SortKey } from "./sort";
 
 // As cores das colunas do Quadro. Repetidas aqui porque o STATUSES do
 // page.tsx é local dele — no dia em que o kanban virar componente
@@ -57,6 +60,9 @@ export function ScopedList({
   const [projects, setProjects] = useState<SharedProject[] | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [sortKey, setSortKey] = useState<SortKey>("entrega");
+  // Projeto aberto no modal de detalhe (o "resumão").
+  const [selected, setSelected] = useState<SharedProject | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -92,20 +98,36 @@ export function ScopedList({
       </EmptyState>
     );
 
-  const list =
+  const list = sortProjects(
     projects === null
       ? []
       : scope === "mine"
         ? mine(projects, worker.id)
-        : unclaimed(projects);
+        : unclaimed(projects),
+    sortKey
+  );
+
+  // O modal assina respostas como staff. StaffRole só tem "owner" (o tipo nasceu
+  // no portão do /admin); o campo NÃO decide permissão nenhuma — quem autoriza a
+  // resposta é a RLS (events_staff_reply, por author_id = auth.uid()). O que
+  // assina de verdade é o author_id/e-mail, que aqui são os do worker logado.
+  const staff: StaffUser = {
+    id: worker.id,
+    email: worker.email,
+    role: "owner",
+    name: null,
+  };
 
   return (
     <div className="space-y-5">
-      <div className="space-y-1">
-        <p className="font-[family-name:var(--font-caveat)] text-base tracking-wide text-muted-foreground/80">
-          {kicker}
-        </p>
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{title}</h1>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="space-y-1">
+          <p className="font-[family-name:var(--font-caveat)] text-base tracking-wide text-muted-foreground/80">
+            {kicker}
+          </p>
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{title}</h1>
+        </div>
+        <SortChips value={sortKey} onChange={setSortKey} />
       </div>
 
       {loading ? (
@@ -115,13 +137,32 @@ export function ScopedList({
       ) : list.length === 0 ? (
         <EmptyState title={emptyTitle}>{emptyBody}</EmptyState>
       ) : (
-        <WorkList projects={list} />
+        <WorkList projects={list} onOpen={setSelected} />
+      )}
+
+      {selected && (
+        <ProjectOverlay
+          project={selected}
+          staff={staff}
+          // Vitrine da home é decisão editorial do DONO; o collab não vê o toggle.
+          canToggleHome={isOwnerRole(worker.role)}
+          onClose={() => {
+            setSelected(null);
+            load(); // marcos/conversa podem ter mudado — a lista reflete
+          }}
+        />
       )}
     </div>
   );
 }
 
-function WorkList({ projects }: { projects: SharedProject[] }) {
+function WorkList({
+  projects,
+  onOpen,
+}: {
+  projects: SharedProject[];
+  onOpen: (p: SharedProject) => void;
+}) {
   return (
     <ul className="space-y-3">
       {projects.map((p) => {
@@ -129,11 +170,11 @@ function WorkList({ projects }: { projects: SharedProject[] }) {
         const due = longDate(deliveryDate(p));
         return (
           <li key={p.id}>
-            {/* O Quadro não tem âncora por card, então o link leva pra tela
-                dele — é o mais perto que dá sem inventar rota. */}
-            <Link
-              href="/projetos"
-              className="block"
+            {/* Abre o modal de detalhe — o Quadro segue na navegação de cima. */}
+            <button
+              type="button"
+              onClick={() => onOpen(p)}
+              className="block w-full text-left"
               style={{ ["--acc" as string]: st.accent }}
             >
               <Panel className="group p-5 transition-transform duration-300 hover:-translate-y-0.5 hover:border-[color-mix(in_oklab,var(--acc)_45%,transparent)]">
@@ -170,7 +211,7 @@ function WorkList({ projects }: { projects: SharedProject[] }) {
                   </span>
                 </div>
               </Panel>
-            </Link>
+            </button>
           </li>
         );
       })}

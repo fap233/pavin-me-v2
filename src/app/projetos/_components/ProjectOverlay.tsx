@@ -2,7 +2,10 @@
 
 // O "resumão" de UM projeto — modal estilo overlay do portfólio (MEDSPACE),
 // pedido do Fellipe (2026-07-22): clicar num projeto do "Meus" abre ISTO em vez
-// de navegar pro Kanban. Mostra e OPERA num lugar só:
+// de navegar pro Kanban/Quadro. Mora em projetos/_components (precedente do
+// KanbanBoard): /admin/meus E /projetos/meus|disponiveis renderizam o MESMO
+// modal — quem recorta o que cada papel vê/marca é a RLS, não a tela.
+// Mostra e OPERA num lugar só:
 //   • marcos (fases do roteiro OU do portal) com marcar/desmarcar;
 //   • conversa (atividade do kanban + comentários do cliente) com resposta;
 //   • briefing/valor (description) e links (repo).
@@ -11,16 +14,16 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Check, Github, Send, X } from "lucide-react";
+import { Check, Eye, EyeOff, Github, Send, X } from "lucide-react";
 import { supabase, type SharedProject } from "@/lib/supabase";
 import { deliveryDate } from "../../cliente/_data";
 import { longDate } from "../../cliente/_format";
-import { postStaffReply, type StaffUser } from "../_data";
+import { postStaffReply, type StaffUser } from "../../admin/_data";
 import {
   loadMilestones,
   toggleMilestone,
   type Milestone,
-} from "../_marcos-data";
+} from "../../admin/_marcos-data";
 
 const STATUS: Record<SharedProject["status"], { label: string; accent: string }> = {
   backlog: { label: "backlog", accent: "#64748b" },
@@ -57,14 +60,19 @@ function shortWhen(iso: string): string {
   );
 }
 
-export function ProjectAdminOverlay({
+export function ProjectOverlay({
   project,
   staff,
   onClose,
+  canToggleHome = false,
 }: {
   project: SharedProject;
   staff: StaffUser;
   onClose: () => void;
+  /** Mostra o toggle "visível na home" — decisão EDITORIAL do dono. O backend
+   *  da home sempre respeitou notes.hide_from_home; o que faltava era a UI
+   *  (pedido do Fellipe, 2026-07-22). */
+  canToggleHome?: boolean;
 }) {
   const closeRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -77,6 +85,9 @@ export function ProjectAdminOverlay({
   const [hasClient, setHasClient] = useState(false);
   const [loadErr, setLoadErr] = useState("");
   const [busy, setBusy] = useState<Set<string>>(new Set());
+  // Visível na home? (= !notes.hide_from_home). null = ainda carregando.
+  const [showHome, setShowHome] = useState<boolean | null>(null);
+  const [homeBusy, setHomeBusy] = useState(false);
 
   const reload = useCallback(async () => {
     if (!supabase) return;
@@ -96,6 +107,7 @@ export function ProjectAdminOverlay({
       .maybeSingle();
     try {
       const obj = row?.notes ? JSON.parse(row.notes) : null;
+      setShowHome(!(obj && obj.hide_from_home)); // default: visível
       const acts: unknown[] = Array.isArray(obj?.activity) ? obj.activity : [];
       for (let i = 0; i < acts.length; i++) {
         const a = (acts[i] ?? {}) as Record<string, unknown>;
@@ -111,7 +123,8 @@ export function ProjectAdminOverlay({
         });
       }
     } catch {
-      /* notes ilegível: segue só com o portal */
+      /* notes ilegível: segue só com o portal; assume visível na home */
+      setShowHome(true);
     }
     // Conversa do portal: comentários da timeline do cliente (e respostas).
     const { data: evs } = await supabase
@@ -171,6 +184,41 @@ export function ProjectAdminOverlay({
     },
     []
   );
+
+  // ---- visível na home (toggle editorial do dono) ----------------------------
+  async function toggleHome() {
+    if (!supabase || showHome === null || homeBusy) return;
+    const next = !showHome;
+    setHomeBusy(true);
+    setShowHome(next); // otimista
+    const { data: row } = await supabase
+      .from("shared_projects")
+      .select("notes")
+      .eq("id", project.id)
+      .maybeSingle();
+    let obj: Record<string, unknown> = {};
+    if (row?.notes) {
+      try {
+        obj = JSON.parse(row.notes);
+      } catch {
+        // notes ilegível: NÃO sobrescreve (perderia roteiro/atividade).
+        setShowHome(!next);
+        setHomeBusy(false);
+        setLoadErr("O notes deste projeto está ilegível — não mexi pra não perder nada.");
+        return;
+      }
+    }
+    obj.hide_from_home = !next; // hide = o inverso de "visível"
+    const { error } = await supabase
+      .from("shared_projects")
+      .update({ notes: JSON.stringify(obj) })
+      .eq("id", project.id);
+    if (error) {
+      setShowHome(!next);
+      setLoadErr(error.message);
+    }
+    setHomeBusy(false);
+  }
 
   // ---- resposta --------------------------------------------------------------
   const [msg, setMsg] = useState("");
@@ -346,6 +394,42 @@ export function ProjectAdminOverlay({
               </span>
             </div>
           </section>
+
+          {/* VISÍVEL NA HOME — só pro dono. O backend da home (public_stats)
+              respeita notes.hide_from_home; a mudança vale na próxima
+              publicação do snapshot (~12 min). */}
+          {canToggleHome && showHome !== null && (
+            <section className="flex items-center justify-between gap-4 rounded-lg border border-border/60 bg-card/50 px-3.5 py-2.5">
+              <div className="min-w-0">
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                  Página inicial
+                </p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  {showHome
+                    ? "Aparece na vitrine anônima da home (Na bancada / Concluídos)."
+                    : "Oculto da home. Backlog, kanban e portal não mudam."}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={toggleHome}
+                disabled={homeBusy}
+                aria-pressed={showHome}
+                className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] transition disabled:opacity-50 ${
+                  showHome
+                    ? "border-emerald-500/60 text-emerald-500"
+                    : "border-border/70 text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {showHome ? (
+                  <Eye className="h-3.5 w-3.5" />
+                ) : (
+                  <EyeOff className="h-3.5 w-3.5" />
+                )}
+                {showHome ? "visível" : "oculto"}
+              </button>
+            </section>
+          )}
 
           {/* MARCOS */}
           <section>

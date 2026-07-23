@@ -22,7 +22,8 @@ import { deliveryDate } from "../../cliente/_data";
 import { longDate } from "../../cliente/_format";
 import { listClaimed } from "../_data";
 import { useStaff } from "../_components/AdminShell";
-import { ProjectAdminOverlay } from "./_overlay";
+import { ProjectOverlay } from "../../projetos/_components/ProjectOverlay";
+import { SortChips, sortProjects, type SortKey } from "../../projetos/_components/sort";
 
 // Mesmas cores de coluna do Kanban — a mesma informação não pode ter duas
 // linguagens visuais no mesmo produto.
@@ -41,6 +42,7 @@ export default function MeusPage() {
   // Projeto aberto no modal de detalhe (o "resumão"). Clicar num card abre isto
   // — antes navegava pro Kanban, que não tem âncora por card (pedido 2026-07-22).
   const [selected, setSelected] = useState<SharedProject | null>(null);
+  const [sortKey, setSortKey] = useState<SortKey>("entrega");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -73,12 +75,15 @@ export default function MeusPage() {
             Meus projetos
           </h1>
         </div>
-        <Link
-          href="/admin/kanban"
-          className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground transition-colors hover:text-foreground"
-        >
-          Abrir o Kanban
-        </Link>
+        <div className="flex items-center gap-4">
+          <SortChips value={sortKey} onChange={setSortKey} />
+          <Link
+            href="/admin/kanban"
+            className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Abrir o Kanban
+          </Link>
+        </div>
       </div>
 
       {!projects || projects.length === 0 ? (
@@ -94,7 +99,7 @@ export default function MeusPage() {
         </EmptyState>
       ) : (
         <ul className="space-y-3">
-          {projects.map((p) => {
+          {sortProjects(projects, sortKey).map((p) => {
             const st = STATUS[p.status] ?? STATUS.backlog;
             const due = longDate(deliveryDate(p));
             return (
@@ -136,9 +141,10 @@ export default function MeusPage() {
       )}
 
       {selected && (
-        <ProjectAdminOverlay
+        <ProjectOverlay
           project={selected}
           staff={staff}
+          canToggleHome // /admin é portão de owner: o dono decide a vitrine
           onClose={() => {
             setSelected(null);
             load(); // marcos/comentários podem ter mudado — a lista reflete
