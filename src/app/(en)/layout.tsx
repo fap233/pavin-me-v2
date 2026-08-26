@@ -1,6 +1,5 @@
 import React from "react";
-import { Inter, Caveat } from "next/font/google";
-import "./globals.css";
+import "../globals.css";
 
 import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
 import Providers from "@/components/providers";
@@ -8,19 +7,12 @@ import { SmoothScroll } from "@/components/SmoothScroll";
 import { Metadata } from "next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { SiteJsonLd } from "@/components/seo/SiteJsonLd";
+import { fontClassName } from "../fonts";
 
-const inter = Inter({
-	subsets: ["latin"],
-	variable: "--font-sans",
-	display: "swap",
-});
-
-const caveat = Caveat({
-	subsets: ["latin"],
-	variable: "--font-caveat",
-	display: "swap",
-	weight: ["400", "500", "600", "700"],
-});
+// ROOT layout da árvore em inglês (route group (en): home, cv, demos, admin,
+// cliente, projetos). A árvore em português tem o próprio root em (main-pt),
+// com <html lang="pt-BR"> saindo do servidor. Fontes compartilhadas em fonts.ts.
 
 export const metadata: Metadata = {
 	metadataBase: new URL("https://pavin.me"),
@@ -59,6 +51,12 @@ export const metadata: Metadata = {
 	publisher: "Fellipe Pavin",
 	alternates: {
 		canonical: "https://pavin.me",
+		// Home em inglês (raiz) e em português (/pt) apontam uma pra outra.
+		languages: {
+			en: "https://pavin.me",
+			"pt-BR": "https://pavin.me/pt",
+			"x-default": "https://pavin.me",
+		},
 	},
 	openGraph: {
 		type: "website",
@@ -95,12 +93,9 @@ export default function RootLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<html
-			lang="en"
-			suppressHydrationWarning
-			className={`${inter.variable} ${caveat.variable}`}
-		>
+		<html lang="en" suppressHydrationWarning className={fontClassName}>
 			<body className="antialiased min-h-screen bg-background text-foreground transition-colors duration-500">
+				<SiteJsonLd />
 				<GoogleAnalytics />
 				<SpeedInsights />
 				<SmoothScroll />

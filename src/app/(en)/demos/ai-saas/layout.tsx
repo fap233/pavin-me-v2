@@ -11,6 +11,7 @@ import Footer from "./_components/Footer";
  */
 
 export const metadata: Metadata = {
+	alternates: { canonical: "https://pavin.me/demos/ai-saas" },
 	title: "Nexus AI — Autonomous agents for your workflows",
 	description:
 		"Demo de UI: SaaS de IA com playground, documentação, planos e cadastro. Frontend lab de Fellipe Pavin.",

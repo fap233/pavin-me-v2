@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { ArrowUpRight, Github, X } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Github, X } from "lucide-react";
 import type { Project } from "@/lib/projects";
 import { projectDetails } from "@/lib/projectDetails";
 import { startLenis, stopLenis } from "@/lib/lenisInstance";
@@ -238,8 +239,8 @@ export function ProjectDetailOverlay({
 						</div>
 					)}
 
-					{href && (
-						<div className="border-t pt-6">
+					<div className="flex flex-col gap-3 border-t pt-6 sm:flex-row sm:flex-wrap">
+						{href && (
 							<a
 								href={href}
 								target="_blank"
@@ -260,8 +261,18 @@ export function ProjectDetailOverlay({
 									)}
 								</span>
 							</a>
-						</div>
-					)}
+						)}
+						{/* Indexable, shareable version of this write-up. */}
+						<Link
+							href={`/cases/${project.slug}`}
+							className="hero-btn hero-btn-outline w-full sm:w-auto"
+						>
+							<span className="relative z-10 inline-flex items-center gap-2 text-sm">
+								{isEN ? "Open case page" : "Ver página do case"}
+								<ArrowRight className="hero-btn-arrow h-4 w-4" />
+							</span>
+						</Link>
+					</div>
 				</div>
 			</div>
 		</div>,

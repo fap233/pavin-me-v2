@@ -101,7 +101,8 @@ const Header = () => {
 
 	const navItems = [
 		{ name: t.nav.about, href: "/#about" },
-		{ name: t.nav.projects, href: "/#projects" },
+		{ name: t.nav.services, href: "/servicos" },
+		{ name: t.nav.cases, href: "/cases" },
 		{ name: t.nav.contact, href: "/#contact" },
 		{ name: t.nav.cv, href: "/cv", icon: FileText },
 	];
@@ -133,10 +134,13 @@ const Header = () => {
 					{navItems.map((item) => {
 						const Icon = item.icon;
 						const isCv = item.href === "/cv";
+						// Links de página (/servicos, /cases, /cv) usam <Link>; âncoras da
+						// home (/#about...) ficam em <a> pra rolagem suave funcionar.
+						const isPage = !item.href.startsWith("/#");
 						const className = isCv
 							? "text-sm font-medium inline-flex items-center gap-1.5 rounded-full border border-primary/40 px-3 py-1 transition-all hover:border-primary hover:bg-primary/10 hover:text-primary"
 							: "text-sm font-medium transition-colors hover:text-primary";
-						return isCv ? (
+						return isPage ? (
 							<Link key={item.name} href={item.href} className={className}>
 								{Icon && <Icon className="h-3.5 w-3.5" />}
 								{item.name}

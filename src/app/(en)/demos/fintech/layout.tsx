@@ -4,6 +4,7 @@ import LuminaFooter from "./_components/LuminaFooter";
 import "./lumina.css";
 
 export const metadata: Metadata = {
+	alternates: { canonical: "https://pavin.me/demos/fintech" },
 	title: "Lumina · Banco digital (demo)",
 	description:
 		"Demo de front-end: banco digital navegável — planos, abertura de conta, extrato com Pix e gestão de cartões.",

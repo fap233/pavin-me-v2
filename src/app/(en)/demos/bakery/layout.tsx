@@ -5,6 +5,7 @@ import { SiteNav } from "./_components/SiteNav";
 import { SiteFooter } from "./_components/SiteFooter";
 
 export const metadata: Metadata = {
+	alternates: { canonical: "https://pavin.me/demos/bakery" },
 	title: "Farine · Padaria Artesanal (demo)",
 	description:
 		"Demo de site de padaria artesanal: cardápio filtrável, carrinho e checkout — construído em Next.js por Fellipe Pavin.",
