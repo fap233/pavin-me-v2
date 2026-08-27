@@ -3,6 +3,7 @@ import GymNav from "./_components/GymNav";
 import GymFooter from "./_components/GymFooter";
 
 export const metadata: Metadata = {
+	alternates: { canonical: "https://pavin.me/demos/gym" },
 	title: "Iron Forge — Demo de academia",
 	description:
 		"Demo de site de academia: planos, matrícula multi-etapas, programas, treinadores e unidades.",

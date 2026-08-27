@@ -4,6 +4,7 @@ import { LuxuryNav } from "./_components/nav";
 import { LuxuryFooter } from "./_components/footer";
 
 export const metadata: Metadata = {
+	alternates: { canonical: "https://pavin.me/demos/luxury" },
 	title: "Aurum · Imóveis de exceção",
 	description:
 		"Demo de front-end: site de real estate de luxo com coleção filtrável, página de imóvel, agendamento de visita e avaliação de imóvel.",

@@ -15,6 +15,8 @@ export const content = {
 		nav: {
 			about: "About",
 			projects: "Projects",
+			services: "Services",
+			cases: "Cases",
 			contact: "Contact",
 			cv: "CV",
 		},
@@ -149,6 +151,8 @@ export const content = {
 		nav: {
 			about: "Sobre",
 			projects: "Projetos",
+			services: "Serviços",
+			cases: "Cases",
 			contact: "Contato",
 			cv: "CV",
 		},
@@ -285,8 +289,19 @@ const LanguageContext = createContext<LanguageContextType | undefined>(
 	undefined,
 );
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
-	const [language, setLanguage] = useState<Language>("en");
+export function LanguageProvider({
+	children,
+	initialLanguage = "en",
+}: {
+	children: ReactNode;
+	/**
+	 * Idioma do primeiro render (SSR). As rotas em português (/pt, /servicos,
+	 * /cases) passam "pt" pra que o HTML servido ao Google já venha em pt-BR;
+	 * o toggle do header continua funcionando por cima.
+	 */
+	initialLanguage?: Language;
+}) {
+	const [language, setLanguage] = useState<Language>(initialLanguage);
 
 	return (
 		<LanguageContext.Provider
