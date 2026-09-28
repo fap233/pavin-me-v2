@@ -35,7 +35,7 @@ export const content = {
 				"I am a Full Stack Software Engineer with 9+ years of experience building and scaling web systems. I founded and scaled my own multi-tenant SaaS to 10,000+ paying recurring users at 99.9% uptime (owning product, PHP/Laravel + MySQL engineering, and Linux/Cloudflare infrastructure in production as a one-person tech team). Today I deliver software for B2B clients: marketplaces, operations SaaS, dashboards, CRM automation, AI agents and security audits. Mostly in TypeScript, React/Next.js and Node.js, with production work in .NET, PHP and Python.",
 			stats: [
 				{ label: "Years of Exp.", value: "9+" },
-				{ label: "Projects Delivered", value: "20+" },
+				{ label: "Projects Delivered", value: "50+" },
 				{ label: "Paying Users Served", value: "10k+" },
 			],
 		},
@@ -171,7 +171,7 @@ export const content = {
 				"Sou Engenheiro de Software Full Stack com 9+ anos de experiência desenvolvendo e escalando sistemas web. Fundei e escalei um SaaS multi-tenant próprio até 10.000+ usuários recorrentes pagantes com 99,9% de uptime (conduzindo produto, engenharia em PHP/Laravel + MySQL e infraestrutura Linux/Cloudflare em produção como time tech de uma pessoa só). Hoje entrego software para clientes B2B: marketplaces, SaaS operacionais, dashboards, automação de CRM, agentes de IA e auditorias de segurança. Principalmente em TypeScript, React/Next.js e Node.js, com entregas em produção também em .NET, PHP e Python.",
 			stats: [
 				{ label: "Anos de Exp.", value: "9+" },
-				{ label: "Projetos Entregues", value: "20+" },
+				{ label: "Projetos Entregues", value: "50+" },
 				{ label: "Usuários Pagantes", value: "10k+" },
 			],
 		},

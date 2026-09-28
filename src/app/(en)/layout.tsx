@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 		template: "%s · Fellipe Pavin",
 	},
 	description:
-		"Full Stack Software Engineer with 9+ years of production experience. Founded a multi-tenant SaaS scaled to 10,000+ paying users at 99.9% uptime. 20+ B2B projects delivered across TypeScript, React/Next.js, Node.js, .NET and PostgreSQL. Open to remote and contract roles worldwide.",
+		"Full Stack Software Engineer with 9+ years of production experience. Founded a multi-tenant SaaS scaled to 10,000+ paying users at 99.9% uptime. 50+ B2B projects delivered across TypeScript, React/Next.js, Node.js, .NET and PostgreSQL. Open to remote and contract roles worldwide.",
 	keywords: [
 		"Software Engineer",
 		"Full Stack Developer",
@@ -65,7 +65,7 @@ export const metadata: Metadata = {
 		url: "https://pavin.me",
 		title: "Fellipe Pavin · Software Engineer (TypeScript, React, Node.js)",
 		description:
-			"9+ years building production software at scale. Founded a multi-tenant SaaS to 10,000+ paying users. 20+ B2B projects delivered. Open to remote and contract roles worldwide.",
+			"9+ years building production software at scale. Founded a multi-tenant SaaS to 10,000+ paying users. 50+ B2B projects delivered. Open to remote and contract roles worldwide.",
 		siteName: "pavin.me",
 	},
 	twitter: {

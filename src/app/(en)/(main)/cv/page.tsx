@@ -69,7 +69,7 @@ const cv: Record<"en" | "pt", CVContent> = {
 			certifications: "Certifications",
 		},
 		summary:
-			"Full Stack Software Engineer with 9+ years of production experience owning the entire lifecycle: architecture, code, tests, CI/CD, deployment, monitoring, incident response and support. Founded and scaled a multi-tenant SaaS from zero to 10,000+ paying recurring users at 99.9% uptime as a single-person tech team. Since 2024, working as an independent engineer for B2B clients with 20+ engagements delivered across healthcare, real estate, tourism, e-commerce, entertainment and legal (marketplaces, SaaS platforms, dashboards, CRM automation, AI agents, security audits and production infrastructure). Core stack: TypeScript, React/Next.js and Node.js, with shipped production work in C#/.NET, PHP/Laravel and Python. Fluent English, remote-async by default.",
+			"Full Stack Software Engineer with 9+ years of production experience owning the entire lifecycle: architecture, code, tests, CI/CD, deployment, monitoring, incident response and support. Founded and scaled a multi-tenant SaaS from zero to 10,000+ paying recurring users at 99.9% uptime as a single-person tech team. Since 2024, working as an independent engineer for B2B clients with 50+ engagements delivered across healthcare, real estate, tourism, e-commerce, entertainment and legal (marketplaces, SaaS platforms, dashboards, CRM automation, AI agents, security audits and production infrastructure). Core stack: TypeScript, React/Next.js and Node.js, with shipped production work in C#/.NET, PHP/Laravel and Python. Fluent English, remote-async by default.",
 		skills: [
 			{
 				label: "Languages",
@@ -132,7 +132,7 @@ const cv: Record<"en" | "pt", CVContent> = {
 				period: "January 2024 — Present",
 				location: "Fortaleza, Brazil · Remote",
 				bullets: [
-					"Delivered 20+ B2B engagements end-to-end (scoping, architecture, implementation, tests, deploy and support) across healthcare, real estate, tourism, e-commerce, entertainment and legal verticals, as sole engineer from first call to production.",
+					"Delivered 50+ B2B engagements end-to-end (scoping, architecture, implementation, tests, deploy and support) across healthcare, real estate, tourism, e-commerce, entertainment and legal verticals, as sole engineer from first call to production.",
 					"Built and operate MEDSPACE (medspacebrasil.com.br), a marketplace connecting doctors to clinics: Next.js 16, React 19, Prisma/PostgreSQL and Auth.js. MVP live in ~4 weeks, evolved in paid cycles with multi-advertiser accounts (CPF/CNPJ validation), a medical-education module, end-to-end LGPD compliance, 105 automated tests (unit/integration/E2E) and Google Ads/Meta conversion instrumentation.",
 					"Ran a self-initiated security audit on that same production platform and fixed all 13 findings (1 critical, 3 high: moderation bypass, fail-open rate limiting, login timing oracle), shipping CSP/HSTS headers and fail-closed rate limiting (Upstash Redis).",
 					"Modernized a legacy PHP/MySQL tourism portal: responsive redesign of 8 pages refactored into 23 reusable components, real-time search and SEO. Accepted and paid in 8 days against a 12-day contract, including a read-only staging environment running over the production database and fail-safe automated FTP deploy tooling.",
@@ -247,7 +247,7 @@ const cv: Record<"en" | "pt", CVContent> = {
 			certifications: "Certificações",
 		},
 		summary:
-			"Engenheiro de Software Full Stack com 9+ anos de experiência em produção conduzindo o ciclo completo: arquitetura, código, testes, CI/CD, deploy, monitoramento, resposta a incidentes e suporte. Fundei e escalei uma plataforma SaaS multi-tenant de zero a 10.000+ usuários recorrentes pagantes com 99,9% de uptime como time tech de uma pessoa só. Desde 2024 atuo como engenheiro independente para clientes B2B, com 20+ projetos entregues nas verticais de saúde, imobiliário, turismo, e-commerce, entretenimento e jurídico (marketplaces, plataformas SaaS, dashboards, automação de CRM, agentes de IA, auditorias de segurança e infraestrutura de produção). Stack principal: TypeScript, React/Next.js e Node.js, com entregas em produção também em C#/.NET, PHP/Laravel e Python. Inglês fluente, remoto-async por padrão.",
+			"Engenheiro de Software Full Stack com 9+ anos de experiência em produção conduzindo o ciclo completo: arquitetura, código, testes, CI/CD, deploy, monitoramento, resposta a incidentes e suporte. Fundei e escalei uma plataforma SaaS multi-tenant de zero a 10.000+ usuários recorrentes pagantes com 99,9% de uptime como time tech de uma pessoa só. Desde 2024 atuo como engenheiro independente para clientes B2B, com 50+ projetos entregues nas verticais de saúde, imobiliário, turismo, e-commerce, entretenimento e jurídico (marketplaces, plataformas SaaS, dashboards, automação de CRM, agentes de IA, auditorias de segurança e infraestrutura de produção). Stack principal: TypeScript, React/Next.js e Node.js, com entregas em produção também em C#/.NET, PHP/Laravel e Python. Inglês fluente, remoto-async por padrão.",
 		skills: [
 			{
 				label: "Linguagens",
@@ -310,7 +310,7 @@ const cv: Record<"en" | "pt", CVContent> = {
 				period: "Janeiro 2024 — Atual",
 				location: "Fortaleza, Brasil · Remoto",
 				bullets: [
-					"Entreguei 20+ projetos B2B ponta a ponta (escopo, arquitetura, implementação, testes, deploy e suporte) nas verticais de saúde, imobiliário, turismo, e-commerce, entretenimento e jurídico, como único engenheiro da primeira call até a produção.",
+					"Entreguei 50+ projetos B2B ponta a ponta (escopo, arquitetura, implementação, testes, deploy e suporte) nas verticais de saúde, imobiliário, turismo, e-commerce, entretenimento e jurídico, como único engenheiro da primeira call até a produção.",
 					"Construí e mantenho o MEDSPACE (medspacebrasil.com.br), marketplace que conecta médicos a clínicas: Next.js 16, React 19, Prisma/PostgreSQL e Auth.js. MVP no ar em ~4 semanas, evoluído em ciclos pagos com contas multi-anunciante (validação CPF/CNPJ), módulo de educação médica, conformidade LGPD ponta a ponta, 105 testes automatizados (unit/integração/E2E) e instrumentação de conversão Google Ads/Meta.",
 					"Conduzi auditoria de segurança por iniciativa própria nessa mesma plataforma em produção e corrigi os 13 achados (1 crítico, 3 altos: bypass de moderação, rate limiting fail-open, timing oracle no login), entregando headers CSP/HSTS e rate limiting fail-closed (Upstash Redis).",
 					"Modernizei um portal de turismo legado em PHP/MySQL: redesign responsivo de 8 páginas refatoradas em 23 componentes reutilizáveis, busca em tempo real e SEO. Entrega aceita e paga em 8 dias num contrato de 12, incluindo ambiente de homologação read-only sobre o banco de produção e deploy FTP automatizado com trava de segurança.",

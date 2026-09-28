@@ -21,9 +21,9 @@ const UI = {
 		lead: "Sou Fellipe Pavin, engenheiro de software full stack em Fortaleza, atendendo empresas de todo o Brasil de forma remota. Do site institucional ao SaaS multi-tenant, cada projeto sai com proposta em até um dia, pagamento por etapas com marcos definidos e acompanhamento pelo portal do cliente.",
 		viewDetails: "Ver detalhes",
 		reviewsHeadline: (avg: string, total: number) =>
-			`${avg}/5 em ${total} avaliações no 99freelas`,
+			`${avg}/5 em ${total} avaliações de clientes`,
 		reviewsSub:
-			"Top 100 da plataforma, selo TOP FREELANCER PLUS. Avaliações reais, nada editado.",
+			"Avaliações reais de clientes, nada editado.",
 		proofReviews: (total: number) => `em ${total} avaliações`,
 		proofProjects: "projetos B2B entregues",
 		proofYears: "anos de experiência",
@@ -38,9 +38,9 @@ const UI = {
 		lead: "I am Fellipe Pavin, a full stack software engineer based in Fortaleza, working remotely with companies all over Brazil. From a corporate website to a multi-tenant SaaS, every project comes with a proposal within a day, staged payment with defined milestones and progress tracking through the client portal.",
 		viewDetails: "View details",
 		reviewsHeadline: (avg: string, total: number) =>
-			`${avg}/5 across ${total} reviews on 99freelas`,
+			`${avg}/5 across ${total} client reviews`,
 		reviewsSub:
-			"Top 100 on the platform, TOP FREELANCER PLUS badge. Real reviews, nothing edited.",
+			"Real client reviews, nothing edited.",
 		proofReviews: (total: number) => `across ${total} reviews`,
 		proofProjects: "B2B projects delivered",
 		proofYears: "years of experience",
@@ -63,7 +63,7 @@ export function ServicesHub({ services, reviews }: Props) {
 
 	const proof = [
 		{ value: `${averageLabel}/5`, label: ui.proofReviews(reviews.total) },
-		{ value: "20+", label: ui.proofProjects },
+		{ value: "50+", label: ui.proofProjects },
 		{ value: "9+", label: ui.proofYears },
 		{ value: "10k+", label: ui.proofUsers },
 	];

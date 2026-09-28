@@ -5,7 +5,7 @@
  * em português (initialLanguage="pt" no layout) e o toggle do header troca o
  * corpo da página pra inglês no cliente. Metadados (metaTitle, metaDescription)
  * e JSON-LD continuam só em pt e só no servidor. Sem travessão no texto
- * visível, sem número inventado. Os fatos citados (9+ anos, 20+ projetos, SaaS
+ * visível, sem número inventado. Os fatos citados (9+ anos, 50+ projetos, SaaS
  * a 10 mil usuários pagantes, 4,92/5 em 28 avaliações) vêm da home e de
  * src/data/reviews.ts. Os cases relacionados apontam pra slugs de
  * src/lib/projects.ts.

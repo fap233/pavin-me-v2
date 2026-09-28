@@ -4,7 +4,7 @@ import CvPage from "../../../(en)/(main)/cv/page";
 export const metadata: Metadata = {
 	title: "Currículo",
 	description:
-		"Fellipe Pavin, engenheiro de software full stack. 9+ anos de experiência, 20+ projetos B2B entregues, fundador de um SaaS multi-tenant com 10 mil usuários pagantes. TypeScript, React/Next.js, Node.js, .NET, PostgreSQL.",
+		"Fellipe Pavin, engenheiro de software full stack. 9+ anos de experiência, 50+ projetos B2B entregues, fundador de um SaaS multi-tenant com 10 mil usuários pagantes. TypeScript, React/Next.js, Node.js, .NET, PostgreSQL.",
 	alternates: {
 		canonical: "https://pavin.me/pt/cv",
 		languages: {

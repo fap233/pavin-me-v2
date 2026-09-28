@@ -19,7 +19,7 @@ const copy = {
 		kicker: "projetos reais, em produção",
 		title: "Cases: projetos entregues em produção",
 		intro:
-			"Uma seleção do que entreguei em produção: mais de 20 projetos B2B entre marketplaces, SaaS operacionais, automação de CRM, auditorias de segurança e aplicações web. Cada case traz o contexto, as decisões de arquitetura e os resultados verificáveis.",
+			"Uma seleção do que entreguei em produção: mais de 50 projetos B2B entre marketplaces, SaaS operacionais, automação de CRM, auditorias de segurança e aplicações web. Cada case traz o contexto, as decisões de arquitetura e os resultados verificáveis.",
 		imageAlt: (title: string) => `Tela do projeto ${title}`,
 		viewCase: "Ver case",
 		closingLead: "Precisa de algo parecido? Veja ",
