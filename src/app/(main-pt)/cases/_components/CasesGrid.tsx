@@ -32,7 +32,7 @@ const copy = {
 		kicker: "real projects, in production",
 		title: "Case studies: projects shipped to production",
 		intro:
-			"A selection of what I have shipped to production: more than 20 B2B projects spanning marketplaces, operations SaaS, CRM automation, security audits and web applications. Each case study covers the context, the architecture decisions and the verifiable results.",
+			"A selection of what I have shipped to production: more than 50 B2B projects spanning marketplaces, operations SaaS, CRM automation, security audits and web applications. Each case study covers the context, the architecture decisions and the verifiable results.",
 		imageAlt: (title: string) => `Screenshot of the ${title} project`,
 		viewCase: "View case",
 		closingLead: "Need something similar? See ",
