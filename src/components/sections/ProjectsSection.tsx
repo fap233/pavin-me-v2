@@ -165,10 +165,6 @@ export function ProjectsSection() {
 				id="projects"
 				className="relative py-20 overflow-hidden"
 			>
-				<div
-					aria-hidden="true"
-					className="absolute inset-0 -z-10 section-grid-bg [mask-image:radial-gradient(ellipse_85%_80%_at_50%_30%,#000_60%,transparent_100%)]"
-				/>
 				<div className="container mx-auto px-4">
 					<div className="mb-12 text-center mx-auto">{heading}</div>
 					<div className="grid gap-6 md:grid-cols-2">
@@ -198,11 +194,6 @@ export function ProjectsSection() {
 			style={{ height: sectionHeight ? `${sectionHeight}px` : undefined }}
 		>
 			<div className="sticky top-0 flex h-screen flex-col overflow-hidden">
-				<div
-					aria-hidden="true"
-					className="absolute inset-0 -z-10 section-grid-bg [mask-image:radial-gradient(ellipse_85%_80%_at_50%_40%,#000_60%,transparent_100%)]"
-				/>
-
 				<div className="container mx-auto shrink-0 px-4 pt-24 pb-8">
 					<div className="flex flex-wrap items-end justify-between gap-6">
 						{heading}

@@ -85,11 +85,6 @@ export function Shell({
 
   return (
     <div className="relative min-h-screen overflow-hidden">
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 -z-10 section-grid-bg [mask-image:radial-gradient(ellipse_85%_75%_at_50%_20%,#000_55%,transparent_100%)]"
-      />
-
       <header
         className={`mx-auto flex ${
           wide ? "max-w-7xl" : "max-w-3xl"

@@ -94,11 +94,6 @@ export function FrontendPreviews() {
 			data-in-view={inView ? "true" : "false"}
 			className="relative py-20 overflow-hidden"
 		>
-			<div
-				aria-hidden="true"
-				className="absolute inset-0 -z-10 section-grid-bg [mask-image:radial-gradient(ellipse_85%_80%_at_50%_30%,#000_60%,transparent_100%)]"
-			/>
-
 			<div className="container mx-auto px-4">
 				<div className="max-w-2xl mx-auto text-center mb-12 space-y-3 in-view-anim in-view-anim-1">
 					<p className="text-base text-muted-foreground/80 font-[family-name:var(--font-caveat)] tracking-wide">

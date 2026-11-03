@@ -51,11 +51,6 @@ const ContactSection = () => {
 			data-in-view={inView ? "true" : "false"}
 			className="relative py-24 md:py-36 overflow-hidden"
 		>
-			<div
-				aria-hidden="true"
-				className="absolute inset-0 -z-10 section-grid-bg [mask-image:radial-gradient(ellipse_75%_70%_at_50%_50%,#000_55%,transparent_100%)]"
-			/>
-
 			<div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
 				{/* Kicker */}
 				<p className="in-view-anim in-view-anim-1 text-base text-muted-foreground/80 font-[family-name:var(--font-caveat)] tracking-wide">

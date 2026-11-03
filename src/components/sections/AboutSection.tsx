@@ -23,11 +23,6 @@ export function AboutSection() {
 			data-in-view={inView ? "true" : "false"}
 			className="relative py-20 overflow-hidden"
 		>
-			<div
-				aria-hidden="true"
-				className="absolute inset-0 -z-10 section-grid-bg [mask-image:radial-gradient(ellipse_80%_70%_at_50%_50%,#000_55%,transparent_100%)]"
-			/>
-
 			<div className="container mx-auto px-4">
 				<div className="grid md:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
 					<div className="space-y-6">

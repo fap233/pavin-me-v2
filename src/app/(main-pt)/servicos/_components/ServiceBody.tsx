@@ -111,10 +111,6 @@ export function ServiceBody({ service, cases }: Props) {
 				as="section"
 				className="relative overflow-hidden pt-28 pb-16 md:pt-36 md:pb-24"
 			>
-				<div
-					aria-hidden="true"
-					className="absolute inset-0 -z-10 section-grid-bg [mask-image:radial-gradient(ellipse_75%_70%_at_50%_30%,#000_50%,transparent_100%)]"
-				/>
 				<div className="container mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
 					<nav
 						aria-label={ui.breadcrumb}
@@ -213,10 +209,6 @@ export function ServiceBody({ service, cases }: Props) {
 				id="como-funciona"
 				className="relative overflow-hidden py-20 md:py-28 scroll-mt-24"
 			>
-				<div
-					aria-hidden="true"
-					className="absolute inset-0 -z-10 section-grid-bg [mask-image:radial-gradient(ellipse_75%_70%_at_50%_45%,#000_55%,transparent_100%)]"
-				/>
 				<div className="container mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
 					<div className="in-view-anim in-view-anim-1 max-w-2xl">
 						<p className={kickerCls}>{ui.stepsKicker}</p>
@@ -275,10 +267,6 @@ export function ServiceBody({ service, cases }: Props) {
 					as="section"
 					className="relative overflow-hidden py-20 md:py-28"
 				>
-					<div
-						aria-hidden="true"
-						className="absolute inset-0 -z-10 section-grid-bg [mask-image:radial-gradient(ellipse_75%_70%_at_50%_45%,#000_55%,transparent_100%)]"
-					/>
 					<div className="container mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
 						<div className="in-view-anim in-view-anim-1 max-w-2xl">
 							<p className={kickerCls}>{ui.casesKicker}</p>

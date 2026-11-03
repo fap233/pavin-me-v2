@@ -30,11 +30,6 @@ export function FaqSection() {
 			data-in-view={inView ? "true" : "false"}
 			className="relative py-20 md:py-28 overflow-hidden"
 		>
-			<div
-				aria-hidden="true"
-				className="absolute inset-0 -z-10 section-grid-bg [mask-image:radial-gradient(ellipse_75%_70%_at_50%_45%,#000_55%,transparent_100%)]"
-			/>
-
 			<div className="container mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
 				<div className="in-view-anim in-view-anim-1 max-w-2xl">
 					<p className="font-[family-name:var(--font-caveat)] text-base tracking-wide text-muted-foreground/80">
