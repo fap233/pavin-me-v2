@@ -125,12 +125,6 @@ export function CollabShell({ children }: { children: React.ReactNode }) {
   return (
     <WorkerContext.Provider value={worker}>
       <div className="relative min-h-screen overflow-hidden">
-        {/* Notebook grid over the site-wide universe background */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 -z-10 section-grid-bg [mask-image:radial-gradient(ellipse_85%_75%_at_50%_20%,#000_55%,transparent_100%)]"
-        />
-
         {/* Minimal workspace bar — this route lives outside the main site chrome */}
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 pt-6">
           <Link

@@ -131,11 +131,6 @@ export function ReviewsSection() {
 			data-in-view={inView ? "true" : "false"}
 			className="relative py-20 md:py-28 overflow-hidden"
 		>
-			<div
-				aria-hidden="true"
-				className="absolute inset-0 -z-10 section-grid-bg [mask-image:radial-gradient(ellipse_80%_70%_at_50%_40%,#000_55%,transparent_100%)]"
-			/>
-
 			<div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
 				<div className="mx-auto max-w-2xl text-center">
 					<p className="in-view-anim in-view-anim-1 font-[family-name:var(--font-caveat)] text-base tracking-wide text-muted-foreground/80">

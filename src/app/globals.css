@@ -172,21 +172,6 @@ body {
 	font-family: var(--font-sans), "Inter", sans-serif;
 }
 
-/* Reusable subtle notebook grid for non-Hero sections */
-.section-grid-bg {
-	background-image: linear-gradient(
-			to right,
-			oklch(0.55 0.02 280 / 0.08) 1px,
-			transparent 1px
-		),
-		linear-gradient(
-			to bottom,
-			oklch(0.55 0.02 280 / 0.08) 1px,
-			transparent 1px
-		);
-	background-size: 32px 32px;
-}
-
 /* Scroll-triggered entrance — initial state hidden, in-view brings it back */
 .in-view-anim {
 	opacity: 0;

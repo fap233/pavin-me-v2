@@ -99,11 +99,6 @@ export function CurrentWorkSection() {
 			data-in-view={inView ? "true" : "false"}
 			className="relative py-20 md:py-28 overflow-hidden"
 		>
-			<div
-				aria-hidden="true"
-				className="absolute inset-0 -z-10 section-grid-bg [mask-image:radial-gradient(ellipse_80%_70%_at_50%_40%,#000_55%,transparent_100%)]"
-			/>
-
 			<div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
 				<div className="flex flex-wrap items-end justify-between gap-6">
 					<div className="max-w-2xl space-y-3">

@@ -75,10 +75,6 @@ export function ServicesHub({ services, reviews }: Props) {
 				as="section"
 				className="relative overflow-hidden pt-28 pb-12 md:pt-36 md:pb-16"
 			>
-				<div
-					aria-hidden="true"
-					className="absolute inset-0 -z-10 section-grid-bg [mask-image:radial-gradient(ellipse_75%_70%_at_50%_30%,#000_50%,transparent_100%)]"
-				/>
 				<div className="container mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
 					<nav
 						aria-label={ui.breadcrumb}

@@ -97,11 +97,6 @@ export function CaseArticle({
 				} as React.CSSProperties
 			}
 		>
-			<div
-				aria-hidden="true"
-				className="absolute inset-0 -z-10 section-grid-bg [mask-image:radial-gradient(ellipse_75%_70%_at_50%_20%,#000_55%,transparent_100%)]"
-			/>
-
 			<div className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
 				<nav aria-label={c.breadcrumb} className="text-sm text-muted-foreground">
 					<ol className="flex flex-wrap items-center gap-2">
