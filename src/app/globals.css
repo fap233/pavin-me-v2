@@ -139,14 +139,6 @@ html {
 		@apply bg-background text-foreground;
 	}
 
-	.bg-grid-pattern {
-		background-color: oklch(var(--background));
-		background-image:
-			linear-gradient(to right, var(--grid-line-color) 1px, transparent 1px),
-			linear-gradient(to bottom, var(--grid-line-color) 1px, transparent 1px);
-		background-size: 25px 25px;
-	}
-
 	.bg-gradient-hero {
 		background: radial-gradient(
 			circle at 50% -20%,
@@ -1127,13 +1119,6 @@ html.lenis body {
 			color-mix(in oklab, var(--accent-to) 14%, transparent)
 		),
 		var(--secondary);
-	background-image: linear-gradient(
-			to right,
-			var(--grid-line-color) 1px,
-			transparent 1px
-		),
-		linear-gradient(to bottom, var(--grid-line-color) 1px, transparent 1px);
-	background-size: 24px 24px;
 }
 
 .project-title {

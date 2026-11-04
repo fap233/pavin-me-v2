@@ -15,9 +15,8 @@ export function HeroSection() {
 			id="hero"
 			className="relative pt-24 pb-16 md:pt-32 md:pb-32 overflow-hidden min-h-[92vh] flex flex-col justify-center select-none"
 		>
-			{/* Notebook grid over the site-wide animated background */}
+			{/* Brand glow over the site-wide animated background */}
 			<div className="absolute inset-0 -z-10 h-full w-full">
-				<div className="absolute h-full w-full bg-[linear-gradient(to_right,oklch(0.55_0.02_280_/_0.18)_1px,transparent_1px),linear-gradient(to_bottom,oklch(0.55_0.02_280_/_0.18)_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_70%_95%_at_50%_10%,#000_55%,transparent_100%)]"></div>
 				<div className="absolute -inset-x-8 top-0 h-[420px] m-auto rounded-full bg-gradient-to-r from-[var(--brand-from)]/20 via-[var(--brand-via)]/15 to-[var(--brand-to)]/20 opacity-60 blur-[120px]"></div>
 			</div>
 
