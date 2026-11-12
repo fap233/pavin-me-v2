@@ -10,8 +10,12 @@ import { Panel, SectionTitle } from "./States";
 
 export function Composer({
   onSend,
+  simulatedText = null,
 }: {
   onSend: (text: string) => Promise<{ ok: true } | { ok: false; message: string }>;
+  /** Só a simulação de /portal-exemplo: mostra um texto "sendo digitado" no
+   *  campo (somente leitura). Padrão null: o campo se comporta como sempre. */
+  simulatedText?: string | null;
 }) {
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
@@ -44,7 +48,8 @@ export function Composer({
 
       <form onSubmit={submit} className="mt-4 space-y-3">
         <textarea
-          value={text}
+          value={simulatedText ?? text}
+          readOnly={simulatedText !== null}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) submit(e);

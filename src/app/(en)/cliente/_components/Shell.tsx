@@ -19,6 +19,7 @@ export function Shell({
   label = "Portal do cliente",
   email,
   wide = false,
+  exemplo = false,
 }: {
   children: React.ReactNode;
   label?: string;
@@ -27,6 +28,9 @@ export function Shell({
    *  e nunca pede isto; quem pede é o back-office quando mostra o Kanban, que é
    *  um quadro de 4 colunas e não cabe na medida de ler. */
   wide?: boolean;
+  /** Página pública /portal-exemplo: nunca consulta o modo demonstração global
+   *  (sessionStorage/URL) nem mostra o selo dele. Padrão false: portal real igual. */
+  exemplo?: boolean;
 }) {
   const { isDarkMode, toggleDarkMode } = useTheme();
   const router = useRouter();
@@ -36,7 +40,9 @@ export function Shell({
   // Ler no primeiro render daria mismatch de hidratação; então só depois de
   // montar.
   const [mock, setMock] = useState(false);
-  useEffect(() => setMock(isMockMode()), []);
+  useEffect(() => {
+    if (!exemplo) setMock(isMockMode());
+  }, [exemplo]);
 
   const switchTheme = (event: React.MouseEvent) => {
     const doc = document as Document & {
